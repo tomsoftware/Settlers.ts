@@ -8,7 +8,6 @@ module Settlers {
 			this.value = new Int32Array(length);
 			this.length = new Int32Array(length);
 		}
-
 	}
 
     /**
@@ -25,6 +24,214 @@ module Settlers {
 			this.initTables();
 		}
 
+
+
+		public unpack(inDataSrc: BinaryReader, inOffset: number, inLenght: number, outLength: number): BinaryReader {
+
+			let inDate = new BitReader(inDataSrc, inOffset, inLenght);
+
+			let writer = new StreamWriter(outLength);
+
+			let huffmanTable = this.initHuffnamTable();
+			let codeQuantities = new Uint32Array(274);
+
+			let done = false;
+
+			let codeTable = this.initCharCodeTable();
+
+
+			while ((inDate.getBufferLength() >= 4) || (!inDate.eof())) {
+				//-------
+				//- read code type
+				let codeType = inDate.read(4);
+
+				if (codeType < 0) {
+					this.log.log("CodeType == 0 -> out of sync!");
+					break;
+				}
+
+				//-------
+				//- read Code Word
+				let codeWord = 0;
+				let codeWord_lenght = huffmanTable.length[codeType];
+				let codeWord_index = huffmanTable.value[codeType];
+
+				if (codeWord_lenght > 0) {
+					//- the codeword is bigger then 4 bits -> read more!
+					codeWord_index += inDate.read(codeWord_lenght);
+
+					if (codeWord_index >= 274) {
+						this.log.log("CodeType >= 274 -> out of sync!");
+						break;
+					}
+				}
+
+				codeWord = codeTable[codeWord_index];
+
+				//-------
+				//- Histogram of code using  
+				codeQuantities[codeWord]++;
+
+
+				//-------
+				//- execute codeword
+				if (codeWord < 256) {
+					if (writer.eof()) {
+						this.log.log("OutBuffer is to small!");
+						break;
+					}
+
+					//- this is a normal letter
+					writer.setByte(codeWord);
+				}
+				else if (codeWord == 272) {
+					//- create new entropy encoding table
+					this.createCodeTableFromQuantities(codeTable, codeQuantities);
+
+					let base = 0;
+					let length = 0;
+
+					for (let i = 0; i < 16; i++) {
+						length--;
+
+						let bitValue = 0;
+						do {
+							length++;
+							bitValue = inDate.read(1);
+						} while (bitValue == 0);
+
+						huffmanTable.value[i] = base;
+						huffmanTable.length[i] = length;
+
+						base += (1 << length);
+					}
+				}
+				else if (codeWord == 273) {
+					if (inDate.sourceLeftLength() > 2) {
+						//- sometimes there is a end-of-stream (eos) codeword (Codeword == 273) if the out data is "too" long.
+						if (writer.eof()) {
+							this.log.log("End-of-stream but Data buffer is not empty (" + inDate.sourceLeftLength() + " IN bytes left; " + writer.getLeftSize() + " i OUT bytes left)? Out of sync!");
+							break;
+						}
+
+						//-  in this case we ignore this eos and read the next part
+						inDate.resetBitBuffer();
+					}
+					else {
+						if (!writer.eof()) {
+							this.log.log("Done uncompress (" + inDate.sourceLeftLength() + " IN bytes left; " + writer.getLeftSize() + " OUT bytes left)!");
+						}
+
+						//- end of data indicator
+						done = true;
+						break;
+					}
+				}
+				else {
+					//- copy from dictionary
+					if (!this.fromDictionary(inDate, writer, codeWord)) {
+						break;
+					}
+				}
+			}
+
+
+			//- did an Error happen?
+			if (!done) {
+				this.log.log("Unexpected End of Data!");
+			}
+
+			//- create new Reader from Data and return it
+			return writer.getReader();
+		}
+
+
+
+		private fromDictionary(inDate: BitReader, writer: StreamWriter, codeword: number): boolean {
+			let entryLenght:number;
+			let bitValue:number;
+			let copyOffset = 0;
+
+
+			if (codeword < 264) {
+				entryLenght = codeword - 256;
+			}
+			else {
+				let length = this.tab1.length[codeword - 264];
+
+				let ReadInByte = inDate.read(length);
+
+
+				if (ReadInByte < 0) {
+					this.log.log("ReadInByte == 0 -> out of sync!");
+					return false;
+				}
+
+				entryLenght = this.tab1.value[codeword - 264] + ReadInByte;
+			}
+
+
+			bitValue = inDate.read(3);
+			if (bitValue < 0) {
+				this.log.log("bitValue < 0 -> out of sync!");
+				return false;
+			}
+
+			let length = this.tab0.length[bitValue] + 1;
+			let baseValue = this.tab0.value[bitValue];
+
+
+			bitValue = inDate.read(8);
+			copyOffset = bitValue << length;
+
+
+
+			bitValue = inDate.read(length);
+			if (bitValue < 0) {
+				this.log.log("bit_value < 0 -> out of sync!");
+				return false;
+			}
+
+
+			entryLenght += 4;
+
+			//- check if destination is big enough:
+			if (writer.getWriteOffset() + entryLenght > writer.getLength()) {
+				this.log.log("buffer for outData is to small!");
+				return false;
+			}
+
+			//- source position in buffer
+			let srcPos = writer.getWriteOffset() - ((bitValue | copyOffset) + (baseValue << 9));
+
+			//- we need to use single-byte-copy the data case, the src and dest can be overlaped
+			for (let i = entryLenght; i > 0; i--) {
+				writer.setByte(writer.getByte(srcPos));
+				srcPos++;
+			}
+
+			return true;
+		}
+
+
+
+		private initTables() {
+
+			//-- tab0
+			this.tab0.length[0] = 0;
+			this.tab0.value[0] = 0;
+
+			for (let i = 1; i < 8; i++) {
+				this.tab0.length[i] = i - 1;
+				this.tab0.value[i] = 1 << (i - 1);
+			}
+
+			//-- tab1
+			for (let i = 0; i < 8; i++) {
+				this.tab1.length[i] = i + 1;
+				this.tab1.value[i] = (1 << (i + 1)) + 6;
+			}
+		}
 
 
 		private createCodeTableFromQuantities(codes: Uint16Array, quantities: Uint32Array) {
@@ -88,221 +295,9 @@ module Settlers {
 
 			} while (stepSize > 0);
 
-
 		}
 
 
-
-		public unpack(inDataSrc: BinaryReader, inOffset: number, inLenght: number, outLength: number): BinaryReader {
-
-			let inDate = new BitReader(inDataSrc, inOffset, inLenght);
-
-			let outData = new Uint8Array(outLength);
-			let outDataPos = 0;
-			let huffmanTable = this.initHuffnamTable();
-			let codeQuantities = new Uint32Array(274);
-
-			let done = false;
-
-			let codeTable = this.initCharCodeTable();
-
-
-			while ((inDate.getBufferLength() >= 4) || (!inDate.eof())) {
-				//-------
-				//- read code type
-				let codeType = inDate.read(4);
-
-				if (codeType < 0) {
-					this.log.log("CodeType == 0 -> out of sync!");
-					break;
-				}
-
-				//-------
-				//- read Code Word
-				let codeWord = 0;
-				let codeWord_lenght = huffmanTable.length[codeType];
-				let codeWord_index = huffmanTable.value[codeType];
-
-				if (codeWord_lenght > 0) {
-					//- the codeword is bigger then 4 bits -> read more!
-					codeWord_index += inDate.read(codeWord_lenght);
-
-					if (codeWord_index >= 274) {
-						this.log.log("CodeType >= 274 -> out of sync!");
-						break;
-					}
-				}
-
-				codeWord = codeTable[codeWord_index];
-
-				//-------
-				//- Histogram of code using  
-				codeQuantities[codeWord]++;
-
-
-				//-------
-				//- execute codeword
-				if (codeWord < 256) {
-					if (outDataPos >= outLength) {
-						this.log.log("OutBuffer is to small!");
-						break;
-					}
-
-					//- this is a normal letter
-					outData[outDataPos] = codeWord;
-					outDataPos++;
-				}
-				else if (codeWord == 272) {
-					//- create new entropy encoding table
-					this.createCodeTableFromQuantities(codeTable, codeQuantities);
-
-					let base = 0;
-					let length = 0;
-
-					for (let i = 0; i < 16; i++) {
-						length--;
-
-						let bitValue = 0;
-						do {
-							length++;
-							bitValue = inDate.read(1);
-						} while (bitValue == 0);
-
-						huffmanTable.value[i] = base;
-						huffmanTable.length[i] = length;
-
-						base += (1 << length);
-					}
-				}
-				else if (codeWord == 273) {
-					if (inDate.sourceLeftLength() > 2) {
-						//- sometimes there is a end-of-stream (eos) codeword (Codeword == 273) if the out data is "too" long.
-						if (outLength <= outDataPos) {
-							this.log.log("End-of-stream but Data buffer is not empty (" + inDate.sourceLeftLength() + " IN bytes left; " + (outLength - outDataPos) + " i OUT bytes left)? Out of sync!");
-							break;
-						}
-
-						//-  in this case we ignore this eos and read the next part
-						inDate.resetBitBuffer();
-					}
-					else {
-						if (outLength != outDataPos) {
-							this.log.log("Done uncompress (" + inDate.sourceLeftLength() + " IN bytes left; " + (outLength - outDataPos) + " OUT bytes left)!");
-						}
-
-						//- end of data indicator
-						done = true;
-						break;
-					}
-				}
-				else {
-					//- copy from dictionary
-					if (!this.fromDictionary(inDate, outData, outDataPos, outLength, codeWord)) {
-						break;
-					}
-				}
-			}
-
-
-			//- did an Error happen?
-			if (!done) {
-				this.log.log("Unexpected End of Data!");
-			}
-
-			//- create new Reader from Data and return it
-			return new BinaryReader(outData);
-		}
-
-
-
-		private fromDictionary(inDate: BitReader, outData: Uint8Array, outDataPos: number, outLength: number, codeword: number): boolean {
-			let entryLenght:number;
-			let bitValue:number;
-			let copyOffset = 0;
-
-
-			if (codeword < 264) {
-				entryLenght = codeword - 256;
-			}
-			else {
-				let length = this.tab1.length[codeword - 264];
-
-				let ReadInByte = inDate.read(length);
-
-
-				if (ReadInByte < 0) {
-					this.log.log("ReadInByte == 0 -> out of sync!");
-					return false;
-				}
-
-				entryLenght = this.tab1.value[codeword - 264] + ReadInByte;
-			}
-
-
-			bitValue = inDate.read(3);
-			if (bitValue < 0) {
-				this.log.log("bitValue < 0 -> out of sync!");
-				return false;
-			}
-
-			let length = this.tab0.length[bitValue] + 1;
-			let baseValue = this.tab0.value[bitValue];
-
-
-			bitValue = inDate.read(8);
-			copyOffset = bitValue << length;
-
-
-
-			bitValue = inDate.read(length);
-			if (bitValue < 0) {
-				this.log.log("bit_value < 0 -> out of sync!");
-				return false;
-			}
-
-
-			entryLenght += 4;
-
-			//- check if destination is big enough:
-			if (outDataPos + entryLenght > outLength) {
-				this.log.log("buffer for outData is to small!");
-				return false;
-			}
-
-			//- source position in buffer
-			let srcPos = (bitValue | copyOffset) + (baseValue << 9);
-
-			//- we need to use single-byte-copy the data case, the src and dest can be overlaped
-			for (let i = entryLenght; i > 0; i--) {
-				outData[outDataPos] = outData[srcPos];
-				outDataPos++;
-				srcPos++;
-			}
-
-			return true;
-		}
-
-
-
-		private initTables() {
-
-			//-- tab0
-			this.tab0.length[0] = 0;
-			this.tab0.value[0] = 0;
-
-			for (let i = 1; i < 8; i++) {
-				this.tab0.length[i] = i - 1;
-				this.tab0.value[i] = 1 << (i - 1);
-			}
-
-			//-- tab1
-			for (let i = 0; i < 8; i++) {
-				this.tab1.length[i] = i + 1;
-				this.tab1.value[i] = (1 << (i + 1)) + 6;
-			}
-
-
-		}
 
 		private initHuffnamTable(): ValueBase {
 			let table = new ValueBase(16);

@@ -55,7 +55,7 @@ module Settlers {
             while(offset > 0) {
                 
                 let newSection = new MapSection();
-                if (newSection.readFromFile(data, offset) == null) {
+                if (!newSection.readFromFile(data, offset)) {
                     return;
                 }
 
