@@ -11,9 +11,7 @@ module Settlers {
     public pos: number;
 
 
-    constructor(dataArray?: BinaryReader | Uint8Array | ArrayBuffer | Blob, offset: number = 0, length?: number, filename: string = "[unknown]") {
-
-      this.filename = filename;
+    constructor(dataArray?: BinaryReader | Uint8Array | ArrayBuffer | Blob, offset: number = 0, length?: number, filename: string = null) {
 
       if (offset == null) {
         offset = 0;
@@ -24,29 +22,24 @@ module Settlers {
       if (dataArray == null) {
         this.data = new Uint8Array(0);
         dataLenght = 0;
-        //this.log.log("BinaryReader from NULL; size:"+ 0);
-
       } else if (dataArray instanceof BinaryReader) {
         //- if dataArray is BinaryReader use there data
         this.data = dataArray.data;
         dataLenght = dataArray.length;
-        //this.log.log("BinaryReader from BinaryReader; size:"+ dataLenght);
-
+        if (!filename) {
+          filename = dataArray.filename;
+        }
       } else if (dataArray instanceof Uint8Array) {
         this.data = dataArray;
         dataLenght = dataArray.byteLength;
-        //this.log.log("BinaryReader from Uint8Array; size:"+ dataLenght);
-
       }
       else if (dataArray instanceof ArrayBuffer) {
         this.data = new Uint8Array(dataArray);
         dataLenght = dataArray.byteLength;
-        //this.log.log("BinaryReader from ArrayBuffer; size:"+ dataLenght);
       }
       else if (dataArray instanceof Blob) {
         this.data = new Uint8Array(<any>dataArray);
         dataLenght = this.data.byteLength;
-        //this.log.log("BinaryReader from Blob; size:"+ dataLenght);
       }
       else {
         this.data = dataArray;
@@ -59,6 +52,8 @@ module Settlers {
       this.hiddenOffset = offset;
       this.length = length;
       this.pos = this.hiddenOffset;
+
+      this.filename = (filename) ? filename : "[Unknown]";
 
     }
 
@@ -159,7 +154,7 @@ module Settlers {
 
       let result = "";
 
-      while(this.pos < this.length) {
+      while (this.pos < this.length) {
         let v: number = this.data[this.pos];
         this.pos++;
         if (v == 0) {

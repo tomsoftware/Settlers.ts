@@ -14,20 +14,25 @@ module Settlers {
         /** load a new game/level */
         public load(sourcePath: string) {
             let fileProvider = new FileProvider(this.rootPath);
-/*
-            fileProvider.loadBinary(sourcePath).then((b) => {
-                let m = new MapFile(b);
-            });
-*/
+            /*
+                        fileProvider.loadBinary(sourcePath).then((b) => {
+                            let m = new MapFile(b);
+                        });
+            */
             fileProvider.loadBinary("Siedler4/game.lib").then((b) => {
                 let r = new LibFileReader(b);
 
-                let fileInfo = r.getFileInfo("Config", "AINames.cfg");
-                let file = fileInfo.getFileReader();
-                let c1 = ChecksumCalculator.calc(file);
-                let c2 = fileInfo.checksum;
+                let fileInfo = r.getFileInfo("GameData", "buildingInfo.xml");
 
-                console.log(file.readString());
+                if (!fileInfo.checkChecksum()) {
+                    this.log.log("Checksumm missmatch!");
+                }
+
+                alert("OK?");
+                let reader = fileInfo.getReader();
+                
+               console.log(reader.readString());
+               alert("OK!");
             });
         };
 

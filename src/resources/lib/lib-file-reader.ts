@@ -5,7 +5,7 @@ module Settlers {
     export class LibFileReader {
         private log: LogHandler = new LogHandler("LibFileReader");
         private fileInfos: LibFileItem[];
-        private pathNames: string[];
+        private pathList: PathList;
         private reader: BinaryReader
 
         constructor(data: BinaryReader) {
@@ -37,12 +37,10 @@ module Settlers {
 
             let info = this.fileInfos[fileIndex];
 
-            if ((info.pathIndex < 0) || (info.pathIndex >= this.pathNames.length)) {
-                return "/??/" + info.fileName;
-            }
-
-            return this.pathNames[info.pathIndex] + "/" + info.fileName;
+            return this.pathList.getPath(info.pathIndex) + "/" + info.fileName;
         }
+
+
 
 
         /** return the data for a given file */
@@ -50,6 +48,7 @@ module Settlers {
             let index = this.getFileIndexFromFileName(pathName, fileName);
             if (index < 0) {
                 this.log.log("File not found: " + pathName + " / " + fileName);
+                return null;
             }
 
             return this.fileInfos[index];
@@ -57,7 +56,7 @@ module Settlers {
 
         /** find the index in this.fileInfos for a given path / file name*/
         private getFileIndexFromFileName(pathName: string, filename: string): number {
-            let pathIndex = this.findPathIndex(pathName);
+            let pathIndex = this.pathList.findPathIndex(pathName);
             if (pathIndex < 0) {
                 return -1;
             }
@@ -73,18 +72,6 @@ module Settlers {
         }
 
 
-        /** find the index in this.pathNames for a given pathName */
-        private findPathIndex(pathName: string): number {
-            let path = pathName.toUpperCase().split("/").join("\\");
-
-            for (let i = 0; i < this.pathNames.length; i++) {
-                if (this.pathNames[i].toUpperCase() == path) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
 
         /** read the meta data of the file */
         private processFile(data: BinaryReader) {
@@ -98,8 +85,8 @@ module Settlers {
 
             this.log.debug("Header-Info: " + header);
 
-            this.pathNames = header.getPathes();
-            this.fileInfos = header.getItems();
+            this.pathList = header.getPathList();
+            this.fileInfos = header.getFileInfo();
 
             for (let i = 0; i < this.fileInfos.length; i++) {
                 console.log("" + this.fileInfos[i]);

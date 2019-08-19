@@ -21,7 +21,7 @@ module Settlers {
 
         public fileInfoOffset: number = 0;
 
-        private pathes:string[];
+        private pathList:PathList;
 
         constructor(data: BinaryReader, offset: number) {
             this.reader = new BinaryReader(data);
@@ -32,15 +32,15 @@ module Settlers {
         }
 
 
-        public getPathes(): string[] {
-            if (!(this.pathes)) {
-                this.pathes = this.readFileNames(this.reader, this.pathNameListOffset, this.pathNameCount);
+        public getPathList(): PathList {
+            if (!(this.pathList)) {
+                this.pathList = new PathList(this.readFileNames(this.reader, this.pathNameListOffset, this.pathNameCount));
             }
-            return this.pathes;
+            return this.pathList;
         }
 
 
-        public getItems(): LibFileItem[] {
+        public getFileInfo(): LibFileItem[] {
             let count = this.fileNameCount;
 
             let result = new Array<LibFileItem>(count);
@@ -49,7 +49,7 @@ module Settlers {
 
             this.reader.setOffset(this.fileInfoOffset);
 
-            let pathNames = this.getPathes();
+            let pathNames = this.getPathList();
 
             for (let i = 0; i < count; i++) {
                 result[i] = new LibFileItem();
