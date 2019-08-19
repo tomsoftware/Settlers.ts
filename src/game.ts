@@ -13,12 +13,22 @@ module Settlers {
 
         /** load a new game/level */
         public load(sourcePath: string) {
-            let file = new FileProvider(this.rootPath);
-
-            file.loadBinary(sourcePath).then((b) => {
+            let fileProvider = new FileProvider(this.rootPath);
+/*
+            fileProvider.loadBinary(sourcePath).then((b) => {
                 let m = new MapFile(b);
-            }
-            );
+            });
+*/
+            fileProvider.loadBinary("Siedler4/game.lib").then((b) => {
+                let r = new LibFileReader(b);
+
+                let fileInfo = r.getFileInfo("Config", "AINames.cfg");
+                let file = fileInfo.getFileReader();
+                let c1 = ChecksumCalculator.calc(file);
+                let c2 = fileInfo.checksum;
+
+                console.log(file.readString());
+            });
         };
 
     }

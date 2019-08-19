@@ -152,6 +152,26 @@ module Settlers {
 
 
     /** Read a String */
+    public readNullString(offset?: number): string {
+      if (offset != null) {
+        this.pos = offset + this.hiddenOffset;
+      }
+
+      let result = "";
+
+      while(this.pos < this.length) {
+        let v: number = this.data[this.pos];
+        this.pos++;
+        if (v == 0) {
+          return result;
+        }
+        result += String.fromCharCode(v);
+      }
+
+      return "";
+    }
+
+    /** Read a String */
     public readString(length?: number, offset?: number): string {
 
       if (offset != null) {
