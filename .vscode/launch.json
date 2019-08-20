@@ -8,20 +8,21 @@
           "url": "http://localhost:8888/settlers.html",
           "webRoot": "${workspaceRoot}\\run\\"
       },
-      {
-          "name": "Launch localhost",
+	  {
+          "name": "Launch localhost - map debug",
           "type": "chrome",
           "request": "launch",
           "sourceMaps": true,
-          "url": "http://localhost/settlers.ts/run/settlers.php#0,0,0",
+          "url": "http://localhost/settlers.ts/run/show_map.php",
           "webRoot": "${workspaceRoot}/run"
       },
       {
-            "name": "Launch index.html (disable sourcemaps)",
-            "type": "chrome",
-            "request": "launch",
-            "sourceMaps": false,
-          "url": "http://localhost/settlers.ts/run/settlers.php"
-        }
+          "name": "Launch localhost - lib file debug",
+          "type": "chrome",
+          "request": "launch",
+          "sourceMaps": true,
+          "url": "http://localhost/settlers.ts/run/show_libfile.php",
+          "webRoot": "${workspaceRoot}/run"
+      }
   ]
 }

@@ -16,7 +16,7 @@ module Settlers {
 
 
         public getFileCount() {
-            return this.fileInfos.length;
+            return (this.fileInfos) ? this.fileInfos.length : 0;
         }
 
         /** return the checksum for a given file index */
@@ -41,17 +41,20 @@ module Settlers {
         }
 
 
-
+        /** return the data for a given file */
+        public getFileInfo(fileIndex:number): LibFileItem {
+            return this.fileInfos[fileIndex]; 
+        }
 
         /** return the data for a given file */
-        public getFileInfo(pathName: string, fileName: string): LibFileItem {
+        public getFileInfoByFileName(pathName: string, fileName: string): LibFileItem {
             let index = this.getFileIndexFromFileName(pathName, fileName);
             if (index < 0) {
                 this.log.log("File not found: " + pathName + " / " + fileName);
                 return null;
             }
 
-            return this.fileInfos[index];
+            return this.getFileInfo(index);
         }
 
         /** find the index in this.fileInfos for a given path / file name*/

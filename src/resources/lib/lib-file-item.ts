@@ -9,7 +9,7 @@ module Settlers {
 
         public offset: number = 0;
 
-        public lenght: number = 0;
+        public length: number = 0;
         public decompressedLength: number = 0;
 
         public pathIndex: number = 0;
@@ -29,7 +29,7 @@ module Settlers {
             this.fileName = fileName;
 
             this.offset = data.readIntBE();
-            this.lenght = data.readIntBE();
+            this.length = data.readIntBE();
             this.decompressedLength = data.readIntBE();
             this.pathIndex = data.readWordBE();
             this.unknown = data.readWordBE();
@@ -48,7 +48,7 @@ module Settlers {
 
 
         public checkChecksum(): boolean {
-            let c1 = ChecksumCalculator.calc(this.reader, this.offset, this.lenght);
+            let c1 = ChecksumCalculator.calc(this.reader, this.offset, this.length);
             return (c1 == this.checksum);
         }
 
@@ -59,11 +59,11 @@ module Settlers {
             let fullName = this.reader.filename + "/" + this.getFullName();
 
             if (!this.isCompressed) {
-                return new BinaryReader(this.reader, this.offset, this.lenght, fullName);
+                return new BinaryReader(this.reader, this.offset, this.length, fullName);
             }
             else {
                 let uncompress = new Uncompress();
-                let reader = uncompress.unpack(this.reader, this.offset, this.lenght, this.decompressedLength);
+                let reader = uncompress.unpack(this.reader, this.offset, this.length, this.decompressedLength);
                 reader.filename = fullName;
 
                 return reader;
@@ -72,7 +72,7 @@ module Settlers {
 
         public toString(): string {
             return "Name: " + this.getFullName() + ";  PathId: " + this.pathIndex + ";  Offset: " + this.offset
-                + ";  Lenght: " + this.lenght + ";  DecompressedLength: " + this.decompressedLength
+                + ";  Length: " + this.length + ";  DecompressedLength: " + this.decompressedLength
                 + ";  isCompressed: " + this.isCompressed + ";  Checksum: " + this.checksum + ";  Unknown: " + this.unknown;
         }
 

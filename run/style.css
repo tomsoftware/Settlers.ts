@@ -1,0 +1,20 @@
+.PixelatedRendering {
+	border: 0px;
+}
+
+.fullsize {
+	width:95%;
+	margin:10px 10px 10px;
+}
+
+#fileContent {
+	height:300px;
+	overflow:scroll;
+	border: 1px solid black;
+}
+
+#fileInfoText {
+	word-wrap: break-word;
+	white-space: pre-wrap; 
+	border: 1px solid black;
+}

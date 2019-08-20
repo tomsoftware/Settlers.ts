@@ -2,8 +2,9 @@ module Settlers {
 
     /** provides information about a section in a map file */
     export class MapSection {
-        public sourceLength:number;
-        public sourceOffset:number;
+
+        public length:number;
+        public offset:number;
 
         public sectionType:MapSectionType;
         public unpackedLength:number;
@@ -11,18 +12,24 @@ module Settlers {
         public unknown1:number;
         public unknown2:number;
 
-        private data: BinaryReader;
+        private reader: BinaryReader;
 
         public getReader() : BinaryReader {
             let c = new Uncompress();
-            return c.unpack(this.data, this.sourceOffset, this.sourceLength, this.unpackedLength);
+            return c.unpack(this.reader, this.offset, this.length, this.unpackedLength);
         }
 
 
         /** return the position of the next section header in the file */
         public calcNextSectionOffset():number {                
-            return this.sourceOffset + this.sourceLength;
+            return this.offset + this.length;
         }
+
+        public checkChecksum(): boolean {
+            let c1 = ChecksumCalculator.calc(this.reader, this.offset, this.length);
+            return (c1 == this.checksum);
+        }
+
 
         /** read the header of a section */
         public readFromFile(data: BinaryReader, offset:number):boolean {
@@ -33,12 +40,12 @@ module Settlers {
                 return false;
             }
 
-            this.data = data;
-            this.sourceOffset = SectionHeaderSize + offset;
+            this.reader = data;
+            this.offset = SectionHeaderSize + offset;
 
             /// all sections have a type and a length... also the "end of file" section
             this.sectionType = plainData.readIntBE();
-            this.sourceLength = plainData.readIntBE();
+            this.length = plainData.readIntBE();
 
             if (this.sectionType == 0) {
                 /// this is the "end of file" section
@@ -55,7 +62,8 @@ module Settlers {
 
 
         public toString(): string {
-            return "Section @ "+ this.sourceOffset +", size: "+ this.unpackedLength +"; Type="+ this.sectionType +"; checksum="+ this.checksum +", unknown1="+ this.unknown1 +", unknown2="+ this.unknown2;
+            return "Section @ "+ this.offset +", size: "+ this.unpackedLength +"; Type="+ this.sectionType +"; checksum="
+            + this.checksum +", unknown1="+ this.unknown1 +", unknown2="+ this.unknown2;
         }
 
 	}

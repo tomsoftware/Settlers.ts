@@ -64,7 +64,7 @@ module Settlers {
 
             const HeaderSize = 6 * 4;
 
-            if (data.length < offset + HeaderSize) {
+            if ((offset < 0) || (data.length < offset + HeaderSize)) {
                 this.log.log("Unable to process LibFileHeader of " + data.filename + " - wrong offset");
                 return;
             }
