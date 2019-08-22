@@ -3,30 +3,14 @@ module Settlers {
     /** provides an game object to controle the game */
     export class MapView {
 
+        public elements: ElementProvider  = new ElementProvider();
         private log: LogHandler = new LogHandler("MapView");
         private rootPath: string;
-
-        private listElement: HTMLSelectElement;
-        private sectionContentElement : HTMLElement;
-        private sectionInfoElement: HTMLElement;
-
         private mapFile: MapFile;
         
 
         constructor(rootPath: string) {
             this.rootPath = rootPath;
-        }
-
-        public setSectionListElement(listElement: HTMLSelectElement) {
-            this.listElement = listElement;
-        }
-
-        public setSectionContentElement(textElement: HTMLElement) {
-            this.sectionContentElement = textElement;
-        }
-
-        public setSectionInfoElement(infoElement: HTMLElement) {
-            this.sectionInfoElement = infoElement;
         }
 
         public showSection(sectionIndex:string) {
@@ -39,8 +23,18 @@ module Settlers {
                 this.log.log("Checksumm missmatch!");
             }
 
-            this.sectionContentElement.innerText = section.getReader().readString();
-            this.sectionInfoElement.innerText = infoText;
+            let data = section.getReader();
+            let content:string = "";
+
+            if (this.elements.get<HTMLInputElement>("showHexView").checked){
+                content = new HexView(data).toString();
+            }
+            else {
+                content = data.readString();
+            }
+
+            this.elements.get<HTMLElement>("Content").innerText = content;
+            this.elements.get<HTMLElement>("info").innerText =  infoText;
         }
 
         private clearOptions(selectbox:HTMLSelectElement){
@@ -51,14 +45,16 @@ module Settlers {
 
 
         private fillSectionList(map: MapFile) {
-            this.clearOptions(this.listElement);
-            this.listElement.add(new Option("-- select section --"));
+            let list = this.elements.get<HTMLSelectElement>("list");
+
+            this.clearOptions(list);
+            list.add(new Option("-- select section --"));
 
             let count = map.getSectionCount();
             for (let i=0; i<count; i++ ){
                 let section = map.getSection(i);
 
-                this.listElement.add(new Option(section.sectionType +" . . . . . . [size: "+ section.unpackedLength +"]", i +""));
+                list.add(new Option(section.sectionType +" . . . . . . [size: "+ section.unpackedLength +"]", i +""));
             }
         }
 

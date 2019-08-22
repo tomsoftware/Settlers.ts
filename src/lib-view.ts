@@ -3,29 +3,13 @@ module Settlers {
     /** View for debugging the lib files */
     export class LibView {
 
+        public elements: ElementProvider  = new ElementProvider();
         private log: LogHandler = new LogHandler("LibView");
         private rootPath: string;
-
-        private listElement: HTMLSelectElement;
-        private fileContentElement : HTMLElement;
-        private fileInfoElement: HTMLElement;
         private libReader: LibFileReader;
-        
 
         constructor(rootPath: string) {
             this.rootPath = rootPath;
-        }
-
-        public setFileListElement(listElement: HTMLSelectElement) {
-            this.listElement = listElement;
-        }
-
-        public setFileContentElement(textElement: HTMLElement) {
-            this.fileContentElement = textElement;
-        }
-
-        public setFileInfoElement(infoElement: HTMLElement) {
-            this.fileInfoElement = infoElement;
         }
 
         private clearOptions(selectbox:HTMLSelectElement){
@@ -33,6 +17,7 @@ module Settlers {
                 selectbox.remove(i);
             }
         }
+
 
         public showLibFile(fileIndex:string) {
             let fileInfo = this.libReader.getFileInfo(parseInt(fileIndex));
@@ -46,13 +31,14 @@ module Settlers {
 
             let reader = fileInfo.getReader();
 
-            this.fileInfoElement.innerText = infoText;
-            this.fileContentElement.innerText = reader.readString();
+            this.elements.get<HTMLElement>("info").innerText = infoText;
+            this.elements.get<HTMLElement>("Content").innerText = reader.readString();
         }
 
         private fillUiList(libReader: LibFileReader) {
-            this.clearOptions(this.listElement);
-            this.listElement.add(new Option("-- select file --"));
+            let list = this.elements.get<HTMLSelectElement>("list");
+            this.clearOptions(list);
+            list.add(new Option("-- select file --"));
             
             let l = libReader.getFileCount();
 
@@ -60,7 +46,7 @@ module Settlers {
                 let fileInfo = libReader.getFileInfo(i);
                 
                 let item = new Option(fileInfo.getFullName() + " . . . . . . . . . . . . ["+ fileInfo.decompressedLength +"]", ""+ i);
-                this.listElement.options.add(item);
+                list.options.add(item);
             }
         }
 

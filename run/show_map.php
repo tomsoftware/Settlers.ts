@@ -15,16 +15,15 @@
     var mapView = new Settlers.MapView("./");
 
     function init() {
-       	mapView.setSectionListElement(document.getElementById("selectSection"));
-		mapView.setSectionContentElement(document.getElementById("sectionContent"));
-		mapView.setSectionInfoElement(document.getElementById("sectionInfoText"));
-		
-		
+        mapView.elements.register("List", "selectSection");
+        mapView.elements.register("content", "sectionContent");
+        mapView.elements.register("info", "sectionInfoText");
+        mapView.elements.register("showHexView", "sectionShowHexView");
     }
 
-	function loadMap(mapFileName) {
-		mapView.load(mapFileName);
-	}
+    function loadMap(mapFileName) {
+        mapView.load(mapFileName);
+    }
 	
 	
     </script>
@@ -45,6 +44,7 @@
 
 	<pre id="sectionInfoText" class="fullsize" >[no section selected]</pre>
 
+  <label><input type="checkbox" value="1" id="sectionShowHexView" />Show Hex View</label>
 	<pre id="sectionContent" class="fullsize" ></pre>
   
   

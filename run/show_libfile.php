@@ -15,9 +15,9 @@
 	var libView = new Settlers.LibView("./");
 
     function init() {
-       	libView.setFileListElement(document.getElementById("selectLibFile"));
-		libView.setFileContentElement(document.getElementById("fileContent"));
-		libView.setFileInfoElement(document.getElementById("fileInfoText"));
+		libView.elements.register("List", "selectLibFile");
+        libView.elements.register("content", "fileContent");
+		libView.elements.register("info", "fileInfoText");
     }
 
 	function loadLib(libFileName) {
