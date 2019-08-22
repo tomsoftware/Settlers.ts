@@ -1,5 +1,12 @@
 module Settlers {
 
+    enum MapFileSourceType {
+        Unknown,
+        GameMap,
+        EditorMap,
+        SaveGame
+    };
+
     /** provides access to a settlers map file (save game or map) */
     export class MapFile {
 
@@ -7,7 +14,9 @@ module Settlers {
         private checksum: number;
         private mapFileVersion: MapFileVersion;
 
-        private mapSections: MapSection[] = [];
+        private mapChunks: MapChunk[] = [];
+
+        private mapFileSourceType: MapFileSourceType = MapFileSourceType.Unknown;
 
         constructor(data: BinaryReader) {
             this.processFile(data);
@@ -15,20 +24,57 @@ module Settlers {
 
 
         public getSectionCount() {
-            return this.mapSections.length;
+            return this.mapChunks.length;
         }
 
-        public getSection(index:number) {
-            return this.mapSections[index];
+        /** return a section by it's index */
+        public getChunkByIndex(index:number) {
+            return this.mapChunks[index];
         }
 
+        /** return a section by it's type */
+        public getChunkByType(type:MapChunkType) {
+            let s = this.mapChunks;
+            for(let i=0; i<s.length; i++){
+                if(s[i].chunkType == type) {
+                    return s[i];
+                }
+            }
+            return null;
+        }
 
-        private processFile(data: BinaryReader) {
+        /** Factory the correct map loader */
+        public getMapLoader() {
+            if (this.mapFileSourceType == MapFileSourceType.GameMap) {
+                return new LoadGameMap(this);
+            } else if (this.mapFileSourceType == MapFileSourceType.SaveGame) {
+                return new LoadSaveGameMap(this);
+            }
+            else {
+                return null;
+            }
+        }
 
-            let dataStartOffset = 6656;
-
+        private processFile(data: BinaryReader):boolean {
+            
             /// settler4 savegames are prefixed by a windows executable
-            if ((data.length > dataStartOffset) && (data.readString(4, 0) != "MZ\x90\x00")) {
+            if ((data.length < 100)) {
+                this.log.log("Not a Settlers save game: " + data.filename);
+                return false;
+            }
+            
+            let dataStartOffset;
+            if (data.readString(4, 0) == "MZ\x90\x00") {
+                /// settler4 savegames are prefixed by a windows executable
+                this.mapFileSourceType = MapFileSourceType.SaveGame;
+                dataStartOffset = 6656;
+            } else {
+                this.mapFileSourceType = MapFileSourceType.GameMap;
+                dataStartOffset = 0;
+            }
+
+            
+            if ((data.length <= dataStartOffset + 8)) {
                 this.log.log("Not a Settlers save game: " + data.filename);
             }
 
@@ -63,14 +109,14 @@ module Settlers {
 
             while (offset > 0) {
 
-                let newSection = new MapSection();
+                let newSection = new MapChunk();
                 if (!newSection.readFromFile(data, offset)) {
                     return;
                 }
 
-                this.mapSections.push(newSection);
+                this.mapChunks.push(newSection);
 
-                offset = newSection.calcNextSectionOffset();
+                offset = newSection.calcNextChunkOffset();
             }
 
         }

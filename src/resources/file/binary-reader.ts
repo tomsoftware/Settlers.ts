@@ -118,6 +118,11 @@ module Settlers {
 
       if (offset == null) offset = this.pos;
 
+      if ((this.pos < 0) || (this.pos + 4 > this.data.length)) {
+        this.log.log("read out of data: " + this.filename + " - size: " + this.data.length + " @ " + this.pos);
+        return 0;
+      }
+
       let v: number = (this.data[offset]) | (this.data[offset + 1] << 8) | (this.data[offset + 2] << 16) | (this.data[offset + 3] << 24);
       this.pos = offset + 4;
 

@@ -25,7 +25,7 @@ module Settlers {
                 let char = source.readByte();
 
                 lineHex += (char < 16 ? "0" : "") + char.toString(16) +" ";
-                lineLetters += String.fromCharCode(char);
+                lineLetters += (char < 16) ? "" : String.fromCharCode(char);
                 length++;
 
                 if (length > 32) {

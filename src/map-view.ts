@@ -14,7 +14,7 @@ module Settlers {
         }
 
         public showSection(sectionIndex:string) {
-            let section = this.mapFile.getSection(parseInt(sectionIndex));
+            let section = this.mapFile.getChunkByIndex(parseInt(sectionIndex));
 
             let infoText = section.toString();
 
@@ -37,24 +37,23 @@ module Settlers {
             this.elements.get<HTMLElement>("info").innerText =  infoText;
         }
 
-        private clearOptions(selectbox:HTMLSelectElement){
-            for(let i = selectbox.options.length - 1 ; i >= 0 ; i--) {
-                selectbox.remove(i);
-            }
-        }
+
+
 
 
         private fillSectionList(map: MapFile) {
             let list = this.elements.get<HTMLSelectElement>("list");
 
-            this.clearOptions(list);
-            list.add(new Option("-- select section --"));
+            HtmlHelper.clearList(list);
+            list.add(new Option("-- select chunk --"));
 
             let count = map.getSectionCount();
             for (let i=0; i<count; i++ ){
-                let section = map.getSection(i);
+                let chunk = map.getChunkByIndex(i);
 
-                list.add(new Option(section.sectionType +" . . . . . . [size: "+ section.unpackedLength +"]", i +""));
+                list.add(new Option(chunk.chunkType +" . . . . . . " 
+                    + "[size: "+ chunk.unpackedLength +"]  " 
+                    + "Type: "+  MapChunkType[chunk.chunkType], i +""));
             }
         }
 
@@ -66,6 +65,9 @@ module Settlers {
                 this.mapFile = new MapFile(b);
 
                 this.fillSectionList(this.mapFile);
+
+                let loader = this.mapFile.getMapLoader();
+                
             });
             
         };

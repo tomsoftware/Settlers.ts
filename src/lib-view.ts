@@ -12,12 +12,6 @@ module Settlers {
             this.rootPath = rootPath;
         }
 
-        private clearOptions(selectbox:HTMLSelectElement){
-            for(let i = selectbox.options.length - 1 ; i >= 0 ; i--) {
-                selectbox.remove(i);
-            }
-        }
-
 
         public showLibFile(fileIndex:string) {
             let fileInfo = this.libReader.getFileInfo(parseInt(fileIndex));
@@ -35,9 +29,11 @@ module Settlers {
             this.elements.get<HTMLElement>("Content").innerText = reader.readString();
         }
 
+        
         private fillUiList(libReader: LibFileReader) {
             let list = this.elements.get<HTMLSelectElement>("list");
-            this.clearOptions(list);
+            
+            HtmlHelper.clearList(list);
             list.add(new Option("-- select file --"));
             
             let l = libReader.getFileCount();

@@ -1,12 +1,12 @@
 module Settlers {
 
     /** provides information about a section in a map file */
-    export class MapSection {
+    export class MapChunk {
 
         public length:number;
         public offset:number;
 
-        public sectionType:MapSectionType;
+        public chunkType:MapChunkType;
         public unpackedLength:number;
         public checksum:number;
         public unknown1:number;
@@ -21,7 +21,7 @@ module Settlers {
 
 
         /** return the position of the next section header in the file */
-        public calcNextSectionOffset():number {                
+        public calcNextChunkOffset():number {                
             return this.offset + this.length;
         }
 
@@ -44,10 +44,10 @@ module Settlers {
             this.offset = SectionHeaderSize + offset;
 
             /// all sections have a type and a length... also the "end of file" section
-            this.sectionType = plainData.readIntBE();
+            this.chunkType = plainData.readIntBE();
             this.length = plainData.readIntBE();
 
-            if (this.sectionType == 0) {
+            if (this.chunkType == 0) {
                 /// this is the "end of file" section
                 return false;
             }
@@ -62,7 +62,7 @@ module Settlers {
 
 
         public toString(): string {
-            return "Section @ "+ this.offset +", size: "+ this.unpackedLength +"; Type="+ this.sectionType +"; checksum="
+            return "Chunk @ "+ this.offset +", size: "+ this.unpackedLength +"; Type="+ this.chunkType +"; checksum="
             + this.checksum +", unknown1="+ this.unknown1 +", unknown2="+ this.unknown2;
         }
 
