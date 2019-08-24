@@ -2,21 +2,21 @@ module Settlers {
 
 
     /** load a .map or a .edm map*/
-    export class LoadGameMap {
+    export class LoadGameMap implements IMapLoader {
         private log: LogHandler = new LogHandler("LoadGameMap");
 
-        public generalInformation: GeneralInformation= new GeneralInformation();
+        public general: GeneralInformation = new GeneralInformation();
         
         constructor(mapFile: MapFile) {
-            this.generalInformation.readFromGameMap(this.getChunkReader(mapFile, MapChunkType.MapGeneralInformation));
+            this.general.readFromGameMap(this.getChunkReader(mapFile, MapChunkType.MapGeneralInformation));
          
-            this.log.debug(this.generalInformation.toString());
+            this.log.debug(this.general.toString());
 
         }
 
 
         private getChunkReader(mapFile: MapFile, chunkType:MapChunkType):BinaryReader {
-            let s = mapFile.getChunkByType(MapChunkType.MapGeneralInformation);
+            let s = mapFile.getChunkByType(chunkType);
             if (!s) {
                 this.log.log("Unable to find MapGeneralInformation in map file");
                 return;
@@ -25,5 +25,8 @@ module Settlers {
             return s.getReader();
         }
 
+        public toString():string {
+            return this.general.toString();
+        }
     }
 }

@@ -26,6 +26,19 @@ module Settlers {
             return true;
         }
 
+        public readFromSaveGame(reader: BinaryReader): boolean {
+
+            if ((!reader) || (reader.length < 24)) {
+                return false;
+            }
+
+            this.mapHeight = this.mapWidth = reader.readIntBE(28);
+            
+
+            return true;
+        }
+
+
         public toString(): string {
             return "gameType: " + MapGameType[this.gameType] + "; "
                 + "playerCount: " + this.playerCount + "; "
