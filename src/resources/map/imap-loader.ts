@@ -2,8 +2,12 @@ module Settlers {
 
 
     /** Interface for map loaders */
-    export class IMapLoader {
+    export interface IMapLoader {
+
         /** General information about the map*/
-        general:GeneralInformation;
+        general: GeneralMapInformation;
+
+		/** return the size of the map */
+		size : Size
     }
 }

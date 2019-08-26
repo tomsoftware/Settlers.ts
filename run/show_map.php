@@ -32,7 +32,11 @@
         mapView.load(mapFileName);
     }
 	
-	
+  
+    function refreshChunk() {
+      mapView.showChunk(document.getElementById("selectChunk").value);
+    }
+
     </script>
 
   </head>
@@ -172,14 +176,16 @@
     
     <pre id="mapInfo" class="fullsize" >[no map selected]</pre>
 
-    <select id="selectChunk" onchange="mapView.showSection(this.value)" class="fullsize">
+    <select id="selectChunk" onchange="mapView.showChunk(this.value)" class="fullsize">
     </select>
 
     <pre id="chunkInfoText" class="fullsize" >[no section selected]</pre>
 
 
     <label><input type="checkbox" value="1" id="chunkShowHexView" />Show Hex View</label>
-    <label><input type="checkbox" value="1" id="chunkShowTextView" />Show Text</label>
+    <label><input type="checkbox" value="1" id="chunkShowTextView" />Show Text</label> 
+
+    <button onclick="refreshChunk()">refresh</button>
     
     <pre id="chunkContent" class="fullsize" ></pre>
     

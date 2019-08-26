@@ -1,38 +1,32 @@
 module Settlers {
 
-    enum MapFileSourceType {
-        Unknown,
-        GameMap,
-        EditorMap,
-        SaveGame
-    };
 
     /** provides access to a settlers map file (save game or map) */
-    export class MapFile {
+    export class OriginalMapFile {
 
-        private log: LogHandler = new LogHandler("MapFile");
-        private checksum: number;
-        private mapFileVersion: MapFileVersion;
+        protected oriLog: LogHandler = new LogHandler("OriginalMapFile");
+
+        protected checksum: number;
+        protected mapFileVersion: MapFileVersion;
+        protected mapFileSourceType : MapFileSourceType;
 
         private mapChunks: MapChunk[] = [];
 
-        private mapFileSourceType: MapFileSourceType = MapFileSourceType.Unknown;
 
         constructor(data: BinaryReader) {
-            this.processFile(data);
+            this.processFileChunks(data);
         }
 
-
-        public getSectionCount() {
+        public getChunkCount() {
             return this.mapChunks.length;
         }
 
-        /** return a section by it's index */
+        /** return a chunk by it's index */
         public getChunkByIndex(index:number) {
             return this.mapChunks[index];
         }
 
-        /** return a section by it's type */
+        /** return a chunk by it's type */
         public getChunkByType(type:MapChunkType) {
             let s = this.mapChunks;
             for(let i=0; i<s.length; i++){
@@ -43,23 +37,36 @@ module Settlers {
             return null;
         }
 
-        /** Factory the correct map loader */
-        public getMapLoader() {
-            if (this.mapFileSourceType == MapFileSourceType.GameMap) {
-                return new LoadGameMap(this);
-            } else if (this.mapFileSourceType == MapFileSourceType.SaveGame) {
-                return new LoadSaveGameMap(this);
-            }
-            else {
+
+        protected getChunkReader(chunkType:MapChunkType, minLength?:number):BinaryReader {
+            let chunk = this.getChunkByType(chunkType);
+            if (!chunk) {
+                this.oriLog.log("Unable to find chunk '"+ MapChunkType[chunkType] +"' in map file");
                 return null;
             }
+
+            let reader = chunk.getReader();
+
+            if (minLength === null) {
+                return reader;
+            }
+            
+            if (reader.length < minLength) {
+                this.oriLog.log("Bad length of chunk '"+ MapChunkType[chunkType] 
+                        +"' in map file. Expect size of "+ minLength + " get "+ reader.length);
+
+                return null;
+            }
+
+            return reader;
+
         }
 
-        private processFile(data: BinaryReader):boolean {
+        private processFileChunks(data: BinaryReader):boolean {
             
             /// settler4 savegames are prefixed by a windows executable
             if ((data.length < 100)) {
-                this.log.log("Not a Settlers save game: " + data.filename);
+                this.oriLog.log("Not a Settlers save game: " + data.filename);
                 return false;
             }
             
@@ -75,7 +82,7 @@ module Settlers {
 
             
             if ((data.length <= dataStartOffset + 8)) {
-                this.log.log("Not a Settlers save game: " + data.filename);
+                this.oriLog.log("Not a Settlers save game: " + data.filename);
             }
 
             let headerSize = this.readFileHeader(data, dataStartOffset);
@@ -83,11 +90,12 @@ module Settlers {
             let realChecksum = ChecksumCalculator.calc(data, dataStartOffset + headerSize);
 
             if (this.checksum != realChecksum) {
-                this.log.log("Checksum mismatch! real: " + realChecksum + " != file: " + this.checksum);
+                this.oriLog.log("Checksum mismatch! real: " + realChecksum + " != file: " + this.checksum);
             }
 
-            this.readFileSections(data, dataStartOffset + headerSize);
+            this.readFileChunks(data, dataStartOffset + headerSize);
         }
+
 
 
         /** read the main file header */
@@ -98,14 +106,14 @@ module Settlers {
             this.checksum = data.readIntBE();
             this.mapFileVersion = data.readIntBE();
 
-            this.log.debug("Save game version: " + this.mapFileVersion + " checksum: " + this.checksum);
+            this.oriLog.debug("Save game version: " + this.mapFileVersion + " checksum: " + this.checksum);
 
             /// size of header
             return 4 * 2;
         }
 
 
-        private readFileSections(data: BinaryReader, offset: number) {
+        private readFileChunks(data: BinaryReader, offset: number) {
 
             while (offset > 0) {
 
