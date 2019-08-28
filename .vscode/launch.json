@@ -23,6 +23,14 @@
           "sourceMaps": true,
           "url": "http://localhost/settlers.ts/run/show_libfile.php",
           "webRoot": "${workspaceRoot}/run"
-      }
+      },
+      {
+        "name": "Launch localhost - gfx file debug",
+        "type": "chrome",
+        "request": "launch",
+        "sourceMaps": true,
+        "url": "http://localhost/settlers.ts/run/show_gfxfile.php",
+        "webRoot": "${workspaceRoot}/run"
+    }
   ]
 }
