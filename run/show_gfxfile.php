@@ -15,14 +15,20 @@
       var gfxView = new Settlers.GfxView("./");
 
       function init() {
-        gfxView.elements.register("list", "selectImage");
+        gfxView.elements.register("list", "gfxSelectImage");
+        gfxView.elements.register("info", "gfxInfo");
+        gfxView.elements.register("showImage", "gfxShowImage");
       }
 
       function showImage(gfxImg) {
-
+        gfxView.showImage(gfxImg);
       }
 
       function loadGfx(gfxFileName) {
+        if (!gfxFileName) {
+          return;
+        }
+        
         gfxView.load(gfxFileName);
       }
       
@@ -33,57 +39,57 @@
 
     <select id="selectGfx" onchange="loadGfx(this.value)" class="fullsize">
       <option>--- select gfx ---</option>
-      <option>Siedler4/gfx/1</option>
-      <option>Siedler4/gfx/14</option>
-
-      <option>Siedler4/gfx/18</option>
-      <option>Siedler4/gfx/24</option>
-
-      <option>Siedler4/gfx/35</option>
-      
-      <option>Siedler4/gfx/34</option>
-      <!--
-      <option>Siedler4/gfx/2</option>
-      <option>Siedler4/gfx/7</option>
-      <option>Siedler4/gfx/8</option>
-      <option>Siedler4/gfx/9</option>
-      <option>Siedler4/gfx/10</option>
-      <option>Siedler4/gfx/11</option>
-      <option>Siedler4/gfx/12</option>
-      <option>Siedler4/gfx/13</option>
-      <option>Siedler4/gfx/14</option>
-
-      <option>Siedler4/gfx/18</option>
-      <option>Siedler4/gfx/19</option>
-      <option>Siedler4/gfx/20</option>
-      <option>Siedler4/gfx/21</option>
-      <option>Siedler4/gfx/22</option>
-      <option>Siedler4/gfx/23</option>
-      <option>Siedler4/gfx/24</option>
-
-      <option>Siedler4/gfx/28</option>
-      <option>Siedler4/gfx/29</option>
-      <option>Siedler4/gfx/30</option>
-      <option>Siedler4/gfx/31</option>
-      <option>Siedler4/gfx/32</option>
-
-      <option>Siedler4/gfx/34</option>
-      <option>Siedler4/gfx/35</option>
-      <option>Siedler4/gfx/36</option>
-      <option>Siedler4/gfx/37</option>
-
-      <option>Siedler4/gfx/39</option>
-      <option>Siedler4/gfx/40</option>
-      -->
+      <option>0</option>
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+      <option>5</option>
+      <option>6</option>
+      <option>7</option>
+      <option>8</option>
+      <option>9</option>
+      <option>10</option>
+      <option>11</option>
+      <option>12</option>
+      <option>13</option>
+      <option>14</option>
+      <option></option>
+      <option>18</option>
+      <option>19</option>
+      <option>20</option>
+      <option>21</option>
+      <option>22</option>
+      <option>23</option>
+      <option>24</option>
+      <option></option>
+      <option>28</option>
+      <option>29</option>
+      <option>30</option>
+      <option>31</option>
+      <option>32</option>
+      <option>33</option>
+      <option>34</option>
+      <option>35</option>
+      <option>36</option>
+      <option>37</option>
+      <option></option>
+      <option>39</option>
+      <option>40</option>
+      <option>41</option>
     </select>
     
-    <select id="selectImage" onchange="showImage(this.value)" class="fullsize">
+    <select id="gfxSelectImage" onchange="showImage(this.value)" class="fullsize">
     </select>
 
-    <pre id="fileInfoText" class="fullsize" >[no file selected]</pre>
+    <pre id="gfxInfo" class="fullsize" >[no file selected]</pre>
+ 
+    <br />
 
-    <pre id="fileContent" class="fullsize"></pre>
-  
+    <canvas height="800" width="800" id="gfxShowImage" class="1PixelatedRendering">
+      Sorry! Your browser does not support HTML5 Canvas and can not run this Application.
+    </canvas>
+
   </body>
 </html>
 

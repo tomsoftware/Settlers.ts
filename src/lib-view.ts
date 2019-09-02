@@ -42,7 +42,7 @@ module Settlers {
                 let fileInfo = libReader.getFileInfo(i);
                 
                 let item = new Option(fileInfo.getFullName() + " . . . . . . . . . . . . ["+ fileInfo.decompressedLength +"]", ""+ i);
-                list.options.add(item);
+                list.add(item);
             }
         }
 

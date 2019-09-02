@@ -56,5 +56,13 @@ module Settlers {
                 this.offsetTable[i]  = reader.readIntBE();
             }
         }
+
+        public toString():string {
+            return "gil: "+  this.magic.toString(16) +"; "
+                + this.flag1 +", "
+                + this.flag2 +", "
+                + this.flag3 +", "
+                + this.flag4.toString(16) + "  --  "+ this.flag4.toString(2) +", ";
+        }
     }
 }

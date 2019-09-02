@@ -10,37 +10,37 @@ module Settlers {
     private log: LogHandler = new LogHandler("FileProvider");
 
 
-    constructor(private rootPath:string) {
+    constructor(private rootPath: string) {
 
     }
 
     /** load binary data from URL: rootPath + [path] + filename */
-    public loadBinary(path:string, filename: string=null): Promise<BinaryReader> {
+    public loadBinary(path: string, filename: string = null): Promise<BinaryReader> {
 
-      let url = this.rootPath + path + ((filename==null)? "" : "/"+ filename);
+      let url = Path.concat(this.rootPath, path, filename);
 
-      this.log.debug("loading:"+ url);
+      this.log.debug("loading:" + url);
 
-      return new Promise( (resolve, reject) => {
+      return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
 
         xhr.onload = () => {
 
           if (xhr.status >= 200 && xhr.status < 300) {
             let reader = new BinaryReader(xhr.response, 0, null, this.filenameFormUrl(url));
-            
+
             resolve(reader);
 
           } else {
 
-            this.log.log("error load file:"+ url);
+            this.log.log("error load file:" + url);
             reject({ status: xhr.status, statusText: xhr.statusText });
           }
         };
 
 
         xhr.onerror = () => {
-          this.log.log("error load file:"+ url);
+          this.log.log("error load file:" + url);
           reject({ status: xhr.status, statusText: xhr.statusText });
         };
 
@@ -61,19 +61,19 @@ module Settlers {
 
         let xhr = new XMLHttpRequest();
 
-        xhr.onload  = (oEvent) => {
-            resolve(xhr.response);
+        xhr.onload = (oEvent) => {
+          resolve(xhr.response);
         }
 
         xhr.onerror = () => {
-           this.log.log("error load file:"+ url);
-           reject({ status: xhr.status, statusText: xhr.statusText });
+          this.log.log("error load file:" + url);
+          reject({ status: xhr.status, statusText: xhr.statusText });
         }
 
         /// setup query
         xhr.open('GET', url, true);
         xhr.responseType = "text";
-      
+
 
         /// call url
         xhr.send(null);
@@ -81,7 +81,7 @@ module Settlers {
     }
 
 
-    // Extract filename form URL
+    /** Extracts the filename form an URL */
     private filenameFormUrl(url: string): string {
       if (url == "") return "";
 

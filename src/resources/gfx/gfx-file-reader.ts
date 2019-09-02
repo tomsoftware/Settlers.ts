@@ -7,8 +7,14 @@ module Settlers {
 
         private log: LogHandler = new LogHandler("GfxFileReader");
         private images: GfxImage[];
+        private isWordHeader:boolean;
 
         private magic:number;
+        private flag1 : number;
+        private flag2 : number;
+        private flag3 : number;
+        private flag4 : number;
+
 
         /** return the number of images in this gfx file */
         public getImageCount() :number {
@@ -27,9 +33,12 @@ module Settlers {
 
         constructor(reader: BinaryReader, offsetTable: GilFileReader) {
 
-            this.magic = reader.readWordBE();
+            this.magic = reader.readIntBE();
+            this.flag1 = reader.readIntBE();
+            this.flag2 = reader.readIntBE();
+            this.flag3 = reader.readIntBE();
+            this.flag4 = reader.readIntBE();
 
-            this.log.log("magic: 0x"+ this.magic.toString(16));
 
             let count = offsetTable.getImageCount();
             this.images = new Array<GfxImage>(count);
@@ -47,9 +56,11 @@ module Settlers {
 
             reader.setOffset(offset);
 
-            let newImg = new GfxImage();
+            let newImg = new GfxImage(reader);
 
             if (imgHeadType > 860) {
+                this.isWordHeader = true;
+
                 newImg.headType = true;
                 newImg.width = reader.readByte();
                 newImg.height = reader.readByte();
@@ -64,6 +75,8 @@ module Settlers {
                 newImg.dataOffset = offset + 8;
             }
             else {
+                this.isWordHeader = false;
+
                 newImg.headType = false;
                 newImg.width = reader.readWordBE();
                 newImg.height = reader.readWordBE();
@@ -81,6 +94,15 @@ module Settlers {
 
             return newImg;
 
+        }
+
+        public toString() {
+            return "gfx: "+  this.magic.toString(16) +"; "
+                + this.flag1 +", "
+                + this.flag2 +", "
+                + this.flag3 +", "
+                + this.flag4.toString(16) + "  --  "+ this.flag4.toString(2) +", --- "
+                + this.isWordHeader;
         }
     }
 }

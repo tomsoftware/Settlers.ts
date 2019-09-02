@@ -6,7 +6,7 @@ module Settlers {
 
         /** find the index in this.pathNames for a given pathName */
         public findPathIndex(pathName: string): number {
-            let path = pathName.toUpperCase().split("/").join("\\");
+            let path = Path.fixPath(pathName).toUpperCase();
 
             for (let i = 0; i < this.pathNames.length; i++) {
                 if (this.pathNames[i].toUpperCase() == path) {
@@ -29,7 +29,7 @@ module Settlers {
             this.pathNames = new Array<string>(pathes.length);
 
             for (let i = 0; i < pathes.length; i++) {
-                this.pathNames[i] = pathes[i].split("\\").join("/");
+                this.pathNames[i] = Path.fixPath(pathes[i]);
             }
         }
     }

@@ -73,7 +73,7 @@ module Settlers {
                 imgData[j++] = value; // r
                 imgData[j++] = value; // g
                 imgData[j++] = value; // b
-                imgData[j++] = value; // alpha
+                imgData[j++] = 255; // alpha
             }
 
             cav.height = height;

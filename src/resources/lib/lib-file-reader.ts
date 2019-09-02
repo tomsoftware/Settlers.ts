@@ -46,11 +46,14 @@ module Settlers {
             return this.fileInfos[fileIndex]; 
         }
 
+
         /** return the data for a given file */
-        public getFileInfoByFileName(pathName: string, fileName: string): LibFileItem {
+        public getFileInfoByFileName(pathName: string, fileName: string, quiet:boolean): LibFileItem {
             let index = this.getFileIndexFromFileName(pathName, fileName);
             if (index < 0) {
-                this.log.log("File not found: " + pathName + " / " + fileName);
+                if (!quiet) {
+                    this.log.log("File not found: " + pathName + " / " + fileName);
+                }
                 return null;
             }
 
