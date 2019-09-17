@@ -1,6 +1,6 @@
 
 module Settlers {
-    export class GfxImage {
+    export class GfxImage implements IGfxImage {
 
         /** start of image data */
         public dataOffset: number;
@@ -29,7 +29,7 @@ module Settlers {
                 let value = buffer[pos];
                 pos++;
 
-                let r, g, b;
+                let r:number, g:number, b:number;
                 let count = 1;
 
                 if (value <= 1) {
@@ -47,6 +47,7 @@ module Settlers {
                 }
                 else {
                     r = g = b = value;
+                    /// todo: add color pallet
                 }
 
                 for (let i = 0; (i < count) && (j < length); i++) {
@@ -66,9 +67,11 @@ module Settlers {
                 let value = buffer[pos];
                 pos++;
 
-                let r, g, b;
+                let r:number, g:number, b:number;
 
                 r = g = b = value;
+
+                /// todo: add color pallet
 
                 imgData[j++] = r; // r
                 imgData[j++] = g; // g
