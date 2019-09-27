@@ -23,6 +23,11 @@ module Settlers {
         private data: BinaryReader;
 
 
+        public getDataSize(): number {
+            return 0;
+        }
+
+
         private getImageDataWithRunLengthEncoding(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
             let j = 0;
             while (j < length) {

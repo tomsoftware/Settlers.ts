@@ -4,5 +4,9 @@ module Settlers {
         getImageData(): ImageData;
         height:number;
         width:number;
+        getDataSize():number;
+
+        /** start of image data */
+        dataOffset: number;
     }
 }

@@ -55,8 +55,11 @@
       </optgroup>
 
       <optgroup label="Test Format">
+        <option> Siedler4\Map\Editor\all_landscape.edm</option>
+        <option>Siedler4/Map/Test/formats/land.exe</option>
         <option>Siedler4/Map/Test/formats/land.exe</option>
         <option>Siedler4/Map/Test/formats/land.edm</option>
+        <option>Siedler4/Map/Test/formats/land.map</option>
         <option>Siedler4/Map/Test/formats/land.map</option>
       </optgroup>
 

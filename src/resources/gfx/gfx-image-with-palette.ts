@@ -23,6 +23,8 @@ module Settlers {
 
         public flag1: number;
         public flag2: number;
+        public flag3: number;
+        public rowCount: number;
 
         private palette:Uint32Array = new Uint32Array(256);
 
@@ -72,6 +74,12 @@ module Settlers {
         }
 
 
+        public getDataSize(): number {
+            return  this.width * this.height  + 
+                Math.floor(this.height / this.chunkHeight) * 3 * 256;
+        }
+
+
         public getImageData(): ImageData {
             let img = new ImageData(this.width, this.height);
             let imgData = img.data;
@@ -87,13 +95,15 @@ module Settlers {
             return img;
         }
 
-        constructor(reader: BinaryReader) {
+        constructor(reader: BinaryReader, chunkHeight:number) {
             this.data = reader;
+            this.chunkHeight = chunkHeight;
         }
 
         public toString(): string {
             return "size: (" + this.width + " x" + this.height + ") "
                 + "data offset " + this.dataOffset +" "
+                + "rows: " + this.rowCount +"; "
                 + "flags: " + this.flag1 + " / " + this.flag2;
         }
     }
