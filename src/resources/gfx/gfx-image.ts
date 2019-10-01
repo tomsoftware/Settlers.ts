@@ -17,8 +17,8 @@ module Settlers {
         /** top (y) offset to display the image */
         public top: number;
 
-        public flag1: number;
         public flag2: number;
+        public flag3: number;
 
         private data: BinaryReader;
 
@@ -112,7 +112,7 @@ module Settlers {
                 + "pos (" + this.left + ", " + this.top + ") "
                 + "type " + this.imgType + "; "
                 + "data offset " + this.dataOffset + "; "
-                + "flags: " + this.flag1 + " / " + this.flag2
+                + "flags: " + this.flag2 + " / " + this.flag3
                 + " heade Type: " + this.headType;
         }
     }

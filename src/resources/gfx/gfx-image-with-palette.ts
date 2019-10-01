@@ -21,7 +21,6 @@ module Settlers {
 
         private data: BinaryReader;
 
-        public flag1: number;
         public flag2: number;
         public flag3: number;
         public rowCount: number;
@@ -90,21 +89,22 @@ module Settlers {
 
             this.getImageDataWithPalette(buffer, imgData, pos, length);
          
-
-
             return img;
         }
 
-        constructor(reader: BinaryReader, chunkHeight:number) {
+        constructor(reader: BinaryReader, width:number, chunkCount:number) {
             this.data = reader;
-            this.chunkHeight = chunkHeight;
+            this.chunkHeight = width;
+            this.width = width;
+            this.height =  width * chunkCount;
+
         }
 
         public toString(): string {
             return "size: (" + this.width + " x" + this.height + ") "
                 + "data offset " + this.dataOffset +" "
                 + "rows: " + this.rowCount +"; "
-                + "flags: " + this.flag1 + " / " + this.flag2;
+                + "flags: " + this.flag2 + " / " + this.flag3;
         }
     }
 

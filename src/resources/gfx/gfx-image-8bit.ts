@@ -10,11 +10,9 @@ module Settlers {
         /** height of the image */
         public height: number;
 
-        public flag1: number;
         public flag2: number;
         public flag3: number;
-    
-
+        
         private data: BinaryReader;
 
 
@@ -58,7 +56,7 @@ module Settlers {
         public toString(): string {
             return "size: (" + this.width + " x" + this.height + ") "
                 + "data offset " + this.dataOffset + "; "
-                + "flags: " + this.flag1  +"  "+ this.flag2 +"  "+ this.flag3;
+                + "flags: " + this.flag2 +"  "+ this.flag3;
         }
     }
 

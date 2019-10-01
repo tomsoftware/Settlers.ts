@@ -37,6 +37,7 @@ module Settlers {
         private flag3 : number;
         private flag4 : number;
 
+        public 
 
         /** return the number of images in this gfx file */
         public getImageCount() :number {
@@ -84,37 +85,31 @@ module Settlers {
                 reader.setOffset(filePos);
 
            
-                let flag1 = reader.readByte();
+                let imageType = reader.readByte();
                 let flag2 = reader.readByte();
                 let flag3 = reader.readByte();
                 let rowCount = reader.readByte();
                 size = reader.readIntBE();
+
                 let img:IGfxImage;
 
-                let width;
-
-                switch(flag1) {
+                switch(imageType) {
                     case 0:
-                        width = 128;
-                        img = new GfxImage16Bit(reader);
+                        img = new GfxImage16Bit(reader, 128, rowCount);
                         break;
                     case 1:
-                        width = 256;
-                        img = new GfxImage16Bit(reader);
+                        img = new GfxImage16Bit(reader, 256, rowCount);
                         break;
                     case 2:
-                        width = 128;
-                        img = new GfxImageWithPalette(reader, width);
+                        img = new GfxImageWithPalette(reader, 128, rowCount);
                         break; 
                     case 3:
-                        width = 256;
-                        img = new GfxImageWithPalette(reader, width);
+                        img = new GfxImageWithPalette(reader, 256, rowCount);
                         break;
                 }
 
-                img.height = rowCount * width;
-                img.width = width;
-
+                img.flag2 = flag2;
+                img.flag3 = flag3;
                 img.dataOffset = filePos + 8;
 
                 this.images.push(img);
