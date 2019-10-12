@@ -5,6 +5,7 @@ module Settlers {
 		/// Save Game
         CommentText = 250,
 		SaveGameGeneralInformation = 130,
+		SaveGameMapLandscape = 200,
 
 		/// Game Map 
         MapGeneralInformation = 1,

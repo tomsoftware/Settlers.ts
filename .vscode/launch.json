@@ -32,14 +32,22 @@
         "url": "http://localhost/settlers.ts/run/show_gfxfile.php",
         "webRoot": "${workspaceRoot}/run"
 	  },
-      {
+    {
         "name": "Launch localhost - gh file debug",
         "type": "chrome",
         "request": "launch",
         "sourceMaps": true,
         "url": "http://localhost/settlers.ts/run/show_ghfile.php",
         "webRoot": "${workspaceRoot}/run"
-    }
+    },
+    {
+      "name": "Launch localhost - landscape debug",
+      "type": "chrome",
+      "request": "launch",
+      "sourceMaps": true,
+      "url": "http://localhost/settlers.ts/run/render_landscape.php",
+      "webRoot": "${workspaceRoot}/run"
+  }
 	
 	
   ]

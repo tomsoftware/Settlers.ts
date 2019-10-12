@@ -37,8 +37,8 @@ module Settlers {
             return null;
         }
 
-
-        protected getChunkReader(chunkType:MapChunkType, minLength?:number):BinaryReader {
+        /** return a reader to the chunk of a given type */
+        public getChunkReader(chunkType:MapChunkType, minLength?:number):BinaryReader {
             let chunk = this.getChunkByType(chunkType);
             if (!chunk) {
                 this.oriLog.log("Unable to find chunk '"+ MapChunkType[chunkType] +"' in map file");
@@ -62,6 +62,7 @@ module Settlers {
 
         }
 
+        /** read the file and all chunks */
         private processFileChunks(data: BinaryReader):boolean {
             
             /// settler4 savegames are prefixed by a windows executable

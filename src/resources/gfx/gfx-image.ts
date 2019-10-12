@@ -17,8 +17,8 @@ module Settlers {
         /** top (y) offset to display the image */
         public top: number;
 
+        public flag1: number;
         public flag2: number;
-        public flag3: number;
 
         private data: BinaryReader;
 
@@ -34,7 +34,7 @@ module Settlers {
                 let value = buffer[pos];
                 pos++;
 
-                let r:number, g:number, b:number;
+                let r: number, g: number, b: number;
                 let count = 1;
 
                 if (value <= 1) {
@@ -72,7 +72,7 @@ module Settlers {
                 let value = buffer[pos];
                 pos++;
 
-                let r:number, g:number, b:number;
+                let r: number, g: number, b: number;
 
                 r = g = b = value;
 
@@ -112,7 +112,7 @@ module Settlers {
                 + "pos (" + this.left + ", " + this.top + ") "
                 + "type " + this.imgType + "; "
                 + "data offset " + this.dataOffset + "; "
-                + "flags: " + this.flag2 + " / " + this.flag3
+                + "flags: " + this.flag1 + " / " + this.flag2
                 + " heade Type: " + this.headType;
         }
     }

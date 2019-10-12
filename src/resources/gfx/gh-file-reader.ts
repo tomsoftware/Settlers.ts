@@ -86,8 +86,8 @@ module Settlers {
 
            
                 let imageType = reader.readByte();
+                let flag1 = reader.readByte();
                 let flag2 = reader.readByte();
-                let flag3 = reader.readByte();
                 let rowCount = reader.readByte();
                 size = reader.readIntBE();
 
@@ -108,8 +108,8 @@ module Settlers {
                         break;
                 }
 
+                img.flag1 = flag1;
                 img.flag2 = flag2;
-                img.flag3 = flag3;
                 img.dataOffset = filePos + 8;
 
                 this.images.push(img);

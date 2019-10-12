@@ -21,8 +21,8 @@ module Settlers {
 
         private data: BinaryReader;
 
+        public flag1: number;
         public flag2: number;
-        public flag3: number;
         public rowCount: number;
 
         private palette:Uint32Array = new Uint32Array(256);
@@ -104,7 +104,7 @@ module Settlers {
             return "size: (" + this.width + " x" + this.height + ") "
                 + "data offset " + this.dataOffset +" "
                 + "rows: " + this.rowCount +"; "
-                + "flags: " + this.flag2 + " / " + this.flag3;
+                + "flags: " + this.flag1 + " / " + this.flag2;
         }
     }
 

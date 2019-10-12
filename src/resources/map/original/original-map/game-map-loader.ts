@@ -20,6 +20,15 @@ module Settlers {
 
         }
 
+        private _landscape:OriginalLandscape;
+        get landscape(): IMapLandscape {
+            if (!this._landscape) {
+                this._landscape = new OriginalLandscape(this, this.size, MapChunkType.MapLandscape);
+            }
+            return this._landscape;
+        }
+        
+
         public readGeneralInformation(): boolean {
             let reader = this.getChunkReader(MapChunkType.MapGeneralInformation, 24);
 
@@ -41,7 +50,8 @@ module Settlers {
             return;
         }
 
-     
+
+
 
         public toString():string {
             return this.general.toString() +"; "

@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8">
-	
-	  <link rel="stylesheet" type="text/css" href="style.css">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
 	
     <title>Settlers.ts Remake</title>
 
@@ -11,32 +11,16 @@
 
     <script type="text/javascript" >
 
-    var mapView = new Settlers.MapView("./");
+    var mapView = new Settlers.LandscapeView("./");
 
     function init() {
-        mapView.elements.register("List", "selectChunk");
-        mapView.elements.register("mapInfo", "mapInfo");
-   
-        mapView.elements.register("info", "chunkInfoText");
-        
-        mapView.elements.register("content", "chunkContent");
-        mapView.elements.register("showHexView", "chunkShowHexView");
-        mapView.elements.register("showTextView", "chunkShowTextView");
-
-        mapView.elements.register("showImage", "chunkShowImage");
-        mapView.elements.register("bytePerPixle", "bytePerPixle");
-        mapView.elements.register("byteOffset", "byteOffset");
+        mapView.elements.register("content", "chunkShowImage");
     }
 
     function loadMap(mapFileName) {
         mapView.load(mapFileName);
     }
 	
-  
-    function refreshChunk() {
-      mapView.showChunk(document.getElementById("selectChunk").value);
-    }
-
     </script>
 
   </head>
@@ -190,29 +174,8 @@
       </optgroup>
     </select>
     
-    <pre id="mapInfo" class="fullsize" >[no map selected]</pre>
 
-    <select id="selectChunk" onchange="mapView.showChunk(this.value)" class="fullsize">
-    </select>
-
-    <pre id="chunkInfoText" class="fullsize" >[no section selected]</pre>
-
-
-    <label><input type="checkbox" value="1" id="chunkShowHexView" />Show Hex View</label>
-    <label><input type="checkbox" value="1" id="chunkShowTextView" />Show Text</label> 
-
-    <button onclick="refreshChunk()">refresh</button>
-    
-    <pre id="chunkContent" class="fullsize" ></pre>
-    
-    <br />
-
-    <label>Bytes per Pixle: <input type="text" value="1" id="bytePerPixle" /></label>
-    <label>Byte offset: <input type="text" value="0" id="byteOffset" /></label>
-    
-    <br />
-
-    <canvas height="800" width="800" id="chunkShowImage" class="1PixelatedRendering">
+    <canvas height="800" width="800" id="chunkShowImage">
       Sorry! Your browser does not support HTML5 Canvas and can not run this Application.
     </canvas>
 
