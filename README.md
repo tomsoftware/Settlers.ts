@@ -17,6 +17,11 @@ This will create the `run/settlers.js` file.
 * Open: http://localhost:8888/
 
 
+# Next BIG steps:
+1. using webGl to render the state of a game by loading a save game
+2. adding game logic to process state changing in the game
+
+
 # State:
 You can access 'all' Settlers file formats
 
