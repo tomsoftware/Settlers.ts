@@ -20,7 +20,14 @@ This will create the `run/settlers.js` file.
 # State:
 You can access 'all' Settlers file formats
 
-![screenshot](docu/example-gfx-viewer.png)
-![screenshot](docu/example-gx-view.png))
+gfx-file view:
+![screenshot](docu/example-gfx-view.png)
+
+gl-file and gh-file view:
+![screenshot](docu/example-gx-view.png)
+
+lib-file view:
 ![screenshot](docu/example-lib-view.png)
+
+map-file view:
 ![screenshot](docu/example-map-view.png)
