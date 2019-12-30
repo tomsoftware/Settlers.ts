@@ -13,14 +13,25 @@ This will create the `run/settlers.js` file.
 
 # How to start:
 * Install Node.js : https://nodejs.org/
-* Copy you Settlers files (`game.lib`, `gfx.lib`, `Gfx/0.gfx`, ...) to the `run/Siedler4/` folder
+* Copy all you Settlers files and folders (`game.lib`, `gfx.lib`, `Gfx/0.gfx`, ...) to the `run/Siedler4/` folder
 * Run `run/run.bat`. This will start a local Webserver on your PC
 * Open: http://localhost:8888/
 
 
 # Next BIG steps:
-1. using webGl to render the state of a game by loading a save game
+1. using webGl to render the state of a game by loading a save game and pushing all data to webGl:
+* see: https://jsfiddle.net/fsg2kw3o/
+
+
 2. adding game logic to process state changing in the game
+* see: `game.lib/objectInfo.xml` and `game.lib/buildingInfo.xml`
+* see: https://github.com/jsettlers/settlers-remake
+
+
+3. adding backend logic
+* using websocket to communicate with local webserver. The webserver now can provide: 
+   * Folder access to e.g. list all save games
+   * Network access to allow network gaming
 
 
 # State:
