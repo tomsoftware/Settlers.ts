@@ -7,6 +7,7 @@ This is a Settlers 4 (Siedler 4) Remake (it will be :-) ) written in JavaScript 
 * Install Node.js : https://nodejs.org/
 * Install TypeScript : https://www.typescriptlang.org/#download-links
 * run `tsc` in the `src` folder
+
 This will create the `run/settlers.js` file.
 
 
@@ -25,14 +26,14 @@ This will create the `run/settlers.js` file.
 # State:
 You can access 'all' Settlers file formats
 
-gfx-file view:
+## gfx-file view:
 ![screenshot](docu/example-gfx-view.png)
 
-gl-file and gh-file view:
+## gl-file and gh-file view:
 ![screenshot](docu/example-gx-view.png)
 
-lib-file view:
+## lib-file view:
 ![screenshot](docu/example-lib-view.png)
 
-map-file view:
+## map-file view:
 ![screenshot](docu/example-map-view.png)
