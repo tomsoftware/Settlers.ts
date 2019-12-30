@@ -18,6 +18,12 @@ This will create the `run/settlers.js` file.
 * Open: http://localhost:8888/
 
 
+# How to edit:
+Use the *Visual Studio Code* to edit and debug your code:
+* Visual Studio Code: https://code.visualstudio.com/
+* Install *Debugger for Chrome* Plugin in Visual Studio Code
+
+
 # Next BIG steps:
 1. using webGl to render the state of a game by loading a save game and pushing all data to webGl:
 * see: https://jsfiddle.net/fsg2kw3o/
