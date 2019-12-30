@@ -1,6 +1,6 @@
 # Settlers 4 remake (File Formats)
 This is a Settlers 4 (Siedler 4) Remake (it will be :-) ) written in JavaScript (Typescript) so 
-  it can be run in you browser.
+  it can be run in your browser.
   
 
 # How to compile:
