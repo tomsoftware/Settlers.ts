@@ -15,7 +15,7 @@ module Settlers {
         }
 
 
-        /** load a new game/level */
+        /** load a new grafix */
         public load(fileId: string) {
 
             let gil = this.resourceProvider.loadBinary(fileId + ".gil");
