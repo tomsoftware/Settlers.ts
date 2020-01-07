@@ -1,12 +1,13 @@
 module Settlers {
 
-    /** interpreates a .gil file -
-     *  gil may stand for: "graphic index file" 
-     *  it is a list of file indexes used to read a .gfx file
+    /** interpreates a .pil file -
+     *  pil may stand for: "palette index file" 
+     *  it is a list of file indexes used to read a .pa5 or .pa6 file
+     * todo: .gil is the same!
      * */
-    export class GilFileReader {
+    export class PilFileReader {
 
-        private log: LogHandler = new LogHandler("GilFileReader");
+        private log: LogHandler = new LogHandler("PilFileReader");
 
         /** may this is the file version or a magic indicator for this
          * file type: 0x03 0x80 */
@@ -16,17 +17,28 @@ module Settlers {
         private flag3: number;
         private flag4: number;
 
-        private offsetTable: Int32Array;
+        private offsetTable: Array<number>;
+
+        public getTable() {
+            return this.offsetTable;
+        }
 
         /** return the number of images stored in the gfx file */
-        public getImageCount() {
+        public getOffsetCount() {
             return this.offsetTable ? this.offsetTable.length : 0;
         }
 
+        /** return a sorted list of all uneque offsets */
+        public getDistinct() {
+            return [...new Set(this.offsetTable)]
+                .sort((index1, index2) => (index2 - index1));
+        }
+
+        
         /** return the fileoffset of a gfx image */
-        public getImageOffset(index: number): number {
+        public getPaletteOffset(index: number): number {
             if ((index < 0) || (index >= this.offsetTable.length)) {
-                this.log.log("Gfx-Index out of range: " + index);
+                this.log.log("palette-Index out of range: " + index);
                 return -1;
             }
             return this.offsetTable[index];
@@ -41,9 +53,9 @@ module Settlers {
             }
 
             let imageCount = (reader.length - HeaderSize) / 4;
-            this.log.debug('image count ' + imageCount);
+            this.log.debug('palette count ' + imageCount);
 
-            this.offsetTable = new Int32Array(imageCount);
+            this.offsetTable = new Array<number>(imageCount);
 
             /// file header
             this.magic = reader.readIntBE();
@@ -59,7 +71,7 @@ module Settlers {
         }
 
         public toString(): string {
-            return "gil: " + this.magic.toString(16) + "; "
+            return "pil: " + this.magic.toString(16) + "; "
                 + this.flag1 + ", "
                 + this.flag2 + ", "
                 + this.flag3 + ", "

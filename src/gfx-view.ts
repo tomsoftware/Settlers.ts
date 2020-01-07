@@ -3,11 +3,10 @@ module Settlers {
     /** View for debugging the gfx files (.dil) */
     export class GfxView {
         private log: LogHandler = new LogHandler("GfxView");
-        public elements: ElementProvider  = new ElementProvider();
+        public elements: ElementProvider = new ElementProvider();
         private rootPath: string;
         private gfxFile: GfxFileReader;
-        private resourceProvider:ResourceFileProvier;
-
+        private resourceProvider: ResourceFileProvier;
 
         constructor(rootPath: string) {
             this.rootPath = rootPath;
@@ -18,24 +17,31 @@ module Settlers {
         /** load a new grafix */
         public load(fileId: string) {
 
-            let gil = this.resourceProvider.loadBinary(fileId + ".gil");
-            let gfx = this.resourceProvider.loadBinary(fileId + ".gfx");
+            const gil = this.resourceProvider.loadBinary(fileId + ".gil");
+            const gfx = this.resourceProvider.loadBinary(fileId + ".gfx");
 
-            Promise.all([gil, gfx]).then((b) => {
-                let gfxIndexList = new GilFileReader(b[0]);
-                this.gfxFile = new GfxFileReader(b[1], gfxIndexList);
+            const pil = this.resourceProvider.loadBinary(fileId + ".pil");
+            const pa6 = this.resourceProvider.loadBinary(fileId + ".pa6");
 
+            Promise.all([gil, gfx, pil, pa6]).then((files) => {
+                const gfxIndexList = new GilFileReader(files[0]);
+                const paletteIndexList = new PilFileReader(files[2]);
+                const palletCollection = new PaletCollection(paletteIndexList, files[3]);
+
+                this.gfxFile = new GfxFileReader(files[1], gfxIndexList, palletCollection);
+                
+    
                 this.fillUiList(this.gfxFile);
 
 
-                this.log.debug("File: "+ fileId);
+                this.log.debug("File: " + fileId);
                 this.log.debug(gfxIndexList.toString());
                 this.log.debug(this.gfxFile.toString());
 
             });
         };
 
-        public showImage(id:string) {
+        public showImage(id: string) {
             let cav = this.elements.get<HTMLCanvasElement>("showImage");
 
             if ((!cav) || (!cav.getContext)) {
@@ -57,13 +63,13 @@ module Settlers {
 
             HtmlHelper.clearList(list);
             list.add(new Option("-- select image --"));
-            
+
             let l = gfxReader.getImageCount();
 
             for (let i = 0; i < l; i++) {
                 let fileInfo = gfxReader.getImage(i);
-                
-                let item = new Option(fileInfo.toString(), ""+ i);
+
+                let item = new Option(fileInfo.toString(), "" + i);
                 list.options.add(item);
             }
         }

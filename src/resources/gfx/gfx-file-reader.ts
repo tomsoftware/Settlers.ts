@@ -7,31 +7,31 @@ module Settlers {
 
         private log: LogHandler = new LogHandler("GfxFileReader");
         private images: GfxImage[];
-        private isWordHeader:boolean;
+        private isWordHeader: boolean;
 
-        private magic:number;
-        private flag1 : number;
-        private flag2 : number;
-        private flag3 : number;
-        private flag4 : number;
+        private magic: number;
+        private flag1: number;
+        private flag2: number;
+        private flag3: number;
+        private flag4: number;
 
 
         /** return the number of images in this gfx file */
-        public getImageCount() :number {
+        public getImageCount(): number {
             return this.images ? this.images.length : 0;
         }
 
         /** return a Image by index */
-        public getImage(index:number) : GfxImage {
+        public getImage(index: number): GfxImage {
             if ((index < 0) || (index >= this.images.length)) {
-                this.log.log("Image Index out of range: "+ index);
+                this.log.log("Image Index out of range: " + index);
                 return null;
             }
             return this.images[index];
         }
 
 
-        constructor(reader: BinaryReader, offsetTable: GilFileReader) {
+        constructor(reader: BinaryReader, offsetTable: GilFileReader, paletteCollection: PaletCollection) {
 
             this.magic = reader.readIntBE();
             this.flag1 = reader.readIntBE();
@@ -44,19 +44,19 @@ module Settlers {
             this.images = new Array<GfxImage>(count);
 
             for (let i = 0; i < count; i++) {
-                this.images[i] = this.readImage(reader, offsetTable.getImageOffset(i));
+                this.images[i] = this.readImage(reader, offsetTable.getImageOffset(i), paletteCollection.getPaletteByGfxIndex(i));
             }
         }
 
 
-        private readImage(reader: BinaryReader, offset: number): GfxImage {
+        private readImage(reader: BinaryReader, offset: number, plette: Palette): GfxImage {
             reader.setOffset(offset);
 
             let imgHeadType = reader.readWordBE();
 
             reader.setOffset(offset);
 
-            let newImg = new GfxImage(reader);
+            let newImg = new GfxImage(reader, plette);
 
             if (imgHeadType > 860) {
                 this.isWordHeader = true;
@@ -97,11 +97,11 @@ module Settlers {
         }
 
         public toString() {
-            return "gfx: "+  this.magic.toString(16) +"; "
-                + this.flag1 +", "
-                + this.flag2 +", "
-                + this.flag3 +", "
-                + this.flag4.toString(16) + "  --  "+ this.flag4.toString(2) +", --- "
+            return "gfx: " + this.magic.toString(16) + "; "
+                + this.flag1 + ", "
+                + this.flag2 + ", "
+                + this.flag3 + ", "
+                + this.flag4.toString(16) + "  --  " + this.flag4.toString(2) + ", --- "
                 + this.isWordHeader;
         }
     }
