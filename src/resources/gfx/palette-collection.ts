@@ -1,47 +1,35 @@
+/// <reference path="./resource-file.ts" />
+
 module Settlers {
-
-    export class PaletCollection {
+    /** read a pa6 file */
+    export class PaletCollection extends ResourceFile {
         private log: LogHandler = new LogHandler("PaletCollection");
-        private paletts: Array<Palette> = [];
-        
-        public getPaletteByGfxIndex(index: number) {
-            return this.paletts[index];
+        private palette: Palette;
+        private pilFile: PilFileReader;
+        private paletteFileOffset: number;
+
+        public getPalette() {
+            return this.palette;
         }
 
-/*
-        public getPaletteByGfxIndex(index: number) {
-            const offset = this.palettIndexList.getPaletteOffset(index);
-            return this.palettsMap.get(offset);
+        public getOffset(gfxImageIndex: number) {
+            return (this.pilFile.getOffset(gfxImageIndex) - this.paletteFileOffset) / 2;
         }
-*/
 
-        public constructor(palettIndexList: PilFileReader, pa6File: BinaryReader) {
-      
-            this.log.debug("pa6File.length: " + pa6File.length);
+        public constructor(pa6File: BinaryReader, pilFile: PilFileReader) {
+            super();
 
-            /// we want to get all palletts from the file
-            /// but we dont know the the size of the pallets
-            /// so we read all distinct pos
-            const positions = palettIndexList.getDistinct();
+            this.pilFile = pilFile;
 
-            const palettsMap : Map<number, Palette> = new Map();
+            /// read file header
+            const reader = super.readResource(pa6File);
 
-            /// push the length of the pallet file to be able to calc
-            ///  also the last length
-            positions.push(pa6File.length);
+            this.paletteFileOffset = super.headerSize;
 
-            for (let i = 1; i < positions.length; i++) {
-                const offset = positions[i - 1];
-                const p = new Palette();
-                const count = (positions[i] - offset) / 2;
-                p.read16BitPalette(pa6File, offset, count);
+            /// read all colors - every color is 2 byte long
+            this.palette = new Palette(reader.length / 2);
 
-                palettsMap.set(offset, p);
-            }
-
-            this.paletts = palettIndexList.getTable()
-                .map((offset) => palettsMap.get(offset));
-
+            this.palette.read16BitPalette(reader, 0);
         }
     }
 }

@@ -1,19 +1,15 @@
+/// <reference path="./resource-file.ts" />
+
 module Settlers {
 
     /** reads a .gfx file
      *    .gfx files contain images
      * */
-    export class GfxFileReader {
+    export class GfxFileReader extends ResourceFile {
 
         private log: LogHandler = new LogHandler("GfxFileReader");
         private images: GfxImage[];
         private isWordHeader: boolean;
-
-        private magic: number;
-        private flag1: number;
-        private flag2: number;
-        private flag3: number;
-        private flag4: number;
 
 
         /** return the number of images in this gfx file */
@@ -33,30 +29,31 @@ module Settlers {
 
         constructor(reader: BinaryReader, offsetTable: GilFileReader, paletteCollection: PaletCollection) {
 
-            this.magic = reader.readIntBE();
-            this.flag1 = reader.readIntBE();
-            this.flag2 = reader.readIntBE();
-            this.flag3 = reader.readIntBE();
-            this.flag4 = reader.readIntBE();
+            super();
 
+            super.readResource(reader);
 
             let count = offsetTable.getImageCount();
             this.images = new Array<GfxImage>(count);
 
             for (let i = 0; i < count; i++) {
-                this.images[i] = this.readImage(reader, offsetTable.getImageOffset(i), paletteCollection.getPaletteByGfxIndex(i));
+                this.images[i] = this.readImage(
+                    reader, 
+                    offsetTable.getImageOffset(i), 
+                    paletteCollection.getPalette(), 
+                    paletteCollection.getOffset(i));
             }
         }
 
 
-        private readImage(reader: BinaryReader, offset: number, plette: Palette): GfxImage {
+        private readImage(reader: BinaryReader, offset: number, plette: Palette, paletteOffset: number): GfxImage {
             reader.setOffset(offset);
 
             let imgHeadType = reader.readWordBE();
 
             reader.setOffset(offset);
 
-            let newImg = new GfxImage(reader, plette);
+            let newImg = new GfxImage(reader, plette, paletteOffset);
 
             if (imgHeadType > 860) {
                 this.isWordHeader = true;
@@ -97,11 +94,7 @@ module Settlers {
         }
 
         public toString() {
-            return "gfx: " + this.magic.toString(16) + "; "
-                + this.flag1 + ", "
-                + this.flag2 + ", "
-                + this.flag3 + ", "
-                + this.flag4.toString(16) + "  --  " + this.flag4.toString(2) + ", --- "
+            return "gfx: " + super.toString() +", --- "
                 + this.isWordHeader;
         }
     }

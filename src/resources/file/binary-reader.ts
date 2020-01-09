@@ -18,6 +18,7 @@ module Settlers {
       }
 
       let dataLenght = 0;
+      let srcHiddenOffset = 0;
 
       if (dataArray == null) {
         this.data = new Uint8Array(0);
@@ -26,6 +27,8 @@ module Settlers {
         //- if dataArray is BinaryReader use there data
         this.data = dataArray.data;
         dataLenght = dataArray.length;
+        srcHiddenOffset = dataArray.hiddenOffset;
+
         if (!filename) {
           filename = dataArray.filename;
         }
@@ -49,7 +52,7 @@ module Settlers {
 
       if (length == null) length = dataLenght - offset;
 
-      this.hiddenOffset = offset;
+      this.hiddenOffset = offset + srcHiddenOffset;
       this.length = length;
       this.pos = this.hiddenOffset;
 

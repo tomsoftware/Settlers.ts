@@ -26,7 +26,7 @@ module Settlers {
             Promise.all([gil, gfx, pil, pa6]).then((files) => {
                 const gfxIndexList = new GilFileReader(files[0]);
                 const paletteIndexList = new PilFileReader(files[2]);
-                const palletCollection = new PaletCollection(paletteIndexList, files[3]);
+                const palletCollection = new PaletCollection(files[3], paletteIndexList);
 
                 this.gfxFile = new GfxFileReader(files[1], gfxIndexList, palletCollection);
                 

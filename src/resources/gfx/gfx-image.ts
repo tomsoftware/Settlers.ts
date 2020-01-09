@@ -21,7 +21,9 @@ module Settlers {
         public flag2: number;
 
         private data: BinaryReader;
-        private palette : Palette;
+
+        private palette: Palette;
+        private paletteOffset: number;
 
         public getDataSize(): number {
             return 0;
@@ -29,6 +31,10 @@ module Settlers {
 
 
         private getImageDataWithRunLengthEncoding(buffer: Uint8Array, imgData: Uint32Array, pos: number, length: number) {
+            
+            const paletteOffset = this.paletteOffset;
+            const palette = this.palette;
+
             let j = 0;
             while (j < length) {
                 let value = buffer[pos];
@@ -49,7 +55,7 @@ module Settlers {
                     }
                 }
                 else {
-                    color = this.palette.getColor(value);
+                    color = palette.getColor(paletteOffset + value);
                 }
 
                 for (let i = 0; (i < count) && (j < length); i++) {
@@ -61,14 +67,18 @@ module Settlers {
 
 
         private getImageDataWithNoEncoding(buffer: Uint8Array, imgData: Uint32Array, pos: number, length: number) {
+                 
+            const paletteOffset = this.paletteOffset;
+            const palette = this.palette;
+
             let j = 0;
             while (j < length) {
                 const value = buffer[pos];
                 pos++;
 
-                imgData[j++] = value << 8 | value << 16 | value | 0xFF000000;
+               // imgData[j++] = value << 8 | value << 16 | value | 0xFF000000;
 
-               // imgData[j++] = this.palette.getColor(value);
+                imgData[j++] = palette.getColor(paletteOffset + value);
             }
         }
 
@@ -82,7 +92,7 @@ module Settlers {
             let pos = this.dataOffset;
 
             if (this.imgType != 32) {
-                this.getImageDataWithRunLengthEncoding(buffer,imgData , pos, length);
+                this.getImageDataWithRunLengthEncoding(buffer, imgData, pos, length);
             }
             else {
                 this.getImageDataWithNoEncoding(buffer, imgData, pos, length);
@@ -92,9 +102,10 @@ module Settlers {
         }
 
 
-        constructor(reader: BinaryReader, palette: Palette) {
+        constructor(reader: BinaryReader, palette: Palette, paletteOffset: number) {
             this.data = reader;
             this.palette = palette;
+            this.paletteOffset = paletteOffset;
         }
 
         public toString(): string {

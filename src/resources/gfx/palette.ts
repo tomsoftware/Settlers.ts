@@ -2,7 +2,11 @@ module Settlers {
 
     /** a image color palette */
     export class Palette {
-        private palette: Uint32Array = new Uint32Array(256);
+        private palette: Uint32Array;
+
+        constructor(count:number = 256) {
+            this.palette = new Uint32Array(count)
+        }
 
         public setRGB(index: number, r: number, g: number, b: number) {
             this.palette[index] = r | (g << 8) | (b << 16) | (255 << 24);
@@ -13,7 +17,7 @@ module Settlers {
         }
 
         public read3BytePalette(buffer: Uint8Array, pos: number) {
-            for (let i = 0; i < 256; i++) {
+            for (let i = 0; i < this.palette.length; i++) {
 
                 let r = buffer[pos++];
                 let g = buffer[pos++];
@@ -25,10 +29,10 @@ module Settlers {
             return pos;
         }
 
-        public read16BitPalette(buffer: BinaryReader, pos: number, count:number) {
+        public read16BitPalette(buffer: BinaryReader, pos: number = 0) {
             buffer.setOffset(pos);
 
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < this.palette.length; i++) {
                 const value1 = buffer.readByte();
                 const value2 = buffer.readByte();
 
