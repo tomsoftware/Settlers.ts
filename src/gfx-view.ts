@@ -14,17 +14,24 @@ module Settlers {
         }
 
 
+
+
         /** load a new grafix */
         public load(fileId: string) {
 
-            /// check if .pil or .pi4 is used
-            this.resourceProvider.loadBinary(fileId + ".jil")
-                .then(() => this.loadAll(fileId, true))
-                .catch(() => this.loadAll(fileId, false))
+            const fileList: Promise<boolean>[] = [];
+            fileList.push(this.resourceProvider.fileExists(fileId + ".pil"));
+            fileList.push(this.resourceProvider.fileExists(fileId + ".jil"));
+            
+
+            Promise.all(fileList).then((filesExist) => {
+                this.doLoad(fileId, filesExist[0], filesExist[1]);
+            });
         }
 
+
         /** load a new grafix */
-        public loadAll(fileId: string, useJil: boolean) {
+        public doLoad(fileId: string, usePil: boolean, useJil: boolean) {
 
             this.log.debug("Using .jil=" + useJil);
 
@@ -33,15 +40,18 @@ module Settlers {
             fileList.push(this.resourceProvider.loadBinary(fileId + ".gfx"));
             fileList.push(this.resourceProvider.loadBinary(fileId + ".gil"));
 
-            if (useJil) {
-                fileList.push(this.resourceProvider.loadBinary(fileId + ".pi4"));
-                fileList.push(this.resourceProvider.loadBinary(fileId + ".p46"));
-                fileList.push(this.resourceProvider.loadBinary(fileId + ".dil"));
-                fileList.push(this.resourceProvider.loadBinary(fileId + ".jil"));
-            }
-            else {
+            if (usePil) {
                 fileList.push(this.resourceProvider.loadBinary(fileId + ".pil"));
                 fileList.push(this.resourceProvider.loadBinary(fileId + ".pa6"));
+            }
+            else {
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".pi4"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".p46"));
+            }
+
+            if (useJil) {
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".dil"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".jil"));
             }
 
 
