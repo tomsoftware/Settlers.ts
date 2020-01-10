@@ -22,19 +22,25 @@ module Settlers {
 
         private data: BinaryReader;
 
+        private palette: Palette;
+        private paletteOffset: number;
 
         public getDataSize(): number {
             return 0;
         }
 
 
-        private getImageDataWithRunLengthEncoding(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
+        private getImageDataWithRunLengthEncoding(buffer: Uint8Array, imgData: Uint32Array, pos: number, length: number) {
+            
+            const paletteOffset = this.paletteOffset;
+            const palette = this.palette;
+
             let j = 0;
             while (j < length) {
                 let value = buffer[pos];
                 pos++;
 
-                let r: number, g: number, b: number;
+                let color: number;
                 let count = 1;
 
                 if (value <= 1) {
@@ -42,52 +48,44 @@ module Settlers {
                     pos++;
 
                     if (value == 0) {
-                        g = b = 0;
-                        r = 255;
+                        color = 0xFF0000FF;
                     }
                     else {
-                        g = r = 0;
-                        b = 255;
+                        color = 0xFF00FF00;
                     }
                 }
                 else {
-                    r = g = b = value;
-                    /// todo: add color pallet
+                    color = palette.getColor(paletteOffset + value);
                 }
 
                 for (let i = 0; (i < count) && (j < length); i++) {
-                    imgData[j++] = r; // r
-                    imgData[j++] = g; // g
-                    imgData[j++] = b; // b
-                    imgData[j++] = 255; // alpha
+                    imgData[j++] = color;
                 }
 
             }
         }
 
 
-        private getImageDataWithNoEncoding(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
+        private getImageDataWithNoEncoding(buffer: Uint8Array, imgData: Uint32Array, pos: number, length: number) {
+                 
+            const paletteOffset = this.paletteOffset;
+            const palette = this.palette;
+
             let j = 0;
             while (j < length) {
-                let value = buffer[pos];
+                const value = buffer[pos];
                 pos++;
 
-                let r: number, g: number, b: number;
+               // imgData[j++] = value << 8 | value << 16 | value | 0xFF000000;
 
-                r = g = b = value;
-
-                /// todo: add color pallet
-
-                imgData[j++] = r; // r
-                imgData[j++] = g; // g
-                imgData[j++] = b; // b
-                imgData[j++] = 255; // alpha
+                imgData[j++] = palette.getColor(paletteOffset + value);
             }
         }
 
+
         public getImageData(): ImageData {
             let img = new ImageData(this.width, this.height);
-            let imgData = img.data;
+            let imgData = new Uint32Array(img.data.buffer);
 
             let buffer = this.data.getBuffer();
             let length = this.width * this.height * 4;
@@ -103,8 +101,11 @@ module Settlers {
             return img;
         }
 
-        constructor(reader: BinaryReader) {
+
+        constructor(reader: BinaryReader, palette: Palette, paletteOffset: number) {
             this.data = reader;
+            this.palette = palette;
+            this.paletteOffset = paletteOffset;
         }
 
         public toString(): string {

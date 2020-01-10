@@ -1,62 +1,75 @@
+/// <reference path="./resource-file.ts" />
+
 module Settlers {
 
     /** reads a .gfx file
      *    .gfx files contain images
      * */
-    export class GfxFileReader {
+    export class GfxFileReader extends ResourceFile {
 
         private log: LogHandler = new LogHandler("GfxFileReader");
         private images: GfxImage[];
-        private isWordHeader:boolean;
-
-        private magic:number;
-        private flag1 : number;
-        private flag2 : number;
-        private flag3 : number;
-        private flag4 : number;
+        private isWordHeader: boolean;
 
 
         /** return the number of images in this gfx file */
-        public getImageCount() :number {
+        public getImageCount(): number {
             return this.images ? this.images.length : 0;
         }
 
         /** return a Image by index */
-        public getImage(index:number) : GfxImage {
+        public getImage(index: number): GfxImage {
             if ((index < 0) || (index >= this.images.length)) {
-                this.log.log("Image Index out of range: "+ index);
+                this.log.log("Image Index out of range: " + index);
                 return null;
             }
             return this.images[index];
         }
 
 
-        constructor(reader: BinaryReader, offsetTable: GilFileReader) {
+        constructor(
+            reader: BinaryReader,
+            offsetTable: GilFileReader,
+            jobIndexList: JilFileReader,
+            directionIndexList: DilFileReader,
+            paletteCollection: PaletCollection) {
 
-            this.magic = reader.readIntBE();
-            this.flag1 = reader.readIntBE();
-            this.flag2 = reader.readIntBE();
-            this.flag3 = reader.readIntBE();
-            this.flag4 = reader.readIntBE();
+            super();
 
+
+            super.readResource(reader);
 
             let count = offsetTable.getImageCount();
             this.images = new Array<GfxImage>(count);
 
             for (let i = 0; i < count; i++) {
-                this.images[i] = this.readImage(reader, offsetTable.getImageOffset(i));
+                const gfxOffset = offsetTable.getImageOffset(i);
+
+                let jobIndex = i;
+                /// if we use a jil file or not?
+                if (directionIndexList) {
+                    const dirOffset = directionIndexList.reverseLookupOffset(i);
+                    jobIndex = jobIndexList.reverseLookupOffset(dirOffset);
+                }
+
+
+                this.images[i] = this.readImage(
+                    reader,
+                    gfxOffset,
+                    paletteCollection.getPalette(),
+                    paletteCollection.getOffset(jobIndex));
             }
         }
 
 
-        private readImage(reader: BinaryReader, offset: number): GfxImage {
+        private readImage(reader: BinaryReader, offset: number, plette: Palette, paletteOffset: number): GfxImage {
             reader.setOffset(offset);
 
             let imgHeadType = reader.readWordBE();
 
             reader.setOffset(offset);
 
-            let newImg = new GfxImage(reader);
+            let newImg = new GfxImage(reader, plette, paletteOffset);
 
             if (imgHeadType > 860) {
                 this.isWordHeader = true;
@@ -97,11 +110,7 @@ module Settlers {
         }
 
         public toString() {
-            return "gfx: "+  this.magic.toString(16) +"; "
-                + this.flag1 +", "
-                + this.flag2 +", "
-                + this.flag3 +", "
-                + this.flag4.toString(16) + "  --  "+ this.flag4.toString(2) +", --- "
+            return "gfx: " + super.toString() + ", --- "
                 + this.isWordHeader;
         }
     }

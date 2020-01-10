@@ -17,7 +17,7 @@ module Settlers {
         /** height of the image */
         public height: number;
 
-        public chunkHeight : number;
+        public chunkHeight: number;
 
         private data: BinaryReader;
 
@@ -25,22 +25,7 @@ module Settlers {
         public flag2: number;
         public rowCount: number;
 
-        private palette:Uint32Array = new Uint32Array(256);
-
-
-        public read3BytePalette(buffer: Uint8Array, pos:number) {
-
-            for(let i=0; i<256; i++) {
-
-               let r = buffer[pos++];
-               let g = buffer[pos++];
-               let b = buffer[pos++]; 
-
-               this.palette[i] = r | (g << 8) | (b << 16) | (255 << 24);
-            }
-
-            return pos;
-        }
+        private palette: Palette = new Palette();
 
 
         private getImageDataWithPalette(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
@@ -56,25 +41,25 @@ module Settlers {
             while (j < length) {
                 if (c <= 0) {
                     /// jump over palette data
-                    pos += 256*3;
-                    this.read3BytePalette(buffer, pos + chunklength);
+                    pos += 256 * 3;
+                    this.palette.read3BytePalette(buffer, pos + chunklength);
                     c = chunklength;
                 }
                 c--;
 
                 let index = buffer[pos++];
 
-                i[j++] = p[index];
+                i[j++] = p.getColor(index);
             }
 
-            
-            console.log("size : "+ (pos - this.dataOffset));
-            console.log("left byte: "+ (buffer.length - pos));
+
+            console.log("size : " + (pos - this.dataOffset));
+            console.log("left byte: " + (buffer.length - pos));
         }
 
 
         public getDataSize(): number {
-            return  this.width * this.height  + 
+            return this.width * this.height +
                 Math.floor(this.height / this.chunkHeight) * 3 * 256;
         }
 
@@ -88,22 +73,22 @@ module Settlers {
             let pos = this.dataOffset;
 
             this.getImageDataWithPalette(buffer, imgData, pos, length);
-         
+
             return img;
         }
 
-        constructor(reader: BinaryReader, width:number, chunkCount:number) {
+        constructor(reader: BinaryReader, width: number, chunkCount: number) {
             this.data = reader;
             this.chunkHeight = width;
             this.width = width;
-            this.height =  width * chunkCount;
+            this.height = width * chunkCount;
 
         }
 
         public toString(): string {
             return "size: (" + this.width + " x" + this.height + ") "
-                + "data offset " + this.dataOffset +" "
-                + "rows: " + this.rowCount +"; "
+                + "data offset " + this.dataOffset + " "
+                + "rows: " + this.rowCount + "; "
                 + "flags: " + this.flag1 + " / " + this.flag2;
         }
     }
