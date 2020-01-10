@@ -27,9 +27,15 @@ module Settlers {
         }
 
 
-        constructor(reader: BinaryReader, offsetTable: GilFileReader, paletteCollection: PaletCollection) {
+        constructor(
+            reader: BinaryReader,
+            offsetTable: GilFileReader,
+            jobIndexList: JilFileReader,
+            directionIndexList: DilFileReader,
+            paletteCollection: PaletCollection) {
 
             super();
+
 
             super.readResource(reader);
 
@@ -37,11 +43,21 @@ module Settlers {
             this.images = new Array<GfxImage>(count);
 
             for (let i = 0; i < count; i++) {
+                const gfxOffset = offsetTable.getImageOffset(i);
+
+                let jobIndex = i;
+                /// if we use a jil file or not?
+                if (directionIndexList) {
+                    const dirOffset = directionIndexList.reverseLookupOffset(i);
+                    jobIndex = jobIndexList.reverseLookupOffset(dirOffset);
+                }
+
+
                 this.images[i] = this.readImage(
-                    reader, 
-                    offsetTable.getImageOffset(i), 
-                    paletteCollection.getPalette(), 
-                    paletteCollection.getOffset(i));
+                    reader,
+                    gfxOffset,
+                    paletteCollection.getPalette(),
+                    paletteCollection.getOffset(jobIndex));
             }
         }
 
@@ -94,7 +110,7 @@ module Settlers {
         }
 
         public toString() {
-            return "gfx: " + super.toString() +", --- "
+            return "gfx: " + super.toString() + ", --- "
                 + this.isWordHeader;
         }
     }

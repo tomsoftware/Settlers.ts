@@ -17,20 +17,55 @@ module Settlers {
         /** load a new grafix */
         public load(fileId: string) {
 
-            const gil = this.resourceProvider.loadBinary(fileId + ".gil");
-            const gfx = this.resourceProvider.loadBinary(fileId + ".gfx");
+            /// check if .pil or .pi4 is used
+            this.resourceProvider.loadBinary(fileId + ".jil")
+                .then(() => this.loadAll(fileId, true))
+                .catch(() => this.loadAll(fileId, false))
+        }
 
-            const pil = this.resourceProvider.loadBinary(fileId + ".pil");
-            const pa6 = this.resourceProvider.loadBinary(fileId + ".pa6");
+        /** load a new grafix */
+        public loadAll(fileId: string, useJil: boolean) {
 
-            Promise.all([gil, gfx, pil, pa6]).then((files) => {
-                const gfxIndexList = new GilFileReader(files[0]);
-                const paletteIndexList = new PilFileReader(files[2]);
-                const palletCollection = new PaletCollection(files[3], paletteIndexList);
+            this.log.debug("Using .jil=" + useJil);
 
-                this.gfxFile = new GfxFileReader(files[1], gfxIndexList, palletCollection);
-                
-    
+            const fileList: Promise<BinaryReader>[] = [];
+
+            fileList.push(this.resourceProvider.loadBinary(fileId + ".gfx"));
+            fileList.push(this.resourceProvider.loadBinary(fileId + ".gil"));
+
+            if (useJil) {
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".pi4"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".p46"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".dil"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".jil"));
+            }
+            else {
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".pil"));
+                fileList.push(this.resourceProvider.loadBinary(fileId + ".pa6"));
+            }
+
+
+            Promise.all(fileList).then((files) => {
+                const gfx = files[0];
+                const gil = files[1];
+                const paletteIndex = files[2];
+                const palette = files[3];
+
+                const gfxIndexList = new GilFileReader(gil);
+                const paletteIndexList = new PilFileReader(paletteIndex);
+                const palletCollection = new PaletCollection(palette, paletteIndexList);
+
+                let directionIndexList: DilFileReader = null;
+                let jobIndexList: JilFileReader = null;
+
+                if (useJil) {
+                    directionIndexList = new DilFileReader(files[4]);
+                    jobIndexList = new JilFileReader(files[5]);
+                }
+
+                this.gfxFile = new GfxFileReader(gfx, gfxIndexList, jobIndexList, directionIndexList, palletCollection);
+
+
                 this.fillUiList(this.gfxFile);
 
 
