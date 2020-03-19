@@ -29,7 +29,7 @@ module Settlers {
                 this.loadBinary(fileName)
                     .then(() => resolve(true))
                     .catch(()  => resolve(false))
-            }
+            })
         }
 
         /** load file from lib or from remote source */
