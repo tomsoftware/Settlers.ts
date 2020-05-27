@@ -42,6 +42,7 @@ module Settlers {
             let count = offsetTable.getImageCount();
             this.images = new Array<GfxImage>(count);
 
+            let lastGood = 0;
             for (let i = 0; i < count; i++) {
                 const gfxOffset = offsetTable.getImageOffset(i);
 
@@ -50,6 +51,8 @@ module Settlers {
                 if (directionIndexList) {
                     const dirOffset = directionIndexList.reverseLookupOffset(i);
                     jobIndex = jobIndexList.reverseLookupOffset(dirOffset);
+                    jobIndex = jobIndex == -1 ? lastGood : jobIndex;
+                    lastGood = jobIndex;
                 }
 
 

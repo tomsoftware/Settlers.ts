@@ -34,7 +34,7 @@ module Settlers {
             }
 
             this.log.log("Unable to find offset gilIndex:" + gilIndex);
-            return 0;
+            return lastGood;
 
         }
 

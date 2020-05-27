@@ -27,7 +27,7 @@ module Settlers {
             }
 
             this.log.log("Unable to find offset dirOffset: " + dirOffset);
-            return 0;
+            return -1;
 
         }
 
