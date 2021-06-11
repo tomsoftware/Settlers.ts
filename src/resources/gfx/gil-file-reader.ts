@@ -1,50 +1,49 @@
-/// <reference path="./resource-file.ts" />
+import { LogHandler } from '@/utilities/log-handler';
+import { BinaryReader } from '../file/binary-reader';
+import { ResourceFile } from './resource-file';
 
-module Settlers {
-
-    /** interpreates a .gil file -
+/** interprets a .gil file -
      *  gil may stand for: "graphic index list" file
      *  it contains the offsets for all frames in a .gfx file
      * */
-    export class GilFileReader extends ResourceFile {
-
-        private log: LogHandler = new LogHandler("GilFileReader");
+export class GilFileReader extends ResourceFile {
+        private log: LogHandler = new LogHandler('GilFileReader');
 
         private offsetTable: Int32Array;
 
         /** return the number of images stored in the gfx file */
-        public getImageCount() {
-            return this.offsetTable ? this.offsetTable.length : 0;
+        public getImageCount():number {
+          return this.offsetTable ? this.offsetTable.length : 0;
         }
 
-        /** return the fileoffset of a gfx image */
+        /** return the file offset of a gfx image */
         public getImageOffset(index: number): number {
-            if ((index < 0) || (index >= this.offsetTable.length)) {
-                this.log.log("Gfx-Index out of range: " + index);
-                return -1;
-            }
-            return this.offsetTable[index];
+          if ((index < 0) || (index >= this.offsetTable.length)) {
+            this.log.error('Gfx-Index out of range: ' + index);
+            return -1;
+          }
+          return this.offsetTable[index];
         }
 
-        constructor(resouceReader: BinaryReader) {
-            super();
+        constructor(resourceReader: BinaryReader) {
+          super();
 
-            const reader = super.readResource(resouceReader);
+          const reader = super.readResource(resourceReader);
 
-          
-            let imageCount = reader.length / 4;
-            this.log.debug('image count ' + imageCount);
+          const imageCount = reader.length / 4;
+          this.log.debug('image count ' + imageCount + ' of ' + resourceReader.filename + '  with size ' + reader.length);
 
-            this.offsetTable = new Int32Array(imageCount);
+          this.offsetTable = new Int32Array(imageCount);
 
-            /// image offsets
-            for (let i = 0; i < imageCount; i++) {
-                this.offsetTable[i] = reader.readIntBE();
-            }
+          /// image offsets
+          for (let i = 0; i < imageCount; i++) {
+            this.offsetTable[i] = reader.readIntBE();
+          }
+
+          Object.seal(this);
         }
 
         public toString(): string {
-            return "gil: " + super.toString();
+          return 'gil: ' + super.toString();
         }
-    }
 }

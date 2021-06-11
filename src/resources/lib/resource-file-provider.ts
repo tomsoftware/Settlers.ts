@@ -1,59 +1,69 @@
-module Settlers {
-    /** provides resource files for the game
-     *  tryes to get the file from lib and falls back to "loosely" file from "disk"
+import { FileListProvider } from '@/utilities/file-list-provider';
+import { LogHandler } from '@/utilities/log-handler';
+import { Path } from '@/utilities/path';
+import { BinaryReader } from '../file/binary-reader';
+import { FileProvider } from '../file/file-provider';
+import { LibFileReader } from './lib-file-reader';
+
+/** provides resource files for the game
+     *  types to get the file from lib and falls back to "loosely" file from "disk"
     */
-    export class ResourceFileProvier {
-        private subPath: string;
-        private log: LogHandler = new LogHandler("ResourceFileProvier");
-        private libFile: Promise<LibFileReader>;
-        private fileProvider: FileProvider;
+export class ResourceFileProvider {
+    private log: LogHandler = new LogHandler('ResourceFileProvider');
+    private libFile: Promise<LibFileReader>;
+    private fileProvider: FileProvider;
 
-        constructor(rootPath: string, subPath: string, libFileName: string) {
-            this.subPath = subPath;
-            this.fileProvider = new FileProvider(rootPath);
+    constructor(libFileName: string) {
+      this.fileProvider = new FileProvider();
 
-            this.libFile = new Promise((resolve, reject) => {
-                this.fileProvider.loadBinary(libFileName)
-                    .then((b) => {
-                        resolve(new LibFileReader(b));
-                    }).catch((msg) => {
-                        this.log.log("Unable to read lib file: " + msg);
-                        reject(msg);
-                    })
-            });
-        }
+      this.libFile = new Promise((resolve, reject) => {
+        new FileListProvider().filter(libFileName)
+          .then((fullLibFileNameList) => {
+            if (fullLibFileNameList.length < 1) {
+              reject(new Error('Unable to resolve full path for: ' + libFileName));
+              return;
+            }
 
-        /** check if file exists */
-        public fileExists(fileName: string): Promise<boolean> {
-            return new Promise((resolve, reject) => {
-                this.loadBinary(fileName)
-                    .then(() => resolve(true))
-                    .catch(()  => resolve(false))
-            })
-        }
+            this.log.debug('full path for ' + libFileName + ' is: ' + fullLibFileNameList[0]);
+            return this.fileProvider.loadBinary(fullLibFileNameList[0]);
+          })
+          .then((b) => {
+            if (b) {
+              resolve(new LibFileReader(b));
+            }
+          }).catch((msg) => {
+            this.log.error('Unable to read lib file: ' + msg);
+            reject(msg);
+          });
+      });
 
-        /** load file from lib or from remote source */
-        public loadBinary(fileName: string): Promise<BinaryReader> {
-            let fullFileName = Path.concat(this.subPath, fileName);
+      Object.seal(this);
+    }
 
-            return new Promise((resolve, reject) => {
-                this.libFile.then((lib) => {
-                    let f = lib.getFileInfoByFileName(Path.getPathName(fullFileName), Path.getFileName(fullFileName), true);
-                    if (f) {
-                        resolve(f.getReader());
-                        return;
-                    }
+    /** check if file exists */
+    public fileExists(fileName: string): Promise<boolean> {
+      return new Promise((resolve) => {
+        this.loadBinary(fileName)
+          .then(() => resolve(true))
+          .catch(() => resolve(false));
+      });
+    }
 
-                    this.fileProvider.loadBinary(fullFileName)
-                        .then((b) => {
-                            resolve(b);
-                            return;
-                        }).catch((msg) => {
-                            this.log.log("Unable to read resource file: " + msg.statusText);
-                            reject(msg);
-                        })
-                });
-            });
-        }
+    /** load file from lib or from remote source */
+    public async loadBinary(fileName: string): Promise<BinaryReader> {
+      const lib = await this.libFile;
+      const f = lib.getFileInfoByFileName(Path.getPathName(fileName), Path.getFileName(fileName), true);
+      if (f) {
+        return f.getReader();
+      }
+
+      this.log.debug('Not in lib: ' + fileName);
+
+      const fileList = await (new FileListProvider()).filter(fileName);
+      if (fileList.length <= 0) {
+        throw (new Error('file not found ' + fileName));
+      }
+
+      return await this.fileProvider.loadBinary(fileList[0]);
     }
 }

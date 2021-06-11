@@ -1,114 +1,109 @@
+import { LogHandler } from '@/utilities/log-handler';
+import { BinaryReader } from '../file/binary-reader';
+import { LibFileItem } from './lib-file-item';
+import { PathList } from './path-list';
 
-module Settlers {
+/** header of a lib file */
+export class LibFileHeader {
+    private log: LogHandler = new LogHandler('LibFileHeader');
 
-    /** healder of a lib file */
-    export class LibFileHeader {
-        private log: LogHandler = new LogHandler("LibFileHeader");
+    private reader: BinaryReader;
 
-        private reader: BinaryReader;
+    public headerOffset = 0;
+    public length = 0;
+    public unknown = 0;
 
-        public headerOffset: number = 0;
-        public length: number = 0;
-        public unknown: number = 0;
+    public pathNameListOffset = 0;
+    public pathNameListLength = 0;
+    public pathNameCount = 0;
 
-        public pathNameListOffset: number = 0;
-        public pathNameListLenght: number = 0;
-        public pathNameCount: number = 0;
+    public fileNameListOffset = 0;
+    public fileNameListLength = 0;
+    public fileNameCount = 0;
 
-        public fileNameListOffset: number = 0;
-        public fileNameListLenght: number = 0;
-        public fileNameCount: number = 0;
+    public fileInfoOffset = 0;
 
-        public fileInfoOffset: number = 0;
+    private pathList: PathList | null = null;
 
-        private pathList:PathList;
+    constructor(data: BinaryReader, offset: number) {
+      this.reader = new BinaryReader(data);
 
-        constructor(data: BinaryReader, offset: number) {
-            this.reader = new BinaryReader(data);
+      if (!this.readHeader(this.reader, offset)) {
 
-            if (!this.readHeader(this.reader, offset)) {
-                return;
-            }
-        }
+      }
 
+      Object.seal(this);
+    }
 
-        public getPathList(): PathList {
-            if (!(this.pathList)) {
-                this.pathList = new PathList(this.readFileNames(this.reader, this.pathNameListOffset, this.pathNameCount));
-            }
-            return this.pathList;
-        }
+    public getPathList(): PathList {
+      if (!this.pathList) {
+        this.pathList = new PathList(this.readFileNames(this.reader, this.pathNameListOffset, this.pathNameCount));
+      }
 
+      return this.pathList;
+    }
 
-        public getFileInfo(): LibFileItem[] {
-            let count = this.fileNameCount;
+    public getFileInfo(): LibFileItem[] {
+      const count = this.fileNameCount;
 
-            let result = new Array<LibFileItem>(count);
+      const result = new Array<LibFileItem>(count);
 
-            let fileNames = this.readFileNames(this.reader, this.fileNameListOffset, this.fileNameCount);
+      const fileNames = this.readFileNames(this.reader, this.fileNameListOffset, this.fileNameCount);
 
-            this.reader.setOffset(this.fileInfoOffset);
+      this.reader.setOffset(this.fileInfoOffset);
 
-            let pathNames = this.getPathList();
+      const pathNames = this.getPathList();
 
-            for (let i = 0; i < count; i++) {
-                result[i] = new LibFileItem();
-                result[i].read(this.reader, fileNames[i], pathNames);
-            }
+      for (let i = 0; i < count; i++) {
+        result[i] = new LibFileItem();
+        result[i].read(this.reader, fileNames[i], pathNames);
+      }
 
-            return result;
-        }
+      return result;
+    }
 
+    private readHeader(data: BinaryReader, offset: number): boolean {
+      const HeaderSize = 6 * 4;
 
-        private readHeader(data: BinaryReader, offset: number): boolean {
+      if ((offset < 0) || (data.length < offset + HeaderSize)) {
+        this.log.error('Unable to process LibFileHeader of ' + data.filename + ' - wrong offset');
+        return false;
+      }
 
-            const HeaderSize = 6 * 4;
+      data.setOffset(offset);
+      this.headerOffset = offset;
 
-            if ((offset < 0) || (data.length < offset + HeaderSize)) {
-                this.log.log("Unable to process LibFileHeader of " + data.filename + " - wrong offset");
-                return;
-            }
+      this.length = data.readIntBE();
+      this.unknown = data.readIntBE();
+      this.pathNameListLength = data.readIntBE();
+      this.pathNameCount = data.readIntBE();
+      this.fileNameListLength = data.readIntBE();
+      this.fileNameCount = data.readIntBE();
 
-            data.setOffset(offset);
-            this.headerOffset = offset;
+      this.pathNameListOffset = this.headerOffset + HeaderSize;
+      this.fileNameListOffset = this.pathNameListOffset + this.pathNameListLength;
+      this.fileInfoOffset = this.fileNameListOffset + this.fileNameListLength;
 
-            this.length = data.readIntBE();
-            this.unknown = data.readIntBE();
-            this.pathNameListLenght = data.readIntBE();
-            this.pathNameCount = data.readIntBE();
-            this.fileNameListLenght = data.readIntBE();
-            this.fileNameCount = data.readIntBE();
+      return true;
+    }
 
-            this.pathNameListOffset = this.headerOffset + HeaderSize;
-            this.fileNameListOffset = this.pathNameListOffset + this.pathNameListLenght;
-            this.fileInfoOffset = this.fileNameListOffset + this.fileNameListLenght;
+    private readFileNames(data: BinaryReader, offset: number, count: number): string[] {
+      if (count <= 0) {
+        return new Array<string>(0);
+      }
 
-            return true;
-        }
+      data.setOffset(offset);
 
+      const list = new Array<string>(count);
 
-        private readFileNames(data: BinaryReader, offset: number, count: number): string[] {
-            if (count <= 0) {
-                return new Array<string>(0);
-            }
+      for (let i = 0; i < count; i++) {
+        list[i] = data.readNullString();
+      }
 
-            data.setOffset(offset);
+      return list;
+    }
 
-            let list = new Array<string>(count);
-
-            for (let i = 0; i < count; i++) {
-                list[i] = data.readNullString();
-            }
-
-            return list;
-        }
-
-
-        public toString(): string {
-            return "Files: " + this.fileNameCount + "; Pathes:" + this.pathNameCount;
-        }
-
-
-
+    public toString(): string {
+      return 'Files: ' + this.fileNameCount + '; Paths:' + this.pathNameCount;
     }
 }

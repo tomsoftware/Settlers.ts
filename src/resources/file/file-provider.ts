@@ -1,96 +1,100 @@
-/// <reference path="binary-reader.ts"/>
+import { LogHandler } from '@/utilities/log-handler';
+import { Path } from '@/utilities/path';
+import { BinaryReader } from './binary-reader';
 
-module Settlers {
+class RequestError extends Error {
+  public state: number;
+  public statusText: string;
 
-  /**
-  * Handle Files loading from remote/web
-  */
-  export class FileProvider {
+  constructor(state: number, msg: string) {
+    super(msg);
+    this.statusText = msg;
+    this.state = state;
 
-    private log: LogHandler = new LogHandler("FileProvider");
+    Object.seal(this);
+  }
+}
 
+/**
+* Handle Files loading from remote/web
+*/
+export class FileProvider {
+  private log: LogHandler = new LogHandler('FileProvider');
+  private rootPath?: string;
 
-    constructor(private rootPath: string) {
+  constructor(rootPath?: string) {
+    this.rootPath = rootPath;
 
-    }
+    Object.seal(this);
+  }
 
-    /** load binary data from URL: rootPath + [path] + filename */
-    public loadBinary(path: string, filename: string = null): Promise<BinaryReader> {
+  /** load binary data from URL: rootPath + [path] + filename */
+  public loadBinary(path: string, filename?: string): Promise<BinaryReader> {
+    const url = Path.combine(this.rootPath, path, filename);
 
-      let url = Path.concat(this.rootPath, path, filename);
+    this.log.debug('loading: ' + url);
 
-      this.log.debug("loading:" + url);
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
 
-      return new Promise((resolve, reject) => {
-        var xhr = new XMLHttpRequest();
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const reader = new BinaryReader(xhr.response, 0, undefined, this.filenameFormUrl(url));
 
-        xhr.onload = () => {
-
-          if (xhr.status >= 200 && xhr.status < 300) {
-            let reader = new BinaryReader(xhr.response, 0, null, this.filenameFormUrl(url));
-
-            resolve(reader);
-
-          } else {
-
-            this.log.log("error load file:" + url);
-            reject({ status: xhr.status, statusText: xhr.statusText });
-          }
-        };
-
-
-        xhr.onerror = () => {
-          this.log.log("error load file:" + url);
-          reject({ status: xhr.status, statusText: xhr.statusText });
-        };
-
-        xhr.open("GET", url);
-        xhr.responseType = "arraybuffer";
-
-        xhr.send();
-      });
-    }
-
-
-    /** load string data from URL */
-    public loadString(url: string): Promise<string> {
-
-      this.log.log("Load file as string: " + url);
-
-      return new Promise((resolve, reject) => {
-
-        let xhr = new XMLHttpRequest();
-
-        xhr.onload = (oEvent) => {
-          resolve(xhr.response);
+          resolve(reader);
+        } else {
+          this.log.error('error load file:' + url);
+          reject(new RequestError(xhr.status, xhr.statusText));
         }
+      };
 
-        xhr.onerror = () => {
-          this.log.log("error load file:" + url);
-          reject({ status: xhr.status, statusText: xhr.statusText });
-        }
+      xhr.onerror = () => {
+        this.log.error('error load file:' + url);
+        reject(new RequestError(xhr.status, xhr.statusText));
+      };
 
-        /// setup query
-        xhr.open('GET', url, true);
-        xhr.responseType = "text";
+      xhr.open('GET', url);
+      xhr.responseType = 'arraybuffer';
 
+      xhr.send();
+    });
+  }
 
-        /// call url
-        xhr.send(null);
-      });
+  /** load string data from URL */
+  public loadString(url: string): Promise<string> {
+    this.log.debug('Load file as string: ' + url);
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.onload = () => {
+        resolve(xhr.response);
+      };
+
+      xhr.onerror = () => {
+        this.log.error('error load file:' + url);
+        reject(new RequestError(xhr.status, xhr.statusText));
+      };
+
+      /// setup query
+      xhr.open('GET', url, true);
+      xhr.responseType = 'text';
+
+      /// call url
+      xhr.send(null);
+    });
+  }
+
+  /** Extracts the filename form an URL */
+  private filenameFormUrl(url: string): string {
+    if (url === '') {
+      return '';
     }
 
+    url = url.substring(0, (url.indexOf('#') === -1) ? url.length : url.indexOf('#'));
+    url = url.substring(0, (url.indexOf('?') === -1) ? url.length : url.indexOf('?'));
+    url = url.substring(url.lastIndexOf('/') + 1, url.length);
 
-    /** Extracts the filename form an URL */
-    private filenameFormUrl(url: string): string {
-      if (url == "") return "";
-
-      url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
-      url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
-      url = url.substring(url.lastIndexOf("/") + 1, url.length);
-
-      return url;
-    }
-
+    return url;
   }
 }

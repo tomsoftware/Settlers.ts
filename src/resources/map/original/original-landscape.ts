@@ -1,48 +1,50 @@
-module Settlers {
+import { LogHandler } from '@/utilities/log-handler';
+import { Size } from '@/utilities/size';
+import { IMapLandscape } from '../imap-landscape';
+import { MapChunkType } from './map-chunk-type';
+import { OriginalMapFile } from './original-map-file';
 
+/** provides access to the original landscape data */
+export class OriginalLandscape implements IMapLandscape {
+    private log: LogHandler = new LogHandler('OriginalLandscape');
+    private data: Uint8Array;
+    private mapSize: Size;
 
-    /** provides access to the original landscape data */
-    export class OriginalLandscape implements IMapLandscape {
+    public constructor(mapFile: OriginalMapFile, mapSize: Size, mapChunkType: MapChunkType) {
+      this.mapSize = mapSize;
 
-        private log: LogHandler = new LogHandler("OriginalLandscape");
-        private data: Uint8Array;
-        private mapSize: Size;
+      const reader = mapFile.getChunkReader(mapChunkType);
+      if (!reader) {
+        this.log.error('No landscape data in this file!');
+        this.data = new Uint8Array(0);
+        return;
+      }
 
-        public constructor(mapFile: OriginalMapFile, mapSize: Size, mapChunkType: MapChunkType) {
-            this.mapSize = mapSize;
+      this.data = reader.getBuffer();
+    }
 
-            let reader = mapFile.getChunkReader(mapChunkType);
-            if (!reader) {
-                this.log.log('No landscape data in this file!');
-                this.data = new Uint8Array(0);
-                return;
-            }
+    /** returns every n-th byte of the data buffer */
+    public getSlice(offset: number): Uint8Array {
+      const land = this.data;
+      const result = new Uint8Array(this.mapSize.width * this.mapSize.height);
 
-            this.data = reader.getBuffer();
-        }
+      if ((land.length * 4) !== result.length) {
+        this.log.error('Size of landscape Data is wrong!');
+        return new Uint8Array(0);
+      }
 
-        /** returns every n-th byte of the data buffer */
-        public getSlice(offset: number): Uint8Array {
-            let land = this.data;
-            let result = new Uint8Array(this.mapSize.width * this.mapSize.height);
+      for (let i = 0, j = offset; i < land.length; i += 4, j++) {
+        result[j] = land[i];
+      }
 
-            if ((land.length * 4) != result.length) {
-                this.log.log('Size of landscape Data is wrong!');
-                return new Uint8Array(0);
-            }
+      return result;
+    }
 
-            for (let i = 0, j = offset; i < land.length; i += 4, j++) {
-                result[j] = land[i];
-            }
-        }
+    public getGroundHeight(): Uint8Array {
+      return this.getSlice(0);
+    }
 
-        
-        public getGroundHeight(): Uint8Array {
-            return this.getSlice(0);
-        }
-
-        public getGroundType(): Uint8Array {
-            return this.getSlice(1);
-        }
+    public getGroundType(): Uint8Array {
+      return this.getSlice(1);
     }
 }

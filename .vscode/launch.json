@@ -1,54 +1,23 @@
 {
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-          {
-          "name": "Launch file",
-          "type": "chrome",
-          "request": "launch",
-          "url": "http://localhost:8888/",
-          "webRoot": "${workspaceRoot}\\run\\"
-      },
-	  {
-          "name": "Launch localhost - map debug",
-          "type": "chrome",
-          "request": "launch",
-          "sourceMaps": true,
-          "url": "http://localhost:8888/show_map.html",
-          "webRoot": "${workspaceRoot}/run"
-      },
-      {
-          "name": "Launch localhost - lib file debug",
-          "type": "chrome",
-          "request": "launch",
-          "sourceMaps": true,
-          "url": "http://localhost:8888/show_libfile.html",
-          "webRoot": "${workspaceRoot}/run"
-      },
-      {
-        "name": "Launch localhost - gfx file debug",
-        "type": "chrome",
-        "request": "launch",
-        "sourceMaps": true,
-        "url": "http://localhost:8888/show_gfxfile.html",
-        "webRoot": "${workspaceRoot}/run"
-	  },
     {
-        "name": "Launch localhost - gh file debug",
-        "type": "chrome",
-        "request": "launch",
-        "sourceMaps": true,
-        "url": "http://localhost:8888/show_ghfile.html",
-        "webRoot": "${workspaceRoot}/run"
+      "name": "Launch localhost Chrome",
+      "request": "launch",
+      "type": "chrome",
+      "userDataDir": false,
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
     },
     {
-      "name": "Launch localhost - landscape debug",
-      "type": "chrome",
+      "name": "Launch localhost firefox",
       "request": "launch",
-      "sourceMaps": true,
-      "url": "http://localhost:8888/render_landscape.html",
-      "webRoot": "${workspaceRoot}/run"
-  }
-	
-	
+      "type": "firefox",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    }
   ]
 }
