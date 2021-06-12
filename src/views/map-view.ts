@@ -3,16 +3,18 @@ import { FileProvider } from '@/resources/file/file-provider';
 import { MapLoader } from '@/resources/map/map-loader';
 import { OriginalMapFile } from '@/resources/map/original/original-map-file';
 import { MapChunk } from '@/resources/map/original/map-chunk';
+import { IMapLoader } from '@/resources/map/imap-loader';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
-import { IMapLoader } from '@/resources/map/imap-loader';
+import RendererView from '@/components/renderer-viewer.vue';
 
 @Options({
   name: 'MapView',
   components: {
     FileBrowser,
-    HexViewer
+    HexViewer,
+    RendererView
   }
 })
 export default class MapView extends Vue {

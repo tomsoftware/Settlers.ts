@@ -2,7 +2,7 @@ import { LogHandler } from '@/utilities/log-handler';
 
 /** Class to provide a read pointer and read functions to a binary Buffer */
 export class BinaryReader {
-  private readonly log: LogHandler = new LogHandler('BinaryReader');
+  private readonly log = new LogHandler('BinaryReader');
   public filename: string;
   protected readonly data: Uint8Array;
   protected readonly hiddenOffset: number;

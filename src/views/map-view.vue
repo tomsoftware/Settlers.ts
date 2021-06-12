@@ -25,6 +25,8 @@
     />
 
   </div>
+
+  <renderer-view />
 </template>
 
 <script src="./map-view.ts"></script>
