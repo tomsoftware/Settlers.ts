@@ -28,7 +28,7 @@ export class ShaderProgram {
     }
 
     public create():boolean {
-      // Create a shader program object to store combined shader program.
+      // Create a shader program object to store combined shader program
       this.shaderProgram = this.gl.createProgram();
 
       if (!this.shaderProgram) {
@@ -36,12 +36,12 @@ export class ShaderProgram {
         return false;
       }
 
-      // Attach all shader.
+      // Attach all shaders
       for (const s of this.shaders) {
         this.gl.attachShader(this.shaderProgram, s);
       }
 
-      // Link both programs.
+      // Link programs
       this.gl.linkProgram(this.shaderProgram);
 
       return true;
@@ -89,6 +89,19 @@ export class ShaderProgram {
       }
     }
 
+    /**
+     * setup, compiles shaders and links GLSL program
+     */
+    public attachShaders(srcVertex: string, srcFragment: string) {
+      const r1 = this.attachShader(srcVertex, ShaderType.VERTEX_SHADER);
+      const r2 = this.attachShader(srcFragment, ShaderType.FRAGMENT_SHADER);
+
+      return r1 && r2;
+    }
+
+    /**
+     * setup, compiles one shader and links GLSL program
+     */
     public attachShader(src: string, shaderType: ShaderType) : boolean {
       // Create a shader object.
       const newShader = this.gl.createShader(this.shaderTypeToNumber(shaderType));
