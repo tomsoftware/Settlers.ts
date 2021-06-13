@@ -2,7 +2,6 @@ import { LogHandler } from '@/utilities/log-handler';
 import { ShaderProgram } from './shader-program';
 import vertCode from './test-vert.glsl';
 import fragCode from './test-frag.glsl';
-import { m4 } from './tools';
 
 // https://stackoverflow.com/questions/48741570/how-can-i-import-glsl-as-string-in-typescript
 // https://tympanus.net/codrops/2019/01/17/interactive-particles-with-three-js/
@@ -66,48 +65,30 @@ export class Renderer {
         return alert('need ANGLE_instanced_arrays');  // eslint-disable-line
       }
 
-      const positionLoc = sp.getAttribLocation('a_position');
-      const colorLoc = sp.getAttribLocation('color');
-      const matrixLoc = sp.getAttribLocation('matrix');
-      const projectionLoc = sp.getUniformLocation('projection');
-      const viewLoc = sp.getUniformLocation('view');
+      // activate shader
+      sp.use();
 
+      const numVertices = 6;
+      // setup matrices, one per instance
+      const numInstances = 5;
+
+      // define vertex
+      const positionLoc = sp.getAttribLocation('a_position');
       const positionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -0.1, 0.4,
-        -0.1, -0.4,
-        0.1, -0.4,
-        0.1, -0.4,
-        -0.1, 0.4,
-        0.1, 0.4,
-        0.4, -0.1,
-        -0.4, -0.1,
-        -0.4, 0.1,
-        -0.4, 0.1,
-        0.4, -0.1,
-        0.4, 0.1
+        0.0, 0.0,
+        -0.5, 1.0,
+        0.5, 1.0,
+
+        0.0, 0.0,
+        0.5, 1.0,
+        1.0, 0.0
       ]), gl.STATIC_DRAW);
-      const numVertices = 12;
 
-      // setup matrices, one per instance
-      const numInstances = 5;
-      // make a typed array with one view per matrix
-      const matrixData = new Float32Array(numInstances * 16);
-      const matrices = [];
-      for (let i = 0; i < numInstances; ++i) {
-        const byteOffsetToMatrix = i * 16 * 4;
-        const numFloatsForView = 16;
-        matrices.push(new Float32Array(
-          matrixData.buffer,
-          byteOffsetToMatrix,
-          numFloatsForView));
-      }
-
-      const matrixBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
-      // just allocate the buffer
-      gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, gl.DYNAMIC_DRAW);
+      // ///////////
+      // define color
+      const colorLoc = sp.getAttribLocation('color');
 
       // setup colors, one per instance
       const colorBuffer = gl.createBuffer();
@@ -122,59 +103,54 @@ export class Renderer {
         ]),
         gl.STATIC_DRAW);
 
-      const canvas = this.canvas;
-
-      // Tell WebGL how to convert from clip space to pixels
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-      sp.use();
-
-      // set the view and projection matrices since
-      // they are shared by all instances
-      const aspect = canvas.clientWidth / canvas.clientHeight;
-      gl.uniformMatrix4fv(projectionLoc, false,
-        m4.orthographic(-aspect, aspect, -1, 1, -1, 1));
-      gl.uniformMatrix4fv(viewLoc, false, m4.zRotation(1 * 0.1));
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.enableVertexAttribArray(positionLoc);
-      gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
-
-      // update all the matrices
-      matrices.forEach((mat, ndx) => {
-        m4.translation(-0.5 + ndx * 0.25, 0, 0, mat);
-        m4.zRotate(mat, 1 * (0.1 + 0.1 * ndx), mat);
-      });
-
-      // upload the new matrix data
-      gl.bindBuffer(gl.ARRAY_BUFFER, matrixBuffer);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, matrixData);
-
-      // set all 4 attributes for matrix
-      const bytesPerMatrix = 4 * 16;
-      for (let i = 0; i < 4; ++i) {
-        const loc = matrixLoc + i;
-        gl.enableVertexAttribArray(loc);
-        // note the stride and offset
-        const offset = i * 16; // 4 floats per row, 4 bytes per float
-        gl.vertexAttribPointer(
-          loc, // location
-          4, // size (num values to pull from buffer per iteration)
-          gl.FLOAT, // type of data in buffer
-          false, // normalize
-          bytesPerMatrix, // stride, num bytes to advance to get to next set of values
-          offset // offset in buffer
-        );
-        // this line says this attribute only changes for each 1 instance
-        ext.vertexAttribDivisorANGLE(loc, 1);
-      }
-
       // set attribute for color
       gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
       gl.enableVertexAttribArray(colorLoc);
       gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
       // this line says this attribute only changes for each 1 instance
       ext.vertexAttribDivisorANGLE(colorLoc, 1);
+
+      // ///////////
+      // define color
+      const mapPos = sp.getAttribLocation('map_pos');
+
+      // setup colors, one per instance
+      const mapPosBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, mapPosBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER,
+        new Int16Array([
+          0, 0,
+          1, 0,
+          2, 0,
+          0, 1,
+          1, 1
+        ]),
+        gl.STATIC_DRAW);
+
+      // set attribute for color
+      gl.bindBuffer(gl.ARRAY_BUFFER, mapPosBuffer);
+      gl.enableVertexAttribArray(mapPos);
+      gl.vertexAttribPointer(mapPos, 2, gl.SHORT, false, 0, 0);
+
+      // this line says this attribute only changes for each 1 instance
+      ext.vertexAttribDivisorANGLE(mapPos, 1);
+
+      // /////////
+      // define camera
+      const projectionLoc = sp.getUniformLocation('projection');
+      const canvas = this.canvas;
+
+      // Tell WebGL how to convert from clip space to pixels
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+      // set the view and projection matrices since
+      // they are shared by all instances
+      const aspect = canvas.clientWidth / canvas.clientHeight;
+      gl.uniformMatrix4fv(projectionLoc, false,Renderer.orthographic(-aspect, aspect, 1, -1, -1, 1));
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.enableVertexAttribArray(positionLoc);
+      gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
       ext.drawArraysInstancedANGLE(
         gl.TRIANGLES,
@@ -184,6 +160,30 @@ export class Renderer {
       );
 
       requestAnimationFrame(() => this.draw);
+    }
+
+    /** Creates a 4-by-4 orthographic projection matrix */
+    public static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number):Float32Array {
+      const mat = new Float32Array(16);
+  
+      mat[0] = 2 / (right - left);
+      mat[1] = 0;
+      mat[2] = 0;
+      mat[3] = 0;
+      mat[4] = 0;
+      mat[5] = 2 / (top - bottom);
+      mat[6] = 0;
+      mat[7] = 0;
+      mat[8] = 0;
+      mat[9] = 0;
+      mat[10] = 2 / (near - far);
+      mat[11] = 0;
+      mat[12] = (left + right) / (left - right);
+      mat[13] = (bottom + top) / (bottom - top);
+      mat[14] = (near + far) / (near - far);
+      mat[15] = 1;
+  
+      return mat;
     }
 
     /** Starts the animation */
