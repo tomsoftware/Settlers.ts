@@ -26,7 +26,7 @@
 
   </div>
 
-  <renderer-view />
+  <renderer-view :game="game"/>
 </template>
 
 <script src="./map-view.ts"></script>

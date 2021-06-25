@@ -15,7 +15,9 @@
       @change="onSelectItem"
     >
       <option v-for="item of ghContent" :key="item.dataOffset" :value="item">
-        {{pad(item.dataOffset, 10)}} Size: {{pad(item.height + ' x ' + item.width, 12)}}
+        {{pad(item.dataOffset, 10)}}
+        Size: {{pad(item.height + ' x ' + item.width, 12)}}
+        {{pad(toImageTypeStr(item.imageType), 10)}}
       </option>
     </select>
 

@@ -10,56 +10,58 @@ import { OriginalMapFile } from '../original-map-file';
 
 /** load a .map or a .edm map */
 export class OriginalMapLoader extends OriginalMapFile implements IMapLoader {
-    private logLoader: LogHandler = new LogHandler('OriginalMapLoader');
+		private logLoader: LogHandler = new LogHandler('OriginalMapLoader');
 
-    public general: GeneralMapInformation = new GeneralMapInformation();
-    public size : Size = new Size(0, 0);
+		public general: GeneralMapInformation = new GeneralMapInformation();
+		public mapSize : Size = new Size(0, 0);
 
-    public unknown5 = 0;
-    public unknown6 = 0;
+		public unknown5 = 0;
+		public unknown6 = 0;
 
-    constructor(data: BinaryReader) {
-      super(data);
+		constructor(data: BinaryReader) {
+			super(data);
 
-      this.readGeneralInformation();
+			this.readGeneralInformation();
 
-      this.logLoader.debug(this.general.toString());
-    }
+			this.logLoader.debug(this.general.toString());
 
-    private _landscape?:OriginalLandscape;
-    get landscape(): IMapLandscape {
-      if (!this._landscape) {
-        this._landscape = new OriginalLandscape(this, this.size, MapChunkType.MapLandscape);
-      }
+			Object.seal(this);
+		}
 
-      return this._landscape;
-    }
+		private _landscape: OriginalLandscape | null = null;
+		get landscape(): IMapLandscape {
+			if (!this._landscape) {
+				this._landscape = new OriginalLandscape(this, this.mapSize, MapChunkType.MapLandscape);
+			}
 
-    public readGeneralInformation(): boolean {
-      const reader = this.getChunkReader(MapChunkType.MapGeneralInformation, 24);
+			return this._landscape;
+		}
 
-      if (!reader) {
-        return false;
-      }
+		public readGeneralInformation(): boolean {
+			const reader = this.getChunkReader(MapChunkType.MapGeneralInformation, 24);
 
-      this.general = new GeneralMapInformation();
-      this.general.gameType = reader.readIntBE();
-      this.general.playerCount = reader.readIntBE();
-      this.general.startResources = reader.readIntBE();
+			if (!reader) {
+				return false;
+			}
 
-      const mapSize = reader.readIntBE();
-      this.size = new Size(mapSize, mapSize);
+			this.general = new GeneralMapInformation();
+			this.general.gameType = reader.readIntBE();
+			this.general.playerCount = reader.readIntBE();
+			this.general.startResources = reader.readIntBE();
 
-      this.unknown5 = reader.readIntBE();
-      this.unknown6 = reader.readIntBE();
+			const mapSize = reader.readIntBE();
+			this.mapSize = new Size(mapSize, mapSize);
 
-      return true;
-    }
+			this.unknown5 = reader.readIntBE();
+			this.unknown6 = reader.readIntBE();
 
-    public toString():string {
-      return this.general.toString() + '; ' +
-            this.size.toString() + '; ' +
-            'unk5: ' + this.unknown5 + '; ' +
-            'unk6: ' + this.unknown6 + '; ';
-    }
+			return true;
+		}
+
+		public toString():string {
+			return this.general.toString() + '; ' +
+						this.mapSize.toString() + '; ' +
+						'unk5: ' + this.unknown5 + '; ' +
+						'unk6: ' + this.unknown6 + '; ';
+		}
 }

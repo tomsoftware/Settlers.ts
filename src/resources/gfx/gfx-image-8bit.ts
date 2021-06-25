@@ -1,59 +1,63 @@
 import { BinaryReader } from '../file/binary-reader';
 import { IGfxImage } from './igfx-image';
+import { ImageType } from './image-type';
 
 export class GfxImage8Bit implements IGfxImage {
-    /** start of image data */
-    public dataOffset = 0;
+	public imageType = ImageType.Image8Bit;
 
-    /** width of the image */
-    public width = 0;
-    /** height of the image */
-    public height = 0;
+	/** start of image data */
+	public dataOffset = 0;
 
-    public flag1 = 0;
-    public flag2 = 0;
+	/** width of the image */
+	public width = 0;
+	/** height of the image */
+	public height = 0;
 
-    private data: BinaryReader;
+	public flag1 = 0;
+	public flag2 = 0;
 
-    private getImageData8Bit(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
-      let j = 0;
-      while (j < length) {
-        const value1 = buffer[pos];
-        pos++;
+	private data: BinaryReader;
 
-        imgData[j++] = value1;// r
-        imgData[j++] = value1; // g
-        imgData[j++] = value1; // b
-        imgData[j++] = 255; // alpha
-      }
-    }
+	private getImageData8Bit(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
+		let j = 0;
+		while (j < length) {
+			const value1 = buffer[pos];
+			pos++;
 
-    public getImageData(): ImageData {
-      const img = new ImageData(this.width, this.height);
-      const imgData = img.data;
+			imgData[j++] = value1;// r
+			imgData[j++] = value1; // g
+			imgData[j++] = value1; // b
+			imgData[j++] = 255; // alpha
+		}
+	}
 
-      const buffer = this.data.getBuffer();
-      const length = this.width * this.height;
-      const pos = this.dataOffset;
+	public getImageData(): ImageData {
+		const img = new ImageData(this.width, this.height);
+		const imgData = img.data;
 
-      this.getImageData8Bit(buffer, imgData, pos, length);
+		const buffer = this.data.getBuffer();
+		const length = this.width * this.height;
+		const pos = this.dataOffset;
 
-      return img;
-    }
+		this.getImageData8Bit(buffer, imgData, pos, length);
 
-    public getDataSize(): number {
-      return this.width * this.height;
-    }
+		return img;
+	}
 
-    constructor(reader: BinaryReader) {
-      this.data = reader;
+	public getDataSize(): number {
+		return this.width * this.height;
+	}
 
-      Object.seal(this);
-    }
+	constructor(reader: BinaryReader) {
+		this.data = reader;
 
-    public toString(): string {
-      return 'size: (' + this.width + ' x' + this.height + ') ' +
-            'data offset ' + this.dataOffset + '; ' +
-            'flags: ' + this.flag1 + '  ' + this.flag2;
-    }
+		Object.seal(this);
+	}
+
+	public toString(): string {
+		return ImageType[this.imageType] + ' - ' +
+					'size: (' + this.width + ' x' + this.height + ') ' +
+					'data offset ' + this.dataOffset + '; ' +
+					'flags: ' + this.flag1 + '	' + this.flag2;
+	}
 }

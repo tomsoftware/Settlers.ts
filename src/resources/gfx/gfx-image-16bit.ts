@@ -1,67 +1,80 @@
 import { BinaryReader } from '../file/binary-reader';
 import { IGfxImage } from './igfx-image';
+import { ImageType } from './image-type';
 
 export class GfxImage16Bit implements IGfxImage {
-    /** start of image data */
-    public dataOffset = 0;
+		public imageType = ImageType.Image16Bit;
 
-    /** width of the image */
-    public width: number;
-    /** height of the image */
-    public height: number;
+		/** start of image data */
+		public dataOffset = 0;
 
-    public flag1 = 0;
-    public flag2 = 0;
-    public rowCount: number;
+		/** width of the image */
+		public width: number;
+		/** height of the image */
+		public height: number;
 
-    private data: BinaryReader;
+		public flag1 = 0;
+		public flag2 = 0;
+		public rowCount: number;
 
-    private getImageData16Bit(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
-      let j = 0;
-      while (j < length) {
-        const value1 = buffer[pos];
-        pos++;
+		private data: BinaryReader;
 
-        const value2 = buffer[pos];
-        pos++;
+		private getImageData16Bit(buffer: Uint8Array, imgData: Uint8ClampedArray, pos: number, length: number) {
+			let j = 0;
+			while (j < length) {
+				const value1 = buffer[pos];
+				pos++;
 
-        imgData[j++] = value2 & 0xF8; // r
-        imgData[j++] = (value1 >> 3) | (value2 << 5) & 0xFC; // g
-        imgData[j++] = (value1 << 3) & 0xF8; // b
-        imgData[j++] = 255; // alpha
-      }
-    }
+				const value2 = buffer[pos];
+				pos++;
 
-    public getImageData(): ImageData {
-      const img = new ImageData(this.width, this.height);
-      const imgData = img.data;
+				imgData[j++] = value2 & 0xF8; // r
+				imgData[j++] = (value1 >> 3) | (value2 << 5) & 0xFC; // g
+				imgData[j++] = (value1 << 3) & 0xF8; // b
+				imgData[j++] = 255; // alpha
+			}
+		}
 
-      const buffer = this.data.getBuffer();
-      const length = this.getDataSize();
-      const pos = this.dataOffset;
+		public getImageData(): ImageData {
+			const img = new ImageData(this.width, this.height);
+			const imgData = img.data;
 
-      this.getImageData16Bit(buffer, imgData, pos, length);
+			const buffer = this.data.getBuffer();
+			const length = this.getDataSize();
+			const pos = this.dataOffset;
 
-      return img;
-    }
+			this.getImageData16Bit(buffer, imgData, pos, length);
 
-    constructor(reader: BinaryReader, width:number, rowCount:number) {
-      this.data = reader;
-      this.rowCount = rowCount;
-      this.width = width;
-      this.height = rowCount * width;
+			return img;
+		}
 
-      Object.seal(this);
-    }
+		public getRaw16BitImage(): Uint16Array {
+			const buffer = this.data.getBuffer();
+			const length = this.getDataSize();
+			const pos = this.dataOffset;
 
-    public getDataSize(): number {
-      return this.width * this.height * 2;
-    }
+			return new Uint16Array(buffer.buffer, pos, length / 2);
+		}
 
-    public toString(): string {
-      return 'size: (' + this.width + ' x' + this.height + ') ' +
-            'rows: ' + this.rowCount + '; ' +
-            'data offset ' + this.dataOffset + '; ' +
-            'flags: ' + this.flag1 + '  ' + this.flag2;
-    }
+		constructor(reader: BinaryReader, width:number, rowCount:number) {
+			this.data = reader;
+			this.rowCount = rowCount;
+			this.width = width;
+			this.height = rowCount * width;
+
+			Object.seal(this);
+		}
+
+		public getDataSize(): number {
+			return this.width * this.height * 2;
+		}
+
+		public toString(): string {
+			return ImageType[this.imageType] + ' - ' +
+						'size: (' + this.width + ' x' + this.height + ') ' +
+						'rows: ' + this.rowCount + '; ' +
+						'data offset ' + this.dataOffset + '; ' +
+						'data size ' + this.getDataSize() + ' ' +
+						'flags: ' + this.flag1 + '	' + this.flag2;
+		}
 }

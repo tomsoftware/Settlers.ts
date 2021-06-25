@@ -1,0 +1,15 @@
+export enum LandscapeType {
+    GrassLand = 1,
+    GrassDark = 2,
+    GrassDry = 3,
+    Sand = 4,
+    Water0 = 5,
+    Water1 = 6,
+    Water2 = 7,
+    Water3 = 8,
+    Water4 = 9,
+    Water5 = 10,
+    Water6 = 11,
+    Water7 = 12,
+    Water8 = 13,
+}

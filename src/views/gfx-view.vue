@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    Gh File:
+    Gfx File:
     <file-browser
       @select="onFileSelect"
       filter=".gfx"
