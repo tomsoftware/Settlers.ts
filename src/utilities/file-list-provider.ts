@@ -19,7 +19,7 @@ export class FileListProvider {
 				.map((f) => Path.fixPath(f));
 		}
 
-		public async filter(filterStr?: string) {
+		public async filter(filterStr?: string): Promise<string[]> {
 			const filterArray = (filterStr ?? '')
 				.split('|')
 				.map((f) => Path.fixPath(f).toUpperCase());

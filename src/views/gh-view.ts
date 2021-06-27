@@ -43,7 +43,7 @@ export default class GhView extends Vue {
 		this.ghInfo = ghFile.toString();
 	}
 
-	public toImageTypeStr(imgType: ImageType) {
+	public toImageTypeStr(imgType: ImageType): string {
 		return ImageType[imgType];
 	}
 
@@ -63,7 +63,7 @@ export default class GhView extends Vue {
 		return list;
 	}
 
-	public onSelectItem() {
+	public onSelectItem(): void {
 		const img = this.selectedItem;
 		if (!img) {
 			return;

@@ -1,7 +1,7 @@
 precision mediump float;
 
 // Passed in from the vertex shader.
-varying vec4 v_color;
+//varying vec4 v_color;
 
 // Passed in from the vertex shader.
 varying vec2 v_texcoord;

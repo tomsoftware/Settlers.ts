@@ -92,7 +92,7 @@ export class ShaderProgram {
 		/**
 		 * setup, compiles shaders and links GLSL program
 		 */
-		public attachShaders(srcVertex: string, srcFragment: string) {
+		public attachShaders(srcVertex: string, srcFragment: string): boolean {
 			const r1 = this.attachShader(srcVertex, ShaderType.VERTEX_SHADER);
 			const r2 = this.attachShader(srcFragment, ShaderType.FRAGMENT_SHADER);
 

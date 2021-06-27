@@ -32,8 +32,8 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 		Object.seal(this);
 	}
 
-	private buildTextureArray(width: number, height: number, groundTypeMap: Uint8Array) {
-		const b = new Float32Array(width * height * 2 * 2);
+	private buildTextureArray(width: number, height: number, groundTypeMap: Uint8Array): Float32Array {
+		const result = new Float32Array(width * height * 2 * 2);
 		const map = this.landscapeTextureMap;
 
 		for (let y = 0; y < height; y++) {
@@ -49,14 +49,14 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 				const a = map.getTextureA(t1, t2, t3, x, y);
 				const b = map.getTextureB(t1, t3, t4, x, y);
 
-				b[j + 0] = a[0];
-				b[j + 1] = a[1];
-				b[j + 2] = b[0];
-				b[j + 3] = b[1];
+				result[j + 0] = a[0];
+				result[j + 1] = a[1];
+				result[j + 2] = b[0];
+				result[j + 3] = b[1];
 			}
 		}
 
-		return b;
+		return result;
 	}
 
 	public async init(gl: WebGLRenderingContext): Promise<boolean> {
@@ -102,6 +102,20 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 		return true;
 	}
 
+	private createPosArray(width: number, height: number): Int16Array {
+		const r = new Int16Array(width * height * 2);
+		let i = 0;
+		for (let y = 0; y < height; y++) {
+			for (let x = 0; x < width; x++) {
+				r[i] = x + Math.floor(y / 2);
+				i++;
+				r[i] = y;
+				i++;
+			}
+		}
+		return r;
+	}
+
 	public draw(gl: WebGLRenderingContext, projection: Float32Array): void {
 		super.drawBase(gl, projection);
 
@@ -116,7 +130,8 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 		}
 
 		// setup matrices, one per instance
-		const numInstances = 11;
+		const numInstancesX = 512;
+		const numInstancesY = 512;
 
 		// ///////////
 		// set vertex
@@ -127,20 +142,12 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 
 		// ///////////
 		// define color
-		const colorLoc = sp.getAttribLocation('color');
+		const colorLoc = sp.getAttribLocation('texture_array');
 
 		// setup colors, one per instance
 		const colorBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER,
-			new Float32Array([
-				1, 0, 0, 1, // red
-				0, 1, 0, 1, // green
-				0, 0, 1, 1, // blue
-				1, 0, 1, 1, // magenta
-				0, 1, 1, 1 // cyan
-			]),
-			gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, this.textureArray, gl.STATIC_DRAW);
 
 		// set attribute for color
 		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -157,19 +164,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 		const mapPosBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, mapPosBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER,
-			new Int16Array([
-				0, 0,
-				1, 0,
-				2, 0,
-				3, 0,
-				4, 0,
-				5, 0,
-				0, 1,
-				1, 1,
-				2, 1,
-				3, 1,
-				4, 1
-			]),
+			this.createPosArray(numInstancesX, numInstancesY),
 			gl.STATIC_DRAW);
 
 		// set attribute for map pos
@@ -186,7 +181,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 			gl.TRIANGLES,
 			0, // offset
 			this.numVertices, // num vertices per instance
-			numInstances // num instances
+			numInstancesX * numInstancesY // num instances
 		);
 
 		console.error(gl.getError());

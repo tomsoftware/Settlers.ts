@@ -54,7 +54,7 @@ private log = new LogHandler('GfxView');
 	}
 
 	/** load a new image */
-	public async doLoad(fileId: string, usePil: boolean, useJil: boolean) {
+	public async doLoad(fileId: string, usePil: boolean, useJil: boolean): Promise<void> {
 		this.log.debug('Using .jil=' + useJil);
 
 		const fileList: Promise<BinaryReader>[] = [];

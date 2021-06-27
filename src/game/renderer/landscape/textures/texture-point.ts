@@ -1,4 +1,4 @@
-import { LandscapeType } from "../landscape-type";
+import { LandscapeType } from '../landscape-type';
 
 export class TexturePoint {
 	public t1: LandscapeType;
