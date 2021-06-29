@@ -20,8 +20,8 @@
     <hex-viewer
       v-if="selectedChunk && mapContent"
       :value="selectedChunk.getReader()"
-      :width="mapContent.size.width"
-      :height="mapContent.size.height"
+      :width="mapContent.mapSize.width"
+      :height="mapContent.mapSize.height"
     />
 
   </div>

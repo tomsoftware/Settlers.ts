@@ -37,11 +37,11 @@ export class LandscapeTextureMap {
 		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDark, 1, 12));
 		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDark, 1, 13));
 
-		this.addTexture(new Hexagon2Texture(LandscapeType.Sand, LandscapeType.GrassLand, 2, 12));
-		this.addTexture(new Hexagon2Texture(LandscapeType.Sand, LandscapeType.GrassLand, 2, 13));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.GrassLand, 2, 12));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.GrassLand, 2, 13));
 
-		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Sand, 3, 12));
-		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Sand, 3, 13));
+		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Beach, 3, 12));
+		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Beach, 3, 13));
 
 		// next row
 		this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDry, 0, 14));
@@ -57,7 +57,7 @@ export class LandscapeTextureMap {
 		this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassDark, 1, 15));
 
 		// next row
-		this.addTexture(new BigLandscapeTexture(LandscapeType.Water8, 16));
+		this.addTexture(new BigLandscapeTexture(LandscapeType.Water7, 16));
 
 		// next row
 		this.addTexture(new SmallLandscapeTexture(LandscapeType.Water0, 0, 20));
@@ -72,15 +72,15 @@ export class LandscapeTextureMap {
 		this.addTexture(new SmallLandscapeTexture(LandscapeType.Water7, 7, 21));
 
 		// next row
-		this.addTexture(new Hexagon2Texture(LandscapeType.Sand, LandscapeType.Water0, 0, 22));
-		this.addTexture(new Hexagon2Texture(LandscapeType.Sand, LandscapeType.Water0, 0, 23));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 22));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 23));
 
-		this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Sand, 1, 22));
-		this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Sand, 1, 23));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 22));
+		this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 23));
 
 		// next row
-		this.addTexture(new Hexagon3Texture(LandscapeType.Sand, LandscapeType.GrassLand, LandscapeType.Water0, 2, 22));
-		this.addTexture(new Hexagon3Texture(LandscapeType.GrassLand, LandscapeType.Sand, LandscapeType.Water0, 3, 23));
+		this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.GrassLand, LandscapeType.Water0, 2, 22));
+		this.addTexture(new Hexagon3Texture(LandscapeType.GrassLand, LandscapeType.Beach, LandscapeType.Water0, 3, 23));
 		// unknown @ 3, 22
 		// unknown @ 3, 23
 
@@ -107,7 +107,8 @@ export class LandscapeTextureMap {
 		this.addTexture(new Hexagon2Texture(LandscapeType.Water8, LandscapeType.Water7, 2, 27));// bad @ 3, 27 -> fake cause this is missing?
 
 		// next row
-		this.addTexture(new BigLandscapeTexture(LandscapeType.Sand, 28));
+		this.addTexture(new BigLandscapeTexture(LandscapeType.Desert, 28));
+		this.addTexture(new BigLandscapeTexture(LandscapeType.Rock, 32));
 
 		Object.seal(this);
 	}

@@ -27,10 +27,16 @@
       <input type="number" v-model.number="bytePerPixel" @change="updateContent" />
     </label>
 
-    <label>Byte offset:
+    <label> Byte offset:
       <input type="number" v-model.number="byteOffset" @change="updateContent" />
     </label>
 
+    <label> Width:
+      <input type="number" v-model.number="useWidth" @change="updateContent" />
+    </label>
+
+    <br />
+    {{imagePointInfo}}
     <br />
 
     <canvas
@@ -38,6 +44,7 @@
       width="800"
       ref="cav"
       class="cav"
+      @mousemove="onMouseMove"
     />
   </div>
 
@@ -55,4 +62,5 @@
   margin: 3px;
   border: 1px solid red;
 }
+
 </style>

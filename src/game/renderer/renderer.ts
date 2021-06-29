@@ -50,7 +50,7 @@ export class Renderer {
 			const projection = Matrix
 				.createOrthographic(-aspect, aspect, 1, -1, -1, 1)
 				.translate(-9, 9.5, 0)
-				.scale(0.1, 0.1, 0.1);
+				.scale(0.04, 0.04, 1.0);
 
 			// draw all renderers
 			for (const r of this.renderers) {

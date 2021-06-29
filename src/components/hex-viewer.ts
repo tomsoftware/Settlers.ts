@@ -16,10 +16,14 @@ export default class HexViewer extends Vue {
 	public width?: number;
 	public height?: number;
 
+	public useWidth = 128;
+	public imagePointInfo = '';
+
 	public bytePerPixel = 4;
 	public byteOffset = 0;
 
 	private mType = '';
+
 	public get type(): string {
 		return this.mType;
 	}
@@ -31,9 +35,48 @@ export default class HexViewer extends Vue {
 
 	public content = '';
 
-	public async mounted():Promise<void> {
+	public async mounted(): Promise<void> {
+		this.useWidth = this.width ?? 128;
+
 		this.$watch('value', () => this.updateContent());
+
+		this.$watch('width', () => {
+			this.useWidth = this.width ?? 128;
+		});
+
 		this.updateContent();
+	}
+
+	public onMouseMove(evt: MouseEvent) {
+		if (!this.value) {
+			return;
+		}
+
+		const rect = (evt.target as HTMLCanvasElement).getBoundingClientRect();
+		const x = Math.trunc(evt.clientX - rect.left);
+		const y = Math.trunc(evt.clientY - rect.top);
+
+		this.imagePointInfo =
+			' x: ' + x +
+			' y: ' + y +
+			' value: ' + this.peekValue(
+				this.value,
+				x, y,
+				this.bytePerPixel, this.byteOffset,
+				this.useWidth ?? 1);
+	}
+
+	private peekValue(data: BinaryReader, x: number, y: number, bytePerPixel: number, byteOffset: number, width: number) {
+		const intX = Math.floor(x);
+		if ((intX < 0) || (intX >= width)) {
+			return;
+		}
+
+		const buffer = data.getBuffer();
+
+		const bufferPos = (Math.floor(x) + Math.floor(y) * width) * bytePerPixel + byteOffset;
+
+		return buffer[bufferPos];
 	}
 
 	private updateContent() {
@@ -56,7 +99,7 @@ export default class HexViewer extends Vue {
 				this.toImg(
 					this.value,
 					this.bytePerPixel, this.byteOffset,
-					this.width ?? 1, this.height ?? 1,
+					this.useWidth ?? 1, this.height ?? 1,
 					cav);
 			}
 			break;
