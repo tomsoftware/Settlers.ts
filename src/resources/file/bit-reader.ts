@@ -9,7 +9,7 @@ export class BitReader {
 	private bufferLen: number;
 	private readonly log: LogHandler = new LogHandler('BitReader');
 
-	constructor(fileReader: BinaryReader, offset: number, sourceLength: number) {
+	constructor(fileReader: BinaryReader, offset?: number, sourceLength?: number) {
 		// - get the data from the source
 		this.data = fileReader.getBuffer(offset, sourceLength);
 		this.pos = 0;

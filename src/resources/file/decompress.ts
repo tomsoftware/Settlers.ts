@@ -62,7 +62,7 @@ export class Decompress {
 				codeWordIndex += inDate.read(codeWordLength);
 
 				if (codeWordIndex >= 274) {
-					this.log.error('CodeType >= 274 -> out of sync!');
+					this.log.error('CodeType(' + codeWordIndex + ') >= 274 -> out of sync!');
 					break;
 				}
 			}
@@ -140,15 +140,15 @@ export class Decompress {
 		return writer.getReader();
 	}
 
-	private fromDictionary(inDate: BitReader, writer: StreamWriter, codeword: number): boolean {
+	private fromDictionary(inDate: BitReader, writer: StreamWriter, codeWord: number): boolean {
 		let entryLength:number;
 		let bitValue:number;
 		let copyOffset = 0;
 
-		if (codeword < 264) {
-			entryLength = codeword - 256;
+		if (codeWord < 264) {
+			entryLength = codeWord - 256;
 		} else {
-			const length = this.tab1.length[codeword - 264];
+			const length = this.tab1.length[codeWord - 264];
 
 			const ReadInByte = inDate.read(length);
 
@@ -157,7 +157,7 @@ export class Decompress {
 				return false;
 			}
 
-			entryLength = this.tab1.value[codeword - 264] + ReadInByte;
+			entryLength = this.tab1.value[codeWord - 264] + ReadInByte;
 		}
 
 		bitValue = inDate.read(3);
@@ -233,7 +233,7 @@ export class Decompress {
 		this.sortCodeTable(codes, tmpQuantity, 274);
 	}
 
-	private sortCodeTable(codes: Uint16Array, quantities: Uint32Array, lenght: number) {
+	private sortCodeTable(codes: Uint16Array, quantities: Uint32Array, length: number) {
 		let pos = 0;
 		let delta = 0;
 		let srcCode = 0;
@@ -242,7 +242,7 @@ export class Decompress {
 		let stepSize = 40;
 
 		do {
-			for (let i = stepSize; i < lenght; i++) {
+			for (let i = stepSize; i < length; i++) {
 				srcCode = codes[i];
 				srcQuantity = quantities[i];
 
