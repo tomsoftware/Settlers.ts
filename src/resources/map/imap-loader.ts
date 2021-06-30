@@ -4,11 +4,11 @@ import { IMapLandscape } from './imap-landscape';
 
 /** Interface for map loaders */
 export interface IMapLoader {
-		landscape: IMapLandscape;
+        landscape: IMapLandscape;
 
-		/** General information about the map */
-		general: GeneralMapInformation;
+        /** General information about the map */
+        general: GeneralMapInformation;
 
-		/** return the size of the map */
-		mapSize : Size;
+        /** return the size of the map */
+        mapSize : Size;
 }

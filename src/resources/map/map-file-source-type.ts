@@ -1,7 +1,7 @@
 
 export enum MapFileSourceType {
-		Unknown,
-		GameMap,
-		EditorMap,
-		SaveGame
+        Unknown,
+        GameMap,
+        EditorMap,
+        SaveGame
 }

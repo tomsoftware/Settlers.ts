@@ -15,126 +15,126 @@ import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
 
 @Options({
-	name: 'GfxView',
-	components: {
-		FileBrowser,
-		HexViewer
-	}
+    name: 'GfxView',
+    components: {
+        FileBrowser,
+        HexViewer
+    }
 })
 export default class GfxView extends Vue {
 private log = new LogHandler('GfxView');
-	public fileName: string | null = null;
-	public gfxContent: IGfxImage[] = [];
-	public selectedItem: IGfxImage | null = null;
-	private resourceProvider = new ResourceFileProvider('gfx.lib');
-	public gfxFile: GfxFileReader | null = null;
+    public fileName: string | null = null;
+    public gfxContent: IGfxImage[] = [];
+    public selectedItem: IGfxImage | null = null;
+    private resourceProvider = new ResourceFileProvider('gfx.lib');
+    public gfxFile: GfxFileReader | null = null;
 
-	public onFileSelect(fileName: string): void {
-		this.fileName = fileName;
-		this.load(fileName);
-	}
+    public onFileSelect(fileName: string): void {
+        this.fileName = fileName;
+        this.load(fileName);
+    }
 
-	public pad(value:string, size:number): string {
-		// convert to string
-		const str = ('' + value + '').split(' ').join('\u00a0');
-		const padSize = Math.max(0, size - str.length);
-		return str + ('\u00a0'.repeat(padSize));
-	}
+    public pad(value:string, size:number): string {
+        // convert to string
+        const str = ('' + value + '').split(' ').join('\u00a0');
+        const padSize = Math.max(0, size - str.length);
+        return str + ('\u00a0'.repeat(padSize));
+    }
 
-	/** load a new gfx */
-	public async load(gfxPath: string):Promise<void> {
-		const fileId = Path.combine('gfx', Path.getFileNameWithoutExtension(gfxPath));
+    /** load a new gfx */
+    public async load(gfxPath: string):Promise<void> {
+        const fileId = Path.combine('gfx', Path.getFileNameWithoutExtension(gfxPath));
 
-		const fileList: Promise<boolean>[] = [];
-		fileList.push(this.resourceProvider.fileExists(fileId + '.pil'));
-		fileList.push(this.resourceProvider.fileExists(fileId + '.jil'));
+        const fileList: Promise<boolean>[] = [];
+        fileList.push(this.resourceProvider.fileExists(fileId + '.pil'));
+        fileList.push(this.resourceProvider.fileExists(fileId + '.jil'));
 
-		const filesExist = await Promise.all(fileList);
-		this.doLoad(fileId, filesExist[0], filesExist[1]);
-	}
+        const filesExist = await Promise.all(fileList);
+        this.doLoad(fileId, filesExist[0], filesExist[1]);
+    }
 
-	/** load a new image */
-	public async doLoad(fileId: string, usePil: boolean, useJil: boolean): Promise<void> {
-		this.log.debug('Using .jil=' + useJil);
+    /** load a new image */
+    public async doLoad(fileId: string, usePil: boolean, useJil: boolean): Promise<void> {
+        this.log.debug('Using .jil=' + useJil);
 
-		const fileList: Promise<BinaryReader>[] = [];
+        const fileList: Promise<BinaryReader>[] = [];
 
-		fileList.push(this.resourceProvider.loadBinary(fileId + '.gfx'));
-		fileList.push(this.resourceProvider.loadBinary(fileId + '.gil'));
+        fileList.push(this.resourceProvider.loadBinary(fileId + '.gfx'));
+        fileList.push(this.resourceProvider.loadBinary(fileId + '.gil'));
 
-		if (usePil) {
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.pil'));
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.pa6'));
-		} else {
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.pi4'));
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.p46'));
-		}
+        if (usePil) {
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.pil'));
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.pa6'));
+        } else {
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.pi4'));
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.p46'));
+        }
 
-		if (useJil) {
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.dil'));
-			fileList.push(this.resourceProvider.loadBinary(fileId + '.jil'));
-		}
+        if (useJil) {
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.dil'));
+            fileList.push(this.resourceProvider.loadBinary(fileId + '.jil'));
+        }
 
-		const files = await Promise.all(fileList);
-		const gfx = files[0];
-		const gil = files[1];
-		const paletteIndex = files[2];
-		const palette = files[3];
+        const files = await Promise.all(fileList);
+        const gfx = files[0];
+        const gil = files[1];
+        const paletteIndex = files[2];
+        const palette = files[3];
 
-		const gfxIndexList = new GilFileReader(gil);
-		const paletteIndexList = new PilFileReader(paletteIndex);
-		const palletCollection = new PaletteCollection(palette, paletteIndexList);
+        const gfxIndexList = new GilFileReader(gil);
+        const paletteIndexList = new PilFileReader(paletteIndex);
+        const palletCollection = new PaletteCollection(palette, paletteIndexList);
 
-		let directionIndexList: DilFileReader | null = null;
-		let jobIndexList: JilFileReader | null = null;
+        let directionIndexList: DilFileReader | null = null;
+        let jobIndexList: JilFileReader | null = null;
 
-		if (useJil) {
-			directionIndexList = new DilFileReader(files[4]);
-			jobIndexList = new JilFileReader(files[5]);
-		}
+        if (useJil) {
+            directionIndexList = new DilFileReader(files[4]);
+            jobIndexList = new JilFileReader(files[5]);
+        }
 
-		this.gfxFile = new GfxFileReader(gfx, gfxIndexList, jobIndexList, directionIndexList, palletCollection);
+        this.gfxFile = new GfxFileReader(gfx, gfxIndexList, jobIndexList, directionIndexList, palletCollection);
 
-		this.gfxContent = this.fillGfxList(this.gfxFile);
+        this.gfxContent = this.fillGfxList(this.gfxFile);
 
-		this.log.debug('File: ' + fileId);
-		this.log.debug(gfxIndexList.toString());
-		this.log.debug(this.gfxFile.toString());
-	}
+        this.log.debug('File: ' + fileId);
+        this.log.debug(gfxIndexList.toString());
+        this.log.debug(this.gfxFile.toString());
+    }
 
-	private fillGfxList(gfxReader: GfxFileReader):IGfxImage[] {
-		const list: IGfxImage[] = [];
+    private fillGfxList(gfxReader: GfxFileReader):IGfxImage[] {
+        const list: IGfxImage[] = [];
 
-		const l = gfxReader.getImageCount();
+        const l = gfxReader.getImageCount();
 
-		for (let i = 0; i < l; i++) {
-			const img = gfxReader.getImage(i);
-			if (img) {
-				list.push(img);
-			}
-		}
+        for (let i = 0; i < l; i++) {
+            const img = gfxReader.getImage(i);
+            if (img) {
+                list.push(img);
+            }
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	public onSelectItem(): void {
-		const img = this.selectedItem;
-		if (!img) {
-			return;
-		}
+    public onSelectItem(): void {
+        const img = this.selectedItem;
+        if (!img) {
+            return;
+        }
 
-		const cav = this.$refs.ghCav as HTMLCanvasElement;
-		if ((!cav) || (!cav.getContext)) {
-			return;
-		}
+        const cav = this.$refs.ghCav as HTMLCanvasElement;
+        if ((!cav) || (!cav.getContext)) {
+            return;
+        }
 
-		cav.height = img.height;
-		const context = cav.getContext('2d');
+        cav.height = img.height;
+        const context = cav.getContext('2d');
 
-		if (!context) {
-			return;
-		}
+        if (!context) {
+            return;
+        }
 
-		context.putImageData(img.getImageData(), 0, 0);
-	}
+        context.putImageData(img.getImageData(), 0, 0);
+    }
 }

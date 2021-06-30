@@ -4,35 +4,35 @@ import { Renderer } from '@/game/renderer/renderer';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({
-	name: 'RendererView',
-	components: {
-	},
-	props: {
-		game: Object
-	}
+    name: 'RendererView',
+    components: {
+    },
+    props: {
+        game: Object
+    }
 })
 export default class RendererViewer extends Vue {
-	public renderer!: Renderer;
-	public game!:Game;
+    public renderer!: Renderer;
+    public game!:Game;
 
-	public async mounted(): Promise<void> {
-		const cav = this.$refs.cav as HTMLCanvasElement;
-		this.renderer = new Renderer(cav);
+    public async mounted(): Promise<void> {
+        const cav = this.$refs.cav as HTMLCanvasElement;
+        this.renderer = new Renderer(cav);
 
-		this.initRenderer();
+        this.initRenderer();
 
-		this.$watch('game', () => {
-			this.initRenderer();
-		});
-	}
+        this.$watch('game', () => {
+            this.initRenderer();
+        });
+    }
 
-	private initRenderer() {
-		if (!this.game) {
-			return;
-		}
+    private initRenderer() {
+        if (!this.game) {
+            return;
+        }
 
-		this.renderer.add(new LandscapeRenderer(this.game.width, this.game.height, this.game.groundType));
+        this.renderer.add(new LandscapeRenderer(this.game.width, this.game.height, this.game.groundType));
 
-		this.renderer.init();
-	}
+        this.renderer.init();
+    }
 }
