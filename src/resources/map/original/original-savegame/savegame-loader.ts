@@ -1,6 +1,6 @@
 import { BinaryReader } from '@/resources/file/binary-reader';
 import { LogHandler } from '@/utilities/log-handler';
-import { Size } from '@/utilities/size';
+import { MapSize } from '@/utilities/map-size';
 import { GeneralMapInformation } from '../../general-map-information';
 import { IMapLandscape } from '../../imap-landscape';
 import { IMapLoader } from '../../imap-loader';
@@ -13,7 +13,7 @@ export class SaveGameLoader extends OriginalMapFile implements IMapLoader {
         private oriLog: LogHandler = new LogHandler('SaveGameLoader');
 
         public general = new GeneralMapInformation();
-        public mapSize: Size = new Size(0, 0);
+        public mapSize: MapSize = new MapSize(0, 0);
 
         public unknown1 = 0;
         public unknown2= 0;
@@ -54,7 +54,7 @@ export class SaveGameLoader extends OriginalMapFile implements IMapLoader {
             this.unknown6 = reader.readIntBE();
 
             const mapSize = reader.readIntBE(28);
-            this.mapSize = new Size(mapSize, mapSize);
+            this.mapSize = new MapSize(mapSize, mapSize);
 
             return true;
         }

@@ -22,6 +22,9 @@ export default class HexViewer extends Vue {
     public bytePerPixel = 4;
     public byteOffset = 0;
 
+    public isTrimmed = false;
+    public doNotTrim = false;
+
     private mType = '';
 
     public get type(): string {
@@ -33,12 +36,20 @@ export default class HexViewer extends Vue {
         this.updateContent();
     }
 
+    public showAll() {
+        this.doNotTrim = true;
+        this.updateContent();
+    }
+
     public content = '';
 
     public async mounted(): Promise<void> {
         this.useWidth = this.width ?? 128;
 
-        this.$watch('value', () => this.updateContent());
+        this.$watch('value', () => {
+            this.doNotTrim = false;
+            this.updateContent();
+        });
 
         this.$watch('width', () => {
             this.useWidth = this.width ?? 128;
@@ -142,7 +153,7 @@ export default class HexViewer extends Vue {
         context.putImageData(img, 0, 0);
     }
 
-    private createHexLine(hexValues:string, asciiValues:string) {
+    private createHexLine(hexValues: string, asciiValues: string) {
         if (hexValues.length > 0) {
             return hexValues + '\t' + asciiValues + '\n';
         } else {
@@ -150,13 +161,23 @@ export default class HexViewer extends Vue {
         }
     }
 
-    private toText(source:BinaryReader): string {
-        const maxLen = Math.min(10000, source.length);
+    private getMaxLengthAndSetTrimmed(source: BinaryReader) {
+        if ((this.doNotTrim) || (source.length <= 10000)) {
+            this.isTrimmed = false;
+            return source.length;
+        }
+
+        this.isTrimmed = true;
+        return 10000;
+    }
+
+    private toText(source: BinaryReader): string {
+        const maxLen = this.getMaxLengthAndSetTrimmed(source);
         return source.readString(maxLen, 0);
     }
 
-    private toHex(source:BinaryReader): string {
-        let maxLen = Math.min(10000, source.length);
+    private toHex(source: BinaryReader): string {
+        let maxLen = this.getMaxLengthAndSetTrimmed(source);
         source.setOffset(0);
 
         let lineLetters = '';

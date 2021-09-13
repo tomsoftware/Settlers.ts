@@ -168,11 +168,11 @@ export class BinaryReader {
 
     /** Read a String */
     public readString(length: number | null = null, offset: number | null = null): string {
-        if (offset != null) {
+        if (offset !== null) {
             this.pos = offset + this.hiddenOffset;
         }
 
-        if (length == null) {
+        if (length === null) {
             length = this.length - this.getOffset();
         }
 
@@ -183,6 +183,27 @@ export class BinaryReader {
             this.pos++;
 
             result += String.fromCharCode(v);
+        }
+        return result;
+    }
+
+    /** Read a String */
+    public readStringHex(length: number | null = null, offset: number | null = null): string {
+        if (offset !== null) {
+            this.pos = offset + this.hiddenOffset;
+        }
+
+        if (length === null) {
+            length = this.length - this.getOffset();
+        }
+
+        let result = '';
+
+        for (let i = 0; i < length; i++) {
+            const v: number = this.data[this.pos];
+            this.pos++;
+
+            result += ('0' + v.toString(16)).slice(-2);
         }
         return result;
     }

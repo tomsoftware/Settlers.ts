@@ -1,5 +1,5 @@
 import { LogHandler } from '@/utilities/log-handler';
-import { Size } from '@/utilities/size';
+import { MapSize } from '@/utilities/map-size';
 import { IMapLandscape } from '../imap-landscape';
 import { MapChunkType } from './map-chunk-type';
 import { OriginalMapFile } from './original-map-file';
@@ -8,9 +8,9 @@ import { OriginalMapFile } from './original-map-file';
 export class OriginalLandscape implements IMapLandscape {
         private log: LogHandler = new LogHandler('OriginalLandscape');
         private data: Uint8Array;
-        private mapSize: Size;
+        private mapSize: MapSize;
 
-        public constructor(mapFile: OriginalMapFile, mapSize: Size, mapChunkType: MapChunkType) {
+        public constructor(mapFile: OriginalMapFile, mapSize: MapSize, mapChunkType: MapChunkType) {
             this.mapSize = mapSize;
 
             const reader = mapFile.getChunkReader(mapChunkType);
@@ -33,7 +33,7 @@ export class OriginalLandscape implements IMapLandscape {
                 return new Uint8Array(0);
             }
 
-            for (let i = 0, j = offset; i < land.length; i += 4, j++) {
+            for (let i = offset, j = 0; i < land.length; i += 4, j++) {
                 result[j] = land[i];
             }
 

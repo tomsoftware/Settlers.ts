@@ -27,7 +27,7 @@
       <br />
 
       Show Content: <hex-viewer
-        :value="selectedItem.getReader()"
+        :value="selectedItemReader"
       />
     </template>
 

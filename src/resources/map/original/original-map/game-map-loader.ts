@@ -1,6 +1,6 @@
 import { BinaryReader } from '@/resources/file/binary-reader';
 import { LogHandler } from '@/utilities/log-handler';
-import { Size } from '@/utilities/size';
+import { MapSize } from '@/utilities/map-size';
 import { GeneralMapInformation } from '../../general-map-information';
 import { IMapLandscape } from '../../imap-landscape';
 import { IMapLoader } from '../../imap-loader';
@@ -13,7 +13,7 @@ export class OriginalMapLoader extends OriginalMapFile implements IMapLoader {
         private logLoader: LogHandler = new LogHandler('OriginalMapLoader');
 
         public general: GeneralMapInformation = new GeneralMapInformation();
-        public mapSize : Size = new Size(0, 0);
+        public mapSize : MapSize = new MapSize(0, 0);
 
         public unknown5 = 0;
         public unknown6 = 0;
@@ -50,7 +50,7 @@ export class OriginalMapLoader extends OriginalMapFile implements IMapLoader {
             this.general.startResources = reader.readIntBE();
 
             const mapSize = reader.readIntBE();
-            this.mapSize = new Size(mapSize, mapSize);
+            this.mapSize = new MapSize(mapSize, mapSize);
 
             this.unknown5 = reader.readIntBE();
             this.unknown6 = reader.readIntBE();

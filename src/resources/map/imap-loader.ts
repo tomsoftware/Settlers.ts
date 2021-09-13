@@ -1,4 +1,4 @@
-import { Size } from '@/utilities/size';
+import { MapSize } from '@/utilities/map-size';
 import { GeneralMapInformation } from './general-map-information';
 import { IMapLandscape } from './imap-landscape';
 
@@ -10,5 +10,5 @@ export interface IMapLoader {
         general: GeneralMapInformation;
 
         /** return the size of the map */
-        mapSize : Size;
+        mapSize : MapSize;
 }

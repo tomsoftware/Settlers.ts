@@ -107,8 +107,27 @@ export class LandscapeTextureMap {
         this.addTexture(new Hexagon2Texture(LandscapeType.Water8, LandscapeType.Water7, 2, 27));// bad @ 3, 27 -> fake cause this is missing?
 
         // next row
-        this.addTexture(new BigLandscapeTexture(LandscapeType.Desert, 28));
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Beach, 28));
         this.addTexture(new BigLandscapeTexture(LandscapeType.Rock, 32));
+
+        // todo: next row (rock <-> gras) 36..39
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Desert, 40));
+
+        // todo: next row (desert <-> gras) 44..47
+        // todo: next row (mud <-> gras) 48..51
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Mud, 52));
+
+        // todo: next row (Swamp <-> gras) 56..59
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Swamp, 60));
+
+        // todo: next row (Rock <-> ice) 64..67
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Snow, 68));
+
+        // todo: next row (river <-> gras) 72..75
+        // todo: next row (?? <-> gras) 76..79
+
+        this.addTexture(new BigLandscapeTexture(LandscapeType.DustyWay, 80));
+        this.addTexture(new BigLandscapeTexture(LandscapeType.RockyWay, 84));
 
         Object.seal(this);
     }

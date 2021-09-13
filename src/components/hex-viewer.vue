@@ -17,9 +17,10 @@
   <br />
 
  <template v-if="type!=='img'">
-    <pre class="content">
-      {{content}}
-    </pre>
+
+    <pre class="content">{{content}}</pre>
+
+    <a href="#" v-if="isTrimmed" @click="showAll">show all</a>
   </template>
 
  <div v-show="type==='img'">
@@ -56,7 +57,7 @@
 .content{
   font-family:"Courier New", Courier, monospace;
   text-align: left;
-  white-space: pre-line;
+  white-space: pre-wrap;
 }
 .cav {
   margin: 3px;

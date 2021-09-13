@@ -5,6 +5,7 @@ import { LibFileItem } from '@/resources/lib/lib-file-item';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
+import { BinaryReader } from '@/resources/file/binary-reader';
 
 @Options({
     name: 'LibView',
@@ -17,10 +18,20 @@ export default class LibView extends Vue {
     public fileName: string | null = null;
     public libContent: LibFileItem[] = [];
     public selectedItem: LibFileItem | null = null;
+    public selectedItemReader: BinaryReader | null = null;
 
     public onFileSelect(fileName: string): void {
         this.fileName = fileName;
         this.load(fileName);
+    }
+
+    public onSelectItem() {
+        if (!this.selectedItem) {
+            this.selectedItemReader = null;
+            return;
+        }
+
+        this.selectedItemReader = this.selectedItem.getReader();
     }
 
     public pad(value:string, size:number): string {

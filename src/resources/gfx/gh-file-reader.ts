@@ -120,7 +120,7 @@ export class GhFileReader {
                 }
 
                 /** return the image of a given type */
-                public findImage<T>(type: ImageType): T | undefined {
+                public findImageByType<T>(type: ImageType): T | undefined {
                     return this.images.find((i) => i.imageType === type) as T | undefined;
                 }
 
