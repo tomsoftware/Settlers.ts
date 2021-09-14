@@ -68,18 +68,26 @@ You can use *Visual Studio Code* to edit and debug your code:
 
 
 # State:
+
+## Load/view a Map
+
+View Landscape using WebGL
+
+![screenshot](docu/example-map-web-gl-2021_09.png)
+
+## View / decode file formats
 You can access 'all' Settlers file formats
 
-## gfx-file view:
+### gfx-file view:
 ![screenshot](docu/example-gfx-view.png)
 
-## gl-file and gh-file view:
+### gl-file and gh-file view:
 ![screenshot](docu/example-gx-view.png)
 
-## lib-file view:
+### lib-file view:
 ![screenshot](docu/example-lib-view.png)
 
-## map-file view:
+### map-file view:
 ![screenshot](docu/example-map-view.png)
 
 
