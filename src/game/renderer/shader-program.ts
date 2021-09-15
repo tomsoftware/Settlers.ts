@@ -11,6 +11,8 @@ export class ShaderProgram implements ShaderObject {
     private gl: WebGLRenderingContext;
     private shaders: WebGLShader[] = [];
     private shaderProgram: WebGLProgram | null = null;
+    // eslint-disable-next-line camelcase
+    private extInstancedArrays: ANGLE_instanced_arrays | null = null;
 
     constructor(gl: WebGLRenderingContext) {
         this.gl = gl;
@@ -57,20 +59,71 @@ export class ShaderProgram implements ShaderObject {
         this.gl.useProgram(this.shaderProgram);
     }
 
-    public getUniformLocation(name: string): WebGLUniformLocation | null {
-        if ((!this.shaderProgram) || (!this.gl)) {
+    public setMatrix(name: string, values: Float32Array): void {
+        const gl = this.gl;
+        if ((!this.shaderProgram) || (!gl)) {
+            return;
+        }
+
+        const uniformLocation = gl.getUniformLocation(this.shaderProgram, name);
+
+        gl.uniformMatrix4fv(uniformLocation, false, values);
+    }
+
+    public setArrayFloat(name: string, values: Float32Array, size: number, divisor = 0): void {
+        this.setUniform(name, values, size, this.gl.FLOAT, divisor);
+    }
+
+    public setArrayShort(name: string, values: Int16Array, size: number, divisor = 0): void {
+        this.setUniform(name, values, size, this.gl.SHORT, divisor);
+    }
+
+    public setUniform(name: string, values: BufferSource, size: number, type: number, divisor: number): void {
+        const gl = this.gl;
+        if ((!this.shaderProgram) || (!gl)) {
+            return;
+        }
+
+        const attribLocation = gl.getAttribLocation(this.shaderProgram, name);
+        gl.enableVertexAttribArray(attribLocation);
+
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, values, gl.STATIC_DRAW);
+
+        gl.vertexAttribPointer(attribLocation, size, type, false, 0, 0);
+
+        if (divisor) {
+            const extInstancedArrays = this.getAngleInstancedArrayExtension();
+            if (extInstancedArrays) {
+                // this line says this attribute only changes for each 1 instance
+                extInstancedArrays.vertexAttribDivisorANGLE(attribLocation, divisor);
+            }
+        }
+    }
+
+    // eslint-disable-next-line camelcase
+    public getAngleInstancedArrayExtension(): ANGLE_instanced_arrays | null {
+        if (this.extInstancedArrays != null) {
+            return this.extInstancedArrays;
+        }
+
+        this.extInstancedArrays = this.gl.getExtension('ANGLE_instanced_arrays');
+        if (!this.extInstancedArrays) {
             return null;
         }
 
-        return this.gl.getUniformLocation(this.shaderProgram, name);
+        return this.extInstancedArrays;
     }
 
-    public getAttribLocation(name: string): number {
+    public bindTexture(name: string, textureId: number): void {
         if ((!this.shaderProgram) || (!this.gl)) {
-            return -1;
+            return;
         }
 
-        return this.gl.getAttribLocation(this.shaderProgram, name);
+        const location = this.gl.getUniformLocation(this.shaderProgram, name);
+
+        this.gl.uniform1i(location, textureId);
     }
 
     public free(): void {

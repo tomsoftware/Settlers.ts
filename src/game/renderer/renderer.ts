@@ -1,6 +1,7 @@
 import { LogHandler } from '@/utilities/log-handler';
 import { IRenderer } from './i-renderer';
 import { Matrix } from './landscape/matrix';
+import { ViewPoint } from './view-point';
 
 // https://stackoverflow.com/questions/48741570/how-can-i-import-glsl-as-string-in-typescript
 // https://tympanus.net/codrops/2019/01/17/interactive-particles-with-three-js/
@@ -12,64 +13,26 @@ export class Renderer {
     private gl: WebGLRenderingContext | null = null;
     private renderers: IRenderer[] = [];
     private animRequest = 0;
-    private x = -400;
-    private y = 100;
-    private deltaX = 0;
-    private deltaY = 0;
-    private downX = 0;
-    private downY = 0;
-    private zoom = 3;
-    private mouseIsMoving = false;
+    private viewPoint: ViewPoint;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
+        this.viewPoint = new ViewPoint(canvas);
+        this.viewPoint.onMove = () => this.onMove();
+
         const newGl = canvas.getContext('webgl');
         if (!newGl) {
-            this.log.error('ERROR: Unable to initialize WbGL. Your browser may not support it.');
+            this.log.error('ERROR: Unable to initialize WebGL. Your browser may not support it.');
             return;
         }
 
         this.gl = newGl;
 
-        canvas.addEventListener('mousedown', e => {
-            this.downX = e.offsetX;
-            this.downY = e.offsetY;
-            this.mouseIsMoving = true;
-        });
-
-        canvas.addEventListener('mousemove', e => {
-            if (!this.mouseIsMoving) {
-                return;
-            }
-
-            this.deltaX = e.offsetX - this.downX;
-            this.deltaY = -(e.offsetY - this.downY);
-
-            this.requestDraw();
-        });
-
-        window.addEventListener('mouseup', e => {
-            if (!this.mouseIsMoving) {
-                return;
-            }
-
-            this.mouseIsMoving = false;
-            this.x += this.deltaX;
-            this.y += this.deltaY;
-
-            this.deltaX = 0;
-            this.deltaY = 0;
-
-            this.requestDraw();
-        });
-
-        canvas.addEventListener('wheel', e => {
-            this.zoom = Math.max(1, this.zoom + Math.sign(e.deltaY));
-            e.preventDefault();
-            this.requestDraw();
-        });
-
         Object.seal(this);
+    }
+
+    private onMove() {
+        this.requestDraw();
     }
 
     private requestDraw() {
@@ -84,16 +47,15 @@ export class Renderer {
     }
 
     private draw() {
-        console.log('need draw');
         const gl = this.gl;
         if (!gl) {
             return;
         }
 
         // view
-        const viewX = (this.x + this.deltaX) * 0.01;
-        const viewY = (this.y + this.deltaY) * 0.01;
-        const zoomV = 0.1 / this.zoom;
+        const viewX = this.viewPoint.x * 0.004 - 4;
+        const viewY = this.viewPoint.y * 0.004 + 0.9;
+        const zoomV = 0.1 / this.viewPoint.zoom;
 
         // define camera
         const canvas = this.canvas;
@@ -104,7 +66,7 @@ export class Renderer {
             .translate(viewX, viewY, 0)
             .scale(zoomV, zoomV, 1.0);
 
-        console.log('draw: ' + viewX + ' x ' + viewY + ' zoom: ' + zoomV);
+        console.log('draw: x: ' + viewX + ' x ' + viewY + ' zoom: ' + zoomV);
 
         // draw all renderers
         for (const r of this.renderers) {

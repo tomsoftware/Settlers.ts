@@ -14,8 +14,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
     private baseVerticesPosBuffer: WebGLBuffer | null = null;
     private baseVerticesIndexBuffer: WebGLBuffer | null = null;
     private numVertices = 0;
-    // eslint-disable-next-line camelcase
-    private extInstancedArrays: ANGLE_instanced_arrays | null = null;
+
     private texture: GhTexture;
     private mapSize: MapSize;
     private groundTypeMap: Uint8Array;
@@ -73,9 +72,8 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 
         await this.texture.load(gl);
 
-        this.extInstancedArrays = gl.getExtension('ANGLE_instanced_arrays');
-        if (!this.extInstancedArrays) {
-            this.log.error('need ANGLE_instanced_arrays');
+        if (!this.shaderProgram?.getAngleInstancedArrayExtension()) {
+            this.log.error('need WebGL ANGLE_instanced_arrays');
         }
 
         this.numVertices = 6;
@@ -105,7 +103,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
             return;
         }
 
-        const ext = this.extInstancedArrays;
+        const ext = sp.getAngleInstancedArrayExtension();
         if (!ext) {
             return;
         }
@@ -119,55 +117,14 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         this.textureManager.setShaderProgram(gl, sp);
 
         // ///////////
-        // set base vertex
-        // define base map shape as a parallelogram
-        // so we always draw the same vertices
-        //        (0/0)    (1/0)
-        //         1 4      6
+        // set vertex index
+        //         0 3      5
         //         /\\------/
         //        /  \\  B /
         //       /  A \\  /
         //      /------\\/
-        //     2       3 5
-        // (-0.5/1)  (0.5/1)
-        const baseVerticesPosLoc = sp.getAttribLocation('baseVerticesPos');
-        gl.enableVertexAttribArray(baseVerticesPosLoc);
-
-        this.baseVerticesPosBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.baseVerticesPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.0, 0.0,
-            -0.5, 1.0,
-            0.5, 1.0,
-
-            0.0, 0.0,
-            0.5, 1.0,
-            1.0, 0.0
-        ]), gl.STATIC_DRAW);
-
-        gl.vertexAttribPointer(baseVerticesPosLoc, 2, gl.FLOAT, false, 0, 0);
-
-        // ///////////
-        // set triangle index (A=0, B=1)
-        //        (A)(B)   (B)
-        //         1 4      6
-        //         /\\------/
-        //        /  \\  B /
-        //       /  A \\  /
-        //      /------\\/
-        //     2       3 5
-        // (A)        (A)(B)
-        const baseVerticesIndexLoc = sp.getAttribLocation('baseVerticesIndex');
-        gl.enableVertexAttribArray(baseVerticesIndexLoc);
-
-        this.baseVerticesIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.baseVerticesIndexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0, 0, 0,
-            1, 1, 1
-        ]), gl.STATIC_DRAW);
-
-        gl.vertexAttribPointer(baseVerticesIndexLoc, 1, gl.FLOAT, false, 0, 0);
+        //     1       2 4
+        sp.setArrayFloat('baseVerticesIndex', new Float32Array([0, 1, 2, 3, 4, 5]), 1);
 
         // ///////////
         // update texture data
@@ -182,22 +139,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         //    /-----/-----/-----/
         //   / 0/1 / 1/1 / 2/1 /
         //  /-----/-----/-----/
-        const instancePosLoc = sp.getAttribLocation('instancePos');
-
-        // setup pos, one per instance
-        const instancePosBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, instancePosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,
-            this.createInstancePosArray(numInstancesX, numInstancesY),
-            gl.STATIC_DRAW);
-
-        // set attribute for map pos
-        gl.bindBuffer(gl.ARRAY_BUFFER, instancePosBuffer);
-        gl.enableVertexAttribArray(instancePosLoc);
-        gl.vertexAttribPointer(instancePosLoc, 2, gl.SHORT, false, 0, 0);
-
-        // this line says this attribute only changes for each 1 instance
-        ext.vertexAttribDivisorANGLE(instancePosLoc, 1);
+        sp.setArrayShort('instancePos', this.createInstancePosArray(numInstancesX, numInstancesY), 2, 1);
 
         // ////////
         // do it!

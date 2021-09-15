@@ -1,14 +1,17 @@
-//        (0,0)    (1,0)
-//         1 4      6
+#define DO_DEBUG 1
+
+// ///////////
+// set vertex index of ONE instance
+//         0 3      5
 //         /\\------/
 //        /  \\  B /
 //       /  A \\  /
 //      /------\\/
-//     2       3 5
-// (-0.5,1)  (0.5,1)
-attribute vec2 baseVerticesPos; // (0,0) or (-0.5,1) or ...
-attribute float baseVerticesIndex; // A=0 or B=1
+//     1       2 4
+attribute float baseVerticesIndex; // 0, 1, 2, 3, 4, 5
 
+// ///////////
+// set the instance index
 //      /-----/-----/-----/
 //     / 0,0 / 1,0 / 2,0 /
 //    /-----/-----/-----/
@@ -18,7 +21,10 @@ attribute vec2 instancePos;
 
 uniform mat4 projection;
 
-//varying vec4 v_color;
+#ifdef DO_DEBUG
+  varying vec3 v_barycentric;
+#endif
+
 varying vec2 v_texcoord;
 
 vec2 mapSize = vec2(256.0, 256.0);
@@ -34,6 +40,68 @@ vec2 mapPos = vec2(-100.0, 10.0);
 uniform sampler2D u_landTypeBuffer;
 
 void main() {
+  // ///////////
+  // set base vertex properties
+  // define base map shape as a parallelogram
+  // so we always draw the same vertices
+  //        (0/0)    (1/0)
+  //         0 3      5
+  //         /\\------/
+  //        /  \\  B /
+  //       /  A \\  /
+  //      /------\\/
+  //     1       2 4
+  // (-0.5/1)  (0.5/1)
+  vec2 baseVerticesPos; // (0,0) or (-0.5,1) or ...
+
+  // triangle A or B ?
+  int baseVertecesTypeAorB;
+
+  if (baseVerticesIndex < 3.0) {
+    baseVertecesTypeAorB = 0;
+    if (baseVerticesIndex == 0.0) {
+      // 0
+      baseVerticesPos =  vec2(0.0, 0.0);
+    }
+    else if (baseVerticesIndex == 1.0) {
+      // 1
+      baseVerticesPos =  vec2( -0.5, 1.0);
+    }
+    else {
+      // 2
+      baseVerticesPos =  vec2( 0.5, 1.0);
+    }
+  }
+  else {
+    baseVertecesTypeAorB = 1;
+    if (baseVerticesIndex == 3.0) {
+      // 3
+      baseVerticesPos =  vec2(0.0, 0.0);
+    }
+    else if (baseVerticesIndex == 4.0) {
+      // 4
+      baseVerticesPos =  vec2(0.5, 1.0);
+    }
+    else {
+      // 5
+      baseVerticesPos =  vec2(1.0, 0.0);
+    }
+  }
+
+
+  ///////
+  #ifdef DO_DEBUG
+    if (baseVerticesPos.x == 0.0) {
+      v_barycentric = vec3(1, 0, 0);
+    }
+    else if (baseVerticesPos.x == 0.5) {
+      v_barycentric = vec3(0, 1, 0);
+    }
+    else {
+      v_barycentric = vec3(0, 0, 1);
+    }
+  #endif
+
   // https://webglfundamentals.org/webgl/lessons/webgl-pulling-vertices.html
   vec2 pixelCoord = instancePos + mapPos;
 
@@ -52,7 +120,7 @@ void main() {
   vec2 text_scale = vec2(1.0, 1.0) / vec2(8, 352);
 
   vec2 real_text_pos;
-  if (baseVerticesIndex > 0.0) {
+  if (baseVertecesTypeAorB > 0) {
     // for triangle B use
     real_text_pos = type.zw * vec2(255, 255);
   }
@@ -70,6 +138,6 @@ void main() {
       );
 
   // Pass the vertex color/texture to the fragment shader.
-  //v_color = color;
+  //v_barycentric = color;
   v_texcoord = (baseVerticesPos.xy + real_text_pos.xy) * text_scale;
 }

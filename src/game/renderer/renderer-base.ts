@@ -21,8 +21,6 @@ export class RendererBase {
 
         // activate shader
         sp.use();
-
-        const projectionLoc = sp.getUniformLocation('projection');
-        gl.uniformMatrix4fv(projectionLoc, false, projection);
+        sp.setMatrix('projection', projection);
     }
 }

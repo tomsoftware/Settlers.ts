@@ -11,8 +11,7 @@ export class TextureManager {
     /** bind texture slot/unit to uniform name */
     public setShaderProgram(gl: WebGLRenderingContext, sp: ShaderProgram): void {
         for (let i = 0; i < this.textureNames.length; i++) {
-            const location = sp.getUniformLocation(this.textureNames[i]);
-            gl.uniform1i(location, i);
+            sp.bindTexture(this.textureNames[i], i);
         }
     }
 }
