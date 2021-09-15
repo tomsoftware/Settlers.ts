@@ -1,17 +1,17 @@
 import { LandscapeType } from '../landscape-type';
 
 export class TexturePoint {
+    public t0: LandscapeType;
     public t1: LandscapeType;
     public t2: LandscapeType;
-    public t3: LandscapeType;
 
-    constructor(t1: LandscapeType, t2: LandscapeType, t3: LandscapeType) {
+    constructor(t0: LandscapeType, t1: LandscapeType, t2: LandscapeType) {
+        this.t0 = t0;
         this.t1 = t1;
         this.t2 = t2;
-        this.t3 = t3;
     }
 
     public getKey(): number {
-        return this.t1 << 16 | this.t2 << 8 | this.t3;
+        return this.t0 << 16 | this.t1 << 8 | this.t2;
     }
 }

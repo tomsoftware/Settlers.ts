@@ -11,13 +11,10 @@ import { ShaderDataTexture } from '../shader-data-texture';
 
 export class LandscapeRenderer extends RendererBase implements IRenderer {
     private readonly log = new LogHandler('LandscapeRenderer');
-    private baseVerticesPosBuffer: WebGLBuffer | null = null;
-    private baseVerticesIndexBuffer: WebGLBuffer | null = null;
     private numVertices = 0;
 
     private texture: GhTexture;
     private mapSize: MapSize;
-    private groundTypeMap: Uint8Array;
     private landscapeTextureMap = new LandscapeTextureMap();
 
     private landTypeBuffer: ShaderDataTexture | null = null;
@@ -26,7 +23,6 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         super();
 
         this.mapSize = mapSize;
-        this.groundTypeMap = groundTypeMap;
 
         this.texture = new GhTexture(this.textureManager.create('u_landText'));
         this.landTypeBuffer = this.createLandTypeBuffer(mapSize, this.textureManager.create('u_landTypeBuffer'), groundTypeMap);
@@ -68,11 +64,15 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
     }
 
     public async init(gl: WebGLRenderingContext): Promise<boolean> {
-        super.initBase(gl, vertCode, fragCode);
+        // this.shaderProgram.setDefine('DEBUG_TRIANGLE_BORDER', 1);
+        this.shaderProgram.setDefine('MAP_WIDTH', this.mapSize.width);
+        this.shaderProgram.setDefine('MAP_HEIGHT', this.mapSize.width);
+
+        super.initShader(gl, vertCode, fragCode);
 
         await this.texture.load(gl);
 
-        if (!this.shaderProgram?.getAngleInstancedArrayExtension()) {
+        if (!this.shaderProgram.getAngleInstancedArrayExtension()) {
             this.log.error('need WebGL ANGLE_instanced_arrays');
         }
 
@@ -114,7 +114,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 
         // ///////////
         // Tell the shader to use all set texture units
-        this.textureManager.setShaderProgram(gl, sp);
+        this.textureManager.bindToShader(gl, sp);
 
         // ///////////
         // set vertex index

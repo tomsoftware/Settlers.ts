@@ -1,5 +1,3 @@
-#define DO_DEBUG 1
-
 // ///////////
 // set vertex index of ONE instance
 //         0 3      5
@@ -21,13 +19,13 @@ attribute vec2 instancePos;
 
 uniform mat4 projection;
 
-#ifdef DO_DEBUG
+#ifdef DEBUG_TRIANGLE_BORDER
   varying vec3 v_barycentric;
 #endif
 
 varying vec2 v_texcoord;
 
-vec2 mapSize = vec2(256.0, 256.0);
+vec2 mapSize = vec2(MAP_HEIGHT, MAP_WIDTH);
 vec2 mapPos = vec2(-100.0, 10.0);
 
 // texture position of the ground where [R G B A] is mapped to [Ax Ay Bx By]
@@ -61,36 +59,36 @@ void main() {
     baseVertecesTypeAorB = 0;
     if (baseVerticesIndex == 0.0) {
       // 0
-      baseVerticesPos =  vec2(0.0, 0.0);
+      baseVerticesPos = vec2(0.0, 0.0);
     }
     else if (baseVerticesIndex == 1.0) {
       // 1
-      baseVerticesPos =  vec2( -0.5, 1.0);
+      baseVerticesPos = vec2(-0.5, 1.0);
     }
     else {
       // 2
-      baseVerticesPos =  vec2( 0.5, 1.0);
+      baseVerticesPos = vec2(0.5, 1.0);
     }
   }
   else {
     baseVertecesTypeAorB = 1;
     if (baseVerticesIndex == 3.0) {
       // 3
-      baseVerticesPos =  vec2(0.0, 0.0);
+      baseVerticesPos = vec2(0.0, 0.0);
     }
     else if (baseVerticesIndex == 4.0) {
       // 4
-      baseVerticesPos =  vec2(0.5, 1.0);
+      baseVerticesPos = vec2(0.5, 1.0);
     }
     else {
       // 5
-      baseVerticesPos =  vec2(1.0, 0.0);
+      baseVerticesPos = vec2(1.0, 0.0);
     }
   }
 
 
   ///////
-  #ifdef DO_DEBUG
+  #ifdef DEBUG_TRIANGLE_BORDER
     if (baseVerticesPos.x == 0.0) {
       v_barycentric = vec3(1, 0, 0);
     }
@@ -114,19 +112,19 @@ void main() {
   }
  
   // read the land-texture-type for the data-texture
-  vec2 texcoord = (pixelCoord + 0.5) / mapSize;
+  vec2 texcoord = pixelCoord / mapSize;
   vec4 type = texture2D(u_landTypeBuffer, texcoord);
 
   vec2 text_scale = vec2(1.0, 1.0) / vec2(8, 352);
 
   vec2 real_text_pos;
-  if (baseVertecesTypeAorB > 0) {
-    // for triangle B use
-    real_text_pos = type.zw * vec2(255, 255);
+  if (baseVertecesTypeAorB == 0) {
+    // for triangle A use
+    real_text_pos = type.xy * vec2(127, 255); // x is scaled by 
   }
   else {
-    // for triangle A use
-    real_text_pos = type.xy * vec2(255, 255);
+    // for triangle B use
+    real_text_pos = type.zw * vec2(127, 255);
   }
 
   gl_Position = projection *

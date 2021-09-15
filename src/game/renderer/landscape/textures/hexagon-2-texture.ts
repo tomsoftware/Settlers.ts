@@ -1,4 +1,4 @@
-import { ILandscapeTexture, TextureBlockSize } from './i-landscape-texture';
+import { ILandscapeTexture, TextureBlockSizeX, TextureBlockSizeY } from './i-landscape-texture';
 import { LandscapeType } from '../landscape-type';
 import { TexturePoint } from './texture-point';
 
@@ -9,29 +9,29 @@ export class Hexagon2Texture implements ILandscapeTexture {
     private innerType: LandscapeType;
 
     constructor(typeOut: LandscapeType, typeIn: LandscapeType, x: number, y: number) {
-        this.y = y;
-        this.x = x;
+        this.x = x * TextureBlockSizeX;
+        this.y = y * TextureBlockSizeY;
         this.outerType = typeOut;
         this.innerType = typeIn;
     }
 
     public getTextureA(tp: TexturePoint, x: number, y: number): [number, number] {
-        if (tp.t1 === this.innerType) {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
-        } else if (tp.t2 === this.innerType) {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
+        if (tp.t0 === this.innerType) {
+            return [this.x + 2, this.y + 1];
+        } else if (tp.t1 === this.innerType) {
+            return [this.x + 3, this.y];
         } else {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
+            return [this.x + 1, this.y];
         }
     }
 
     public getTextureB(tp: TexturePoint, x: number, y: number): [number, number] {
-        if (tp.t1 === this.innerType) {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
-        } else if (tp.t2 === this.innerType) {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
+        if (tp.t0 === this.innerType) {
+            return [this.x + 2, this.y + 1];
+        } else if (tp.t1 === this.innerType) {
+            return [this.x + 1, this.y];
         } else {
-            return [this.x * TextureBlockSize, this.y * TextureBlockSize];
+            return [this.x, this.y + 1];
         }
     }
 

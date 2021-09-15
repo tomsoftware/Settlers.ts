@@ -53,8 +53,8 @@ export class Renderer {
         }
 
         // view
-        const viewX = this.viewPoint.x * 0.004 - 4;
-        const viewY = this.viewPoint.y * 0.004 + 0.9;
+        const viewX = this.viewPoint.x * 0.004 - 11.2;
+        const viewY = this.viewPoint.y * 0.004 + 1.4;
         const zoomV = 0.1 / this.viewPoint.zoom;
 
         // define camera

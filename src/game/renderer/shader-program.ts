@@ -8,18 +8,27 @@ export enum ShaderType {
 
 export class ShaderProgram implements ShaderObject {
     private readonly log = new LogHandler('ShaderProgram');
-    private gl: WebGLRenderingContext;
+    private gl: WebGLRenderingContext | null = null;
     private shaders: WebGLShader[] = [];
     private shaderProgram: WebGLProgram | null = null;
+    private defines: string[] = [];
+
     // eslint-disable-next-line camelcase
     private extInstancedArrays: ANGLE_instanced_arrays | null = null;
 
-    constructor(gl: WebGLRenderingContext) {
-        this.gl = gl;
+    constructor() {
         Object.seal(this);
     }
 
+    public init(gl: WebGLRenderingContext) {
+        this.gl = gl;
+    }
+
     private shaderTypeToNumber(shaderType: ShaderType) {
+        if (!this.gl) {
+            return 0;
+        }
+
         switch (shaderType) {
         case ShaderType.VERTEX_SHADER:
             return this.gl.VERTEX_SHADER;
@@ -30,7 +39,11 @@ export class ShaderProgram implements ShaderObject {
         }
     }
 
-    public create():boolean {
+    public create(): boolean {
+        if (!this.gl) {
+            return false;
+        }
+
         // Create a shader program object to store combined shader program
         this.shaderProgram = this.gl.createProgram();
 
@@ -59,6 +72,10 @@ export class ShaderProgram implements ShaderObject {
         this.gl.useProgram(this.shaderProgram);
     }
 
+    public setDefine(defineName: string, value: number | string): void {
+        this.defines.push('#define ' + defineName + ' ' + value);
+    }
+
     public setMatrix(name: string, values: Float32Array): void {
         const gl = this.gl;
         if ((!this.shaderProgram) || (!gl)) {
@@ -71,10 +88,18 @@ export class ShaderProgram implements ShaderObject {
     }
 
     public setArrayFloat(name: string, values: Float32Array, size: number, divisor = 0): void {
+        if (!this.gl) {
+            return;
+        }
+
         this.setUniform(name, values, size, this.gl.FLOAT, divisor);
     }
 
     public setArrayShort(name: string, values: Int16Array, size: number, divisor = 0): void {
+        if (!this.gl) {
+            return;
+        }
+
         this.setUniform(name, values, size, this.gl.SHORT, divisor);
     }
 
@@ -104,6 +129,10 @@ export class ShaderProgram implements ShaderObject {
 
     // eslint-disable-next-line camelcase
     public getAngleInstancedArrayExtension(): ANGLE_instanced_arrays | null {
+        if (!this.gl) {
+            return null;
+        }
+
         if (this.extInstancedArrays != null) {
             return this.extInstancedArrays;
         }
@@ -156,7 +185,11 @@ export class ShaderProgram implements ShaderObject {
     /**
      * setup, compiles one shader and links GLSL program
      */
-    public attachShader(src: string, shaderType: ShaderType) : boolean {
+    public attachShader(src: string, shaderType: ShaderType): boolean {
+        if (!this.gl) {
+            return false;
+        }
+
         // Create a shader object.
         const newShader = this.gl.createShader(this.shaderTypeToNumber(shaderType));
 
@@ -164,6 +197,9 @@ export class ShaderProgram implements ShaderObject {
             this.log.error('Unable to createShader: ' + shaderType);
             return false;
         }
+
+        // add defines to source
+        src = this.defines.join('\n') + '\n' + src;
 
         // Compile the shader
         this.gl.shaderSource(newShader, src);

@@ -17,7 +17,7 @@ export class LandscapeTextureMap {
         for (const p of pattern) {
             const key = p.getKey();
             if (this.lookup[key]) {
-                this.log.error('Texture type (' + p.t1 + ' ' + p.t2 + ' ' + p.t3 + ') already defined');
+                this.log.error('Texture type (' + p.t0 + ' ' + p.t1 + ' ' + p.t2 + ') already defined');
                 return;
             }
 
@@ -66,10 +66,10 @@ export class LandscapeTextureMap {
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water3, 3, 20));
 
         // next row
-        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water4, 4, 21));
-        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water5, 5, 21));
-        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water6, 6, 21));
-        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water7, 7, 21));
+        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water4, 0, 21));
+        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water5, 1, 21));
+        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water6, 2, 21));
+        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water7, 3, 21));
 
         // next row
         this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 22));

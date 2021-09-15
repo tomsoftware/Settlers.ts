@@ -4,23 +4,23 @@
  * the view-coordinates (x,y,zoom)
  */
 export class ViewPoint {
-    private lastX = 0;
-    private lastY = 0;
+    private posX = 0;
+    private posY = 0;
     private deltaX = 0;
     private deltaY = 0;
     private downX = 0;
     private downY = 0;
-    public zoom = 3;
+    public zoom = 1;
     private mouseIsMoving = false;
 
     public onMove?: () => void;
 
     public get x() {
-        return (this.lastX + this.deltaX);
+        return (this.posX + this.deltaX);
     }
 
     public get y() {
-        return (this.lastY + this.deltaY);
+        return (this.posY + this.deltaY);
     }
 
     private invokeOnMove() {
@@ -55,8 +55,8 @@ export class ViewPoint {
             }
 
             this.mouseIsMoving = false;
-            this.lastX += this.deltaX;
-            this.lastY += this.deltaY;
+            this.posX += this.deltaX;
+            this.posY += this.deltaY;
 
             this.deltaX = 0;
             this.deltaY = 0;

@@ -2,11 +2,11 @@ import { ShaderProgram } from './shader-program';
 import { TextureManager } from './texture-manager';
 
 export class RendererBase {
-    protected shaderProgram: ShaderProgram | null = null;
+    protected shaderProgram: ShaderProgram = new ShaderProgram();
     protected textureManager: TextureManager = new TextureManager();
 
-    public initBase(gl: WebGLRenderingContext, vertCode: string, fragCode: string): void {
-        this.shaderProgram = new ShaderProgram(gl);
+    public initShader(gl: WebGLRenderingContext, vertCode: string, fragCode: string): void {
+        this.shaderProgram.init(gl);
 
         this.shaderProgram.attachShaders(vertCode, fragCode);
 

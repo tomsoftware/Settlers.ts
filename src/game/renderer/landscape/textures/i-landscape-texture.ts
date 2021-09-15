@@ -1,6 +1,7 @@
 import { TexturePoint } from './texture-point';
 
-export const TextureBlockSize = 2;
+export const TextureBlockSizeX = 4;
+export const TextureBlockSizeY = 2;
 
 export interface ILandscapeTexture {
     getTextureA(tp: TexturePoint, x: number, y: number): [number, number];

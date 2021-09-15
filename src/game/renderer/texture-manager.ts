@@ -9,7 +9,7 @@ export class TextureManager {
     }
 
     /** bind texture slot/unit to uniform name */
-    public setShaderProgram(gl: WebGLRenderingContext, sp: ShaderProgram): void {
+    public bindToShader(gl: WebGLRenderingContext, sp: ShaderProgram): void {
         for (let i = 0; i < this.textureNames.length; i++) {
             sp.bindTexture(this.textureNames[i], i);
         }
