@@ -9,19 +9,34 @@ export enum LandscapeType {
     Water7 = 7,
     Water8 = 8, // <- bad water?
 
-    GrassLand = 16,
-    GrassDark = 24,
-    GrassDry = 18,
+    Grass = 16,
+    GrassDark = 18,
+
+    GrassDry = 24,
+    GrassToGrassDry = 25,
 
     Desert = 64,
+    DesertToGras1 = 65,
+    DesertToGras2 = 20,
+
     Beach = 48,
 
     DustyWay = 28,
     RockyWay = 29,
 
     Rock = 32,
+    RockToGras1 = 33,
+    RockToGras2 = 17,
 
     Swamp = 80,
+    SwampToGras1 = 81,
+    SwampToGras2 = 21,
+
     Snow = 128,
-    Mud = 144
+    SnowToRock1 = 129,
+    SnowToRock2 = 35,
+
+    Mud = 144,
+    MudToGras1 = 145,
+    MudToGras2 = 23
 }

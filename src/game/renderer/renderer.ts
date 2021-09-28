@@ -53,9 +53,9 @@ export class Renderer {
         }
 
         // view
-        const viewX = this.viewPoint.x * 0.004 - 11.2;
-        const viewY = this.viewPoint.y * 0.004 + 1.4;
-        const zoomV = 0.1 / this.viewPoint.zoom;
+        const viewX = this.viewPoint.x;
+        const viewY = this.viewPoint.y;
+        const zoomV = this.viewPoint.zoom;
 
         // define camera
         const canvas = this.canvas;
@@ -63,14 +63,14 @@ export class Renderer {
         const aspect = canvas.clientWidth / canvas.clientHeight;
         const projection = Matrix
             .createOrthographic(-aspect, aspect, 1, -1, -1, 1)
-            .translate(viewX, viewY, 0)
+            .translate(-1, 1, 0)
             .scale(zoomV, zoomV, 1.0);
 
         console.log('draw: x: ' + viewX + ' x ' + viewY + ' zoom: ' + zoomV);
 
         // draw all renderers
         for (const r of this.renderers) {
-            r.draw(gl, projection.mat);
+            r.draw(gl, projection.mat, this.viewPoint);
         }
 
         requestAnimationFrame(() => this.draw);

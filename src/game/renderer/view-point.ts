@@ -1,29 +1,34 @@
+import { IViewPoint } from './i-view-point';
 
 /**
  * Handles mouse events and gesture and generates
  * the view-coordinates (x,y,zoom)
  */
-export class ViewPoint {
+export class ViewPoint implements IViewPoint {
     private posX = 0;
     private posY = 0;
     private deltaX = 0;
     private deltaY = 0;
     private downX = 0;
     private downY = 0;
-    public zoom = 1;
+    public zoomValue = 1;
     private mouseIsMoving = false;
 
     public onMove?: () => void;
 
-    public get x() {
-        return (this.posX + this.deltaX);
+    public get zoom(): number {
+        return 0.1 / this.zoomValue;
     }
 
-    public get y() {
-        return (this.posY + this.deltaY);
+    public get x(): number {
+        return this.posX + this.deltaX;
     }
 
-    private invokeOnMove() {
+    public get y(): number {
+        return this.posY + this.deltaY;
+    }
+
+    private invokeOnMove(): void {
         if (!this.onMove) {
             return;
         }
@@ -43,8 +48,8 @@ export class ViewPoint {
                 return;
             }
 
-            this.deltaX = e.offsetX - this.downX;
-            this.deltaY = -(e.offsetY - this.downY);
+            this.deltaX = (e.offsetX - this.downX) * this.zoomValue * 0.03;
+            this.deltaY = (e.offsetY - this.downY) * this.zoomValue * 0.03;
 
             this.invokeOnMove();
         });
@@ -55,8 +60,9 @@ export class ViewPoint {
             }
 
             this.mouseIsMoving = false;
-            this.posX += this.deltaX;
-            this.posY += this.deltaY;
+            // update the pos values
+            this.posX = this.x;
+            this.posY = this.y;
 
             this.deltaX = 0;
             this.deltaY = 0;
@@ -65,7 +71,7 @@ export class ViewPoint {
         });
 
         canvas.addEventListener('wheel', e => {
-            this.zoom = Math.max(1, this.zoom + Math.sign(e.deltaY));
+            this.zoomValue = Math.max(1, this.zoomValue + Math.sign(e.deltaY));
             e.preventDefault();
 
             this.invokeOnMove();

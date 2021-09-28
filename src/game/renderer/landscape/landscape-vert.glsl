@@ -26,7 +26,7 @@ uniform mat4 projection;
 varying vec2 v_texcoord;
 
 vec2 mapSize = vec2(MAP_HEIGHT, MAP_WIDTH);
-vec2 mapPos = vec2(-100.0, 10.0);
+uniform vec2 mapPos; // = vec2(-50.0, 40.0);
 
 // texture position of the ground where [R G B A] is mapped to [Ax Ay Bx By]
 //  so Ax is x-pos for triangle A and By for y-pos of triangle B

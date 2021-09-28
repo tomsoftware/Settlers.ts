@@ -12,11 +12,11 @@ export class BigLandscapeTexture implements ILandscapeTexture {
     }
 
     public getTextureA(tp: TexturePoint, x: number, y: number): [number, number] {
-        return [(x % 4) * 2 + 1, this.y + (y % 4)];
+        return [(x % 8) * 2 + 1, this.y + (y % 8)];
     }
 
     public getTextureB(tp: TexturePoint, x: number, y: number): [number, number] {
-        return [(x % 4) * 2, this.y + (y % 4)];
+        return [(x % 8) * 2, this.y + (y % 8)];
     }
 
     public getPattern(): TexturePoint[] {

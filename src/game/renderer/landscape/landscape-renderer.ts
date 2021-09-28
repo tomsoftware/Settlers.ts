@@ -4,10 +4,11 @@ import { IRenderer } from '../i-renderer';
 import { GhTexture } from '../gh-texture';
 import { LandscapeTextureMap } from './textures/landscape-texture-map';
 import { MapSize } from '@/utilities/map-size';
+import { ShaderDataTexture } from '../shader-data-texture';
+import { IViewPoint } from '../i-view-point';
 
 import vertCode from './landscape-vert.glsl';
 import fragCode from './landscape-frag.glsl';
-import { ShaderDataTexture } from '../shader-data-texture';
 
 export class LandscapeRenderer extends RendererBase implements IRenderer {
     private readonly log = new LogHandler('LandscapeRenderer');
@@ -81,6 +82,12 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         return true;
     }
 
+    // create an array with x,y for every parallelogram
+    //      /-----/-----/-----/
+    //     / 0/0 / 1/0 / 2/0 /
+    //    /-----/-----/-----/
+    //   / 0/1 / 1/1 / 2/1 /
+    //  /-----/-----/-----/
     private createInstancePosArray(width: number, height: number): Int16Array {
         const r = new Int16Array(width * height * 2);
         let i = 0;
@@ -95,7 +102,7 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         return r;
     }
 
-    public draw(gl: WebGLRenderingContext, projection: Float32Array): void {
+    public draw(gl: WebGLRenderingContext, projection: Float32Array, viewPoint: IViewPoint): void {
         super.drawBase(gl, projection);
 
         const sp = this.shaderProgram;
@@ -109,12 +116,15 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         }
 
         // setup matrices, one per instance
-        const numInstancesX = 256;
-        const numInstancesY = 256;
+        const numInstancesX = 2 / viewPoint.zoom;
+        const numInstancesY = 2 / viewPoint.zoom;
 
         // ///////////
         // Tell the shader to use all set texture units
         this.textureManager.bindToShader(gl, sp);
+
+        // set view Point
+        sp.setVector2('mapPos', -viewPoint.x, -viewPoint.y);
 
         // ///////////
         // set vertex index

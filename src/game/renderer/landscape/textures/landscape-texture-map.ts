@@ -25,36 +25,110 @@ export class LandscapeTextureMap {
         }
     }
 
+    private addTextureGradient1(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
+        // Using Hexagon2Texture for SmallLandscapeTexture!
+        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
+        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row));
+
+        // empty: @ 0, row + 1
+        // empty: @ 1, row + 1
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 1));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 2));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 2));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 3));
+    }
+
+    private addTextureGradient2(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
+        // Using Hexagon2Texture for SmallLandscapeTexture!
+        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
+        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+
+        this.addTexture(new Hexagon2Texture(type4, type3, 2, row));
+        this.addTexture(new Hexagon2Texture(type3, type4, 3, row));
+
+        // empty: @ 0, row + 1
+        // empty: @ 1, row + 1
+        this.addTexture(new Hexagon2Texture(type4, type3, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type3, type4, 3, row + 1));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 3));
+    }
+
+    private addTextureGradient3(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
+        // Using Hexagon2Texture for SmallLandscapeTexture!
+        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
+        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row));
+
+        // empty: @ 0, row + 1
+        // empty: @ 1, row + 1
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 1));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2));
+
+        // next row
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 3));
+    }
+
     constructor() {
-        this.addTexture(new BigLandscapeTexture(LandscapeType.GrassLand, 0));
+        this.addTexture(new BigLandscapeTexture(LandscapeType.Grass, 0));
         this.addTexture(new BigLandscapeTexture(LandscapeType.GrassDark, 4));
         this.addTexture(new BigLandscapeTexture(LandscapeType.GrassDry, 8));
 
         // next row
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.GrassLand, 0, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.GrassLand, 0, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 12));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 12));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 12));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 12));
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDark, 1, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDark, 1, 13));
-
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.GrassLand, 2, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.GrassLand, 2, 13));
-
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Beach, 3, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.Beach, 3, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 13));
 
         // next row
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDry, 0, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassLand, LandscapeType.GrassDry, 0, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 14));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 14));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 14));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 14));
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassLand, 1, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassLand, 1, 15));
-
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.GrassDry, 0, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.GrassDry, 0, 15));
-
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassDark, 1, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassDark, 1, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 15));
 
         // next row
         this.addTexture(new BigLandscapeTexture(LandscapeType.Water7, 16));
@@ -71,18 +145,17 @@ export class LandscapeTextureMap {
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water6, 2, 21));
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water7, 3, 21));
 
-        // next row
+        // [beach] --> [water]
         this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 22));
         this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 23));
-
         this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 22));
         this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 23));
 
-        // next row
-        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.GrassLand, LandscapeType.Water0, 2, 22));
-        this.addTexture(new Hexagon3Texture(LandscapeType.GrassLand, LandscapeType.Beach, LandscapeType.Water0, 3, 23));
-        // unknown @ 3, 22
-        // unknown @ 3, 23
+        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 2, 22));
+        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 3, 22));
+
+        this.addTexture(new Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 2, 23));
+        this.addTexture(new Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 3, 23));
 
         // next row
         this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Water1, 0, 24));
@@ -110,21 +183,51 @@ export class LandscapeTextureMap {
         this.addTexture(new BigLandscapeTexture(LandscapeType.Beach, 28));
         this.addTexture(new BigLandscapeTexture(LandscapeType.Rock, 32));
 
-        // todo: next row (rock <-> gras) 36..39
+        // next row
+        // [grass] 16 -> 17 -> 33 -> 32 [rock] @ 36..39
+        this.addTextureGradient1(LandscapeType.Grass, LandscapeType.RockToGras2, LandscapeType.RockToGras1, LandscapeType.Rock, 36);
+
+        // next row
         this.addTexture(new BigLandscapeTexture(LandscapeType.Desert, 40));
 
-        // todo: next row (desert <-> gras) 44..47
-        // todo: next row (mud <-> gras) 48..51
+        // https://github.com/tomsoftware/sied3/blob/master/src/clTexturesLoadHelper.cpp
+        // [grass] 16 -> 20 -> 65 -> 64 [desert] @ 44..47
+        this.addTextureGradient3(LandscapeType.Grass, LandscapeType.DesertToGras2, LandscapeType.DesertToGras1, LandscapeType.Desert, 44);
+
+        // ///////
+        // [mud] 80 -> 81 -> 21 -> 16 [gras] @ 48..51
+        this.addTextureGradient2(LandscapeType.Grass, LandscapeType.MudToGras2, LandscapeType.MudToGras1, LandscapeType.Mud, 48);
+
         this.addTexture(new BigLandscapeTexture(LandscapeType.Mud, 52));
 
-        // todo: next row (Swamp <-> gras) 56..59
+        // ///////
+        // [swamp] 80 -> 81 -> 21 -> 16 [gras] @ 56..59
+        this.addTextureGradient1(LandscapeType.Grass, LandscapeType.SwampToGras2, LandscapeType.SwampToGras1, LandscapeType.Swamp, 56);
+
+        // next row
         this.addTexture(new BigLandscapeTexture(LandscapeType.Swamp, 60));
 
-        // todo: next row (Rock <-> ice) 64..67
+        // ///////
+        // [rock] 32 -> 35 -> 129 -> 128 [ice] @ 64..67
+        this.addTextureGradient1(LandscapeType.Rock, LandscapeType.SnowToRock2, LandscapeType.SnowToRock1, LandscapeType.Snow, 64);
+
+        // next row
         this.addTexture(new BigLandscapeTexture(LandscapeType.Snow, 68));
 
         // todo: next row (river <-> gras) 72..75
         // todo: next row (?? <-> gras) 76..79
+
+        this.addTexture(new Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 76));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 76));
+        this.addTexture(new Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 76));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 76));
+
+        this.addTexture(new Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 77));
+        // empty @ 78
+        // empty @ 79
 
         this.addTexture(new BigLandscapeTexture(LandscapeType.DustyWay, 80));
         this.addTexture(new BigLandscapeTexture(LandscapeType.RockyWay, 84));

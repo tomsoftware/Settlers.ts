@@ -20,7 +20,7 @@ export class ShaderProgram implements ShaderObject {
         Object.seal(this);
     }
 
-    public init(gl: WebGLRenderingContext) {
+    public init(gl: WebGLRenderingContext): void {
         this.gl = gl;
     }
 
@@ -87,12 +87,23 @@ export class ShaderProgram implements ShaderObject {
         gl.uniformMatrix4fv(uniformLocation, false, values);
     }
 
+    public setVector2(name: string, a1: number, a2: number): void {
+        const gl = this.gl;
+        if ((!this.shaderProgram) || (!gl)) {
+            return;
+        }
+
+        const uniformLocation = gl.getUniformLocation(this.shaderProgram, name);
+
+        gl.uniform2fv(uniformLocation, [a1, a2]);
+    }
+
     public setArrayFloat(name: string, values: Float32Array, size: number, divisor = 0): void {
         if (!this.gl) {
             return;
         }
 
-        this.setUniform(name, values, size, this.gl.FLOAT, divisor);
+        this.setAttribute(name, values, size, this.gl.FLOAT, divisor);
     }
 
     public setArrayShort(name: string, values: Int16Array, size: number, divisor = 0): void {
@@ -100,10 +111,10 @@ export class ShaderProgram implements ShaderObject {
             return;
         }
 
-        this.setUniform(name, values, size, this.gl.SHORT, divisor);
+        this.setAttribute(name, values, size, this.gl.SHORT, divisor);
     }
 
-    public setUniform(name: string, values: BufferSource, size: number, type: number, divisor: number): void {
+    public setAttribute(name: string, values: BufferSource, size: number, type: number, divisor: number): void {
         const gl = this.gl;
         if ((!this.shaderProgram) || (!gl)) {
             return;
