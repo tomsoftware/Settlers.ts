@@ -1,16 +1,19 @@
 precision mediump float;
 
-// Passed in from the vertex shader.
+// input form vertex sheder: Barycentric Coordinate
 varying vec3 v_barycentric;
 
-// Passed in from the vertex shader.
+// input form vertex sheder: landscape texture
 varying vec2 v_texcoord;
+
+// input form vertex sheder: gray
+varying float v_shader_color;
 
 // The texture.
 uniform sampler2D u_texture;
 
 void main() {
-  gl_FragColor = texture2D(u_texture, v_texcoord);
+  gl_FragColor = texture2D(u_texture, v_texcoord) * vec4(v_shader_color, v_shader_color, v_shader_color, 1.0);
 
   #ifdef DEBUG_TRIANGLE_BORDER
     // draw triangle border

@@ -31,7 +31,14 @@ export default class RendererViewer extends Vue {
             return;
         }
 
-        this.renderer.add(new LandscapeRenderer(this.game.mapSize, this.game.groundType));
+        this.renderer.add(
+            new LandscapeRenderer(
+                this.renderer.textureManager,
+                this.game.mapSize,
+                this.game.groundType,
+                this.game.groundHeight
+            )
+        );
 
         this.renderer.init();
     }

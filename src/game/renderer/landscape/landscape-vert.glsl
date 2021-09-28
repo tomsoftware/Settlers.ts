@@ -20,13 +20,20 @@ attribute vec2 instancePos;
 uniform mat4 projection;
 
 #ifdef DEBUG_TRIANGLE_BORDER
+  // output color 
   varying vec3 v_barycentric;
 #endif
 
+// output color used to shader/gray the texture
+varying float v_shader_color;
+
+// output texture coordinate of the background
 varying vec2 v_texcoord;
 
 vec2 mapSize = vec2(MAP_HEIGHT, MAP_WIDTH);
-uniform vec2 mapPos; // = vec2(-50.0, 40.0);
+
+// the position the camera is focused at
+uniform vec2 viewPoint;
 
 // texture position of the ground where [R G B A] is mapped to [Ax Ay Bx By]
 //  so Ax is x-pos for triangle A and By for y-pos of triangle B
@@ -36,6 +43,16 @@ uniform vec2 mapPos; // = vec2(-50.0, 40.0);
 //   / Ax0 Ay1 Bx0 By1 / Ax1 Ay1 Bx1 By1 / Ax2 Ay1 Bx2 By1 /
 //  /-----------------/-----------------/-----------------/
 uniform sampler2D u_landTypeBuffer;
+
+// map height
+//       /---/---/---/---/
+//      / 0 / 0 / 0 / 0 /
+//     /---/---/---/---/
+//    / 0 / 0 / 7 / 0 /
+//   /---/---/---/---/
+//  / 0 / 0 / 0 / 0 /
+// /---/---/---/---/
+uniform sampler2D u_landHeightBuffer;
 
 void main() {
   // ///////////
@@ -55,19 +72,33 @@ void main() {
   // triangle A or B ?
   int baseVertecesTypeAorB;
 
+  // the position offset in the map-data-array for this vertex
+  //        (0/0)    (1/0)  
+  //         0 3      5
+  //         /\\------/
+  //        /  \\  B /
+  //       /  A \\  /
+  //      /------\\/
+  //     1       2 4
+  // (0/1)      (1/1)  
+  vec2 baseMapPosOffset;
+
   if (baseVerticesIndex < 3.0) {
     baseVertecesTypeAorB = 0;
     if (baseVerticesIndex == 0.0) {
       // 0
       baseVerticesPos = vec2(0.0, 0.0);
+      baseMapPosOffset = vec2(0.0, 0.0);
     }
     else if (baseVerticesIndex == 1.0) {
       // 1
       baseVerticesPos = vec2(-0.5, 1.0);
+      baseMapPosOffset = vec2(0.0, 1.0);
     }
     else {
       // 2
       baseVerticesPos = vec2(0.5, 1.0);
+      baseMapPosOffset = vec2(1.0, 1.0);
     }
   }
   else {
@@ -75,14 +106,17 @@ void main() {
     if (baseVerticesIndex == 3.0) {
       // 3
       baseVerticesPos = vec2(0.0, 0.0);
+      baseMapPosOffset = vec2(0.0, 0.0);
     }
     else if (baseVerticesIndex == 4.0) {
       // 4
       baseVerticesPos = vec2(0.5, 1.0);
+      baseMapPosOffset = vec2(1.0, 1.0);
     }
     else {
       // 5
       baseVerticesPos = vec2(1.0, 0.0);
+      baseMapPosOffset = vec2(1.0, 0.0);
     }
   }
 
@@ -101,7 +135,7 @@ void main() {
   #endif
 
   // https://webglfundamentals.org/webgl/lessons/webgl-pulling-vertices.html
-  vec2 pixelCoord = instancePos + mapPos;
+  vec2 pixelCoord = instancePos + viewPoint;
 
   // check if position is in map position
   if (pixelCoord.x < 0.0 || pixelCoord.x >= mapSize.x 
@@ -111,9 +145,15 @@ void main() {
         return;
   }
  
+  vec2 mapPointCord = pixelCoord + baseMapPosOffset;
+
   // read the land-texture-type for the data-texture
   vec2 texcoord = pixelCoord / mapSize;
   vec4 type = texture2D(u_landTypeBuffer, texcoord);
+
+  // value of map height at this vertex
+  float mapHeight1 = texture2D(u_landHeightBuffer, mapPointCord / mapSize).a * 20.0;
+  float mapHeight2 = texture2D(u_landHeightBuffer, (mapPointCord + vec2(0.0, 1.0)) / mapSize).a * 20.0;
 
   vec2 text_scale = vec2(1.0, 1.0) / vec2(8, 352);
 
@@ -130,7 +170,7 @@ void main() {
   gl_Position = projection *
       vec4(
         baseVerticesPos.x + instancePos.x - instancePos.y * 0.5,
-        baseVerticesPos.y + instancePos.y,
+        (baseVerticesPos.y + instancePos.y - mapHeight1) * 0.5,
         0,
         1 /* not sure why this needs to be 1 ??? */
       );
@@ -138,4 +178,15 @@ void main() {
   // Pass the vertex color/texture to the fragment shader.
   //v_barycentric = color;
   v_texcoord = (baseVerticesPos.xy + real_text_pos.xy) * text_scale;
+
+  // color depending on height gradient
+  float mapHeightGrad = mapHeight1 - mapHeight2;
+  v_shader_color = 0.95 + mapHeightGrad * (mapHeightGrad > 0.0 ? 0.8 : 1.0);
+  
+ /* if (v_shader_color > 1.0) {
+    v_shader_color = 1.0;
+  } else if (v_shader_color < 0.4) {
+    v_shader_color = 0.4;
+  }
+*/
 }

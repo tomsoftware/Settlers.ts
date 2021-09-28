@@ -1,6 +1,7 @@
 import { LogHandler } from '@/utilities/log-handler';
 import { IRenderer } from './i-renderer';
 import { Matrix } from './landscape/matrix';
+import { TextureManager } from './texture-manager';
 import { ViewPoint } from './view-point';
 
 // https://stackoverflow.com/questions/48741570/how-can-i-import-glsl-as-string-in-typescript
@@ -11,6 +12,7 @@ export class Renderer {
     private readonly log = new LogHandler('Renderer');
     private canvas: HTMLCanvasElement;
     private gl: WebGLRenderingContext | null = null;
+    public textureManager: TextureManager = new TextureManager();
     private renderers: IRenderer[] = [];
     private animRequest = 0;
     private viewPoint: ViewPoint;

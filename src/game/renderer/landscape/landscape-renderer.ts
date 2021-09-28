@@ -9,30 +9,50 @@ import { IViewPoint } from '../i-view-point';
 
 import vertCode from './landscape-vert.glsl';
 import fragCode from './landscape-frag.glsl';
+import { TextureManager } from '../texture-manager';
 
 export class LandscapeRenderer extends RendererBase implements IRenderer {
     private readonly log = new LogHandler('LandscapeRenderer');
     private numVertices = 0;
-
+    private textureManager: TextureManager;
     private texture: GhTexture;
     private mapSize: MapSize;
     private landscapeTextureMap = new LandscapeTextureMap();
 
-    private landTypeBuffer: ShaderDataTexture | null = null;
+    private landTypeBuffer: ShaderDataTexture;
+    private landHeightBuffer: ShaderDataTexture;
 
-    constructor(mapSize: MapSize, groundTypeMap: Uint8Array) {
+    constructor(textureManager: TextureManager, mapSize: MapSize, groundTypeMap: Uint8Array, groundHeightMap: Uint8Array) {
         super();
 
         this.mapSize = mapSize;
 
+        this.textureManager = textureManager;
         this.texture = new GhTexture(this.textureManager.create('u_landText'));
         this.landTypeBuffer = this.createLandTypeBuffer(mapSize, this.textureManager.create('u_landTypeBuffer'), groundTypeMap);
+        this.landHeightBuffer = this.createLandHeightBuffer(mapSize, this.textureManager.create('u_landHeightBuffer'), groundHeightMap);
 
         Object.seal(this);
     }
 
+    private createLandHeightBuffer(mapSize: MapSize, textureIndex: number, groundHeightMap: Uint8Array): ShaderDataTexture {
+        const result = new ShaderDataTexture(mapSize.width, mapSize.height, 1, textureIndex);
+
+        const h = mapSize.height;
+        const w = mapSize.width;
+
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const h = groundHeightMap[mapSize.toIndex(x, y)];
+                result.update(x, y, h);
+            }
+        }
+
+        return result;
+    }
+
     private createLandTypeBuffer(mapSize: MapSize, textureIndex: number, groundTypeMap: Uint8Array): ShaderDataTexture {
-        const result = new ShaderDataTexture(this.mapSize.width, this.mapSize.height, textureIndex);
+        const result = new ShaderDataTexture(mapSize.width, mapSize.height, 4, textureIndex);
 
         const h = mapSize.height;
         const w = mapSize.width;
@@ -117,14 +137,14 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 
         // setup matrices, one per instance
         const numInstancesX = 2 / viewPoint.zoom;
-        const numInstancesY = 2 / viewPoint.zoom;
+        const numInstancesY = 4 / viewPoint.zoom;
 
         // ///////////
         // Tell the shader to use all set texture units
         this.textureManager.bindToShader(gl, sp);
 
         // set view Point
-        sp.setVector2('mapPos', -viewPoint.x, -viewPoint.y);
+        sp.setVector2('viewPoint', -viewPoint.x, -viewPoint.y);
 
         // ///////////
         // set vertex index
@@ -140,6 +160,12 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         // update texture data
         if (this.landTypeBuffer) {
             this.landTypeBuffer.create(gl);
+        }
+
+        // ///////////
+        // update texture data
+        if (this.landHeightBuffer) {
+            this.landHeightBuffer.create(gl);
         }
 
         // ///////////
