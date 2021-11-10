@@ -6,10 +6,11 @@ import { LandscapeTextureMap } from './textures/landscape-texture-map';
 import { MapSize } from '@/utilities/map-size';
 import { ShaderDataTexture } from '../shader-data-texture';
 import { IViewPoint } from '../i-view-point';
+import { TextureManager } from '../texture-manager';
+import { FileManager } from '@/resources/file-manager';
 
 import vertCode from './landscape-vert.glsl';
 import fragCode from './landscape-frag.glsl';
-import { TextureManager } from '../texture-manager';
 
 export class LandscapeRenderer extends RendererBase implements IRenderer {
     private readonly log = new LogHandler('LandscapeRenderer');
@@ -22,13 +23,13 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
     private landTypeBuffer: ShaderDataTexture;
     private landHeightBuffer: ShaderDataTexture;
 
-    constructor(textureManager: TextureManager, mapSize: MapSize, groundTypeMap: Uint8Array, groundHeightMap: Uint8Array) {
+    constructor(fileManager: FileManager, textureManager: TextureManager, mapSize: MapSize, groundTypeMap: Uint8Array, groundHeightMap: Uint8Array) {
         super();
 
         this.mapSize = mapSize;
 
         this.textureManager = textureManager;
-        this.texture = new GhTexture(this.textureManager.create('u_landText'));
+        this.texture = new GhTexture(fileManager, this.textureManager.create('u_landText'));
         this.landTypeBuffer = this.createLandTypeBuffer(mapSize, this.textureManager.create('u_landTypeBuffer'), groundTypeMap);
         this.landHeightBuffer = this.createLandHeightBuffer(mapSize, this.textureManager.create('u_landHeightBuffer'), groundHeightMap);
 

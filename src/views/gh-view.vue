@@ -2,6 +2,7 @@
   <div class="about">
     Gh File:
     <file-browser
+      :fileManager="fileManager"
       @select="onFileSelect"
       filter=".gh|.gl"
       class="browser"

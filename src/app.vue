@@ -6,8 +6,10 @@
     <router-link to="/gh-view">Gh View</router-link> |
     <router-link to="/gfx-view">Gfx View</router-link>
   </div>
-  <router-view/>
+  <router-view :fileManager="fileManager"/>
 </template>
+
+<script src="./app.ts"></script>
 
 <style>
 #app {
@@ -30,4 +32,5 @@
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
 </style>

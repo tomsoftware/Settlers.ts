@@ -1,22 +1,32 @@
+import { FileManager } from '@/resources/file-manager';
 import { GfxImage16Bit } from '@/resources/gfx/gfx-image-16bit';
 import { GhFileReader } from '@/resources/gfx/gh-file-reader';
 import { ImageType } from '@/resources/gfx/image-type';
-import { ResourceFileProvider } from '@/resources/lib/resource-file-provider';
+import { LogHandler } from '@/utilities/log-handler';
 import { ShaderTexture } from './shader-texture';
 
 // https://stackoverflow.com/questions/57699322/webgl2-render-uint16array-to-canvas-as-an-image
 // https://webglfundamentals.org/webgl/lessons/webgl-data-textures.html
 
 export class GhTexture extends ShaderTexture {
-    constructor(textureIndex: number) {
+    private static log = new LogHandler('GhTexture');
+    private fileManager: FileManager;
+
+    constructor(fileManager: FileManager, textureIndex: number) {
         super(textureIndex);
+
+        this.fileManager = fileManager;
 
         Object.seal(this);
     }
 
     public async load(gl: WebGLRenderingContext): Promise<void> {
-        const fp = new ResourceFileProvider();
-        const imgFile = await fp.loadBinary('gfx/2.gh6');
+        const imgFile = await this.fileManager.readFile('gfx/2.gh6', false);
+        if (!imgFile) {
+            GhTexture.log.error('Unable to load texture file "2.gh6"');
+            return;
+        }
+
         const reader = new GhFileReader(imgFile);
         const img = reader.findImageByType<GfxImage16Bit>(ImageType.Image16Bit);
 

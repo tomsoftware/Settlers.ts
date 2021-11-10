@@ -2,6 +2,7 @@
   <div class="about">
     Map File:
     <file-browser
+      :fileManager="fileManager"
       @select="onFileSelect"
       filter=".map"
       class="browser"

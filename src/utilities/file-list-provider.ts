@@ -1,35 +1,44 @@
+import { IFileProvider, IFileSource } from '@/resources/file-manager';
+import { BinaryReader } from '@/resources/file/binary-reader';
 import { FileProvider } from '@/resources/file/file-provider';
 import { Path } from './path';
 
-export class FileListProvider {
-        private static fileList: Promise<string[]>;
+class FileListFile implements IFileSource {
+    public name: string;
+    private baseUrl: string;
 
-        constructor() {
-            if (!FileListProvider.fileList) {
-                FileListProvider.fileList = FileListProvider.loadFileList();
-            }
-        }
+    constructor(fileName: string, baseUrl: string) {
+        this.name = fileName;
+        this.baseUrl = baseUrl;
 
-        private static async loadFileList() {
-            const fp = new FileProvider(process.env.BASE_URL);
-            const fileListText = await fp.loadString('file-list.txt');
+        Object.seal(this);
+    }
 
-            return fileListText
-                .split(/\r?\n/)
-                .map((f) => Path.fixPath(f));
-        }
+    public readBinary(): Promise<BinaryReader> {
+        const fileProvider = new FileProvider();
+        return fileProvider.loadBinary(this.name);
+    }
+}
 
-        public async filter(filterStr?: string): Promise<string[]> {
-            const filterArray = (filterStr ?? '')
-                .split('|')
-                .map((f) => Path.fixPath(f).toUpperCase());
+export class FileListProvider implements IFileProvider {
+    public baseUrl: string;
 
-            const fileList = await FileListProvider.fileList;
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl;
+    }
 
-            return fileList
-                .filter((f) => {
-                    const fUpper = f.toUpperCase();
-                    return filterArray.find((filter) => fUpper.indexOf(filter) >= 0);
-                });
-        }
+    public async readFiles(): Promise<IFileSource[]> {
+        const fileNames = await this.loadFileList();
+
+        return fileNames.map((f) => new FileListFile(f, this.baseUrl));
+    }
+
+    private async loadFileList() {
+        const fp = new FileProvider(process.env.BASE_URL);
+        const fileListText = await fp.loadString('file-list.txt');
+
+        return fileListText
+            .split(/\r?\n/)
+            .map((f) => Path.fixPath(f));
+    }
 }

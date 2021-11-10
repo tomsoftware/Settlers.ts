@@ -2,6 +2,7 @@
   <div class="about">
     Lib File:
     <file-browser
+      :fileManager="fileManager"
       @select="onFileSelect"
       filter=".lib"
       class="browser"

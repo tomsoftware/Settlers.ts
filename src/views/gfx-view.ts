@@ -1,8 +1,6 @@
 import { Options, Vue } from 'vue-class-component';
-import { ResourceFileProvider } from '@/resources/lib/resource-file-provider';
 import { IGfxImage } from '@/resources/gfx/igfx-image';
 import { Path } from '@/utilities/path';
-import { BinaryReader } from '@/resources/file/binary-reader';
 import { DilFileReader } from '@/resources/gfx/dil-file-reader';
 import { GfxFileReader } from '@/resources/gfx/gfx-file-reader';
 import { GilFileReader } from '@/resources/gfx/gil-file-reader';
@@ -10,28 +8,32 @@ import { JilFileReader } from '@/resources/gfx/jil-file-reader';
 import { PaletteCollection } from '@/resources/gfx/palette-collection';
 import { PilFileReader } from '@/resources/gfx/pil-file-reader';
 import { LogHandler } from '@/utilities/log-handler';
+import { FileManager, IFileSource } from '@/resources/file-manager';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
 
 @Options({
     name: 'GfxView',
+    props: {
+        fileManager: Object
+    },
     components: {
         FileBrowser,
         HexViewer
     }
 })
 export default class GfxView extends Vue {
-private log = new LogHandler('GfxView');
+    private static log = new LogHandler('GfxView');
+    public readonly fileManager!: FileManager;
     public fileName: string | null = null;
     public gfxContent: IGfxImage[] = [];
     public selectedItem: IGfxImage | null = null;
-    private resourceProvider = new ResourceFileProvider('gfx.lib');
     public gfxFile: GfxFileReader | null = null;
 
-    public onFileSelect(fileName: string): void {
-        this.fileName = fileName;
-        this.load(fileName);
+    public onFileSelect(file: IFileSource): void {
+        this.fileName = file.name;
+        this.load(file);
     }
 
     public pad(value:string, size:number): string {
@@ -42,64 +44,57 @@ private log = new LogHandler('GfxView');
     }
 
     /** load a new gfx */
-    public async load(gfxPath: string):Promise<void> {
-        const fileId = Path.combine('gfx', Path.getFileNameWithoutExtension(gfxPath));
+    public async load(file: IFileSource):Promise<void> {
+        if (!this.fileManager) {
+            return;
+        }
 
-        const fileList: Promise<boolean>[] = [];
-        fileList.push(this.resourceProvider.fileExists(fileId + '.pil'));
-        fileList.push(this.resourceProvider.fileExists(fileId + '.jil'));
+        const fileId = Path.combine('gfx', Path.getFileNameWithoutExtension(file.name));
 
-        const filesExist = await Promise.all(fileList);
-        this.doLoad(fileId, filesExist[0], filesExist[1]);
+        this.doLoad(fileId);
     }
 
     /** load a new image */
-    public async doLoad(fileId: string, usePil: boolean, useJil: boolean): Promise<void> {
-        this.log.debug('Using .jil=' + useJil);
+    public async doLoad(fileId: string): Promise<void> {
+        const fileNameList: {[key: string]: string} = {};
 
-        const fileList: Promise<BinaryReader>[] = [];
+        fileNameList.gfx = fileId + '.gfx';
+        fileNameList.gil = fileId + '.gil';
 
-        fileList.push(this.resourceProvider.loadBinary(fileId + '.gfx'));
-        fileList.push(this.resourceProvider.loadBinary(fileId + '.gil'));
+        const pilFileExists = this.fileManager.findFile(fileId + '.pil', false);
 
-        if (usePil) {
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.pil'));
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.pa6'));
+        if (pilFileExists) {
+            fileNameList.paletteIndex = fileId + '.pil';
+            fileNameList.palette = fileId + '.pa6';
         } else {
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.pi4'));
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.p46'));
+            fileNameList.paletteIndex = fileId + '.pi4';
+            fileNameList.palette = fileId + '.p46';
         }
 
-        if (useJil) {
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.dil'));
-            fileList.push(this.resourceProvider.loadBinary(fileId + '.jil'));
-        }
+        fileNameList.dil = fileId + '.dil';
+        fileNameList.jil = fileId + '.jil';
 
-        const files = await Promise.all(fileList);
-        const gfx = files[0];
-        const gil = files[1];
-        const paletteIndex = files[2];
-        const palette = files[3];
+        const files = await this.fileManager.readFiles(fileNameList, false);
 
-        const gfxIndexList = new GilFileReader(gil);
-        const paletteIndexList = new PilFileReader(paletteIndex);
-        const palletCollection = new PaletteCollection(palette, paletteIndexList);
+        const gfxIndexList = new GilFileReader(files.gil);
+        const paletteIndexList = new PilFileReader(files.paletteIndex);
+        const palletCollection = new PaletteCollection(files.palette, paletteIndexList);
 
         let directionIndexList: DilFileReader | null = null;
         let jobIndexList: JilFileReader | null = null;
 
-        if (useJil) {
-            directionIndexList = new DilFileReader(files[4]);
-            jobIndexList = new JilFileReader(files[5]);
+        if (files.jil.length) {
+            directionIndexList = new DilFileReader(files.dil);
+            jobIndexList = new JilFileReader(files.jil);
         }
 
-        this.gfxFile = new GfxFileReader(gfx, gfxIndexList, jobIndexList, directionIndexList, palletCollection);
+        this.gfxFile = new GfxFileReader(files.gfx, gfxIndexList, jobIndexList, directionIndexList, palletCollection);
 
         this.gfxContent = this.fillGfxList(this.gfxFile);
 
-        this.log.debug('File: ' + fileId);
-        this.log.debug(gfxIndexList.toString());
-        this.log.debug(this.gfxFile.toString());
+        GfxView.log.debug('File: ' + fileId);
+        GfxView.log.debug(gfxIndexList.toString());
+        GfxView.log.debug(this.gfxFile.toString());
     }
 
     private fillGfxList(gfxReader: GfxFileReader):IGfxImage[] {

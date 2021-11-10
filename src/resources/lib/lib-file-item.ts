@@ -82,7 +82,7 @@ export class LibFileItem {
 
         const flat2 = decompress.unpack(pack, 0, pack.length, reader.length);
 
-        console.log(flat2.readString());
+        // console.log(flat2.readString());
         console.log(this.length + ' <-> ' + pack.length + ' unpacked: ' + reader.length + ' <-> ' + flat2.length + ' in ' + (endTimeStamp - startTimeStamp));
 
         // console.log(this.reader.readStringHex(this.length, this.offset));

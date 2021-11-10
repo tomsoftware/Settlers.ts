@@ -1,28 +1,32 @@
 import { Options, Vue } from 'vue-class-component';
-import { FileProvider } from '@/resources/file/file-provider';
 import { LibFileReader } from '@/resources/lib/lib-file-reader';
 import { LibFileItem } from '@/resources/lib/lib-file-item';
+import { BinaryReader } from '@/resources/file/binary-reader';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
-import { BinaryReader } from '@/resources/file/binary-reader';
+import { FileManager, IFileSource } from '@/resources/file-manager';
 
 @Options({
     name: 'LibView',
+    props: {
+        fileManager: Object
+    },
     components: {
         FileBrowser,
         HexViewer
     }
 })
 export default class LibView extends Vue {
+    public readonly fileManager!: FileManager;
     public fileName: string | null = null;
     public libContent: LibFileItem[] = [];
     public selectedItem: LibFileItem | null = null;
     public selectedItemReader: BinaryReader | null = null;
 
-    public onFileSelect(fileName: string): void {
-        this.fileName = fileName;
-        this.load(fileName);
+    public onFileSelect(file: IFileSource): void {
+        this.fileName = file.name;
+        this.load(file);
     }
 
     public onSelectItem() {
@@ -42,10 +46,8 @@ export default class LibView extends Vue {
     }
 
     /** load a new lib */
-    public async load(sourcePath: string):Promise<void> {
-        const fileProvider = new FileProvider();
-
-        const content = await fileProvider.loadBinary(sourcePath);
+    public async load(file: IFileSource):Promise<void> {
+        const content = await file.readBinary();
         const libReader = new LibFileReader(content);
 
         this.libContent = this.fillLibList(libReader);

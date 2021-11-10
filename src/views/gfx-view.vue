@@ -2,6 +2,7 @@
   <div class="about">
     Gfx File:
     <file-browser
+      :fileManager="fileManager"
       @select="onFileSelect"
       filter=".gfx"
       class="browser"
