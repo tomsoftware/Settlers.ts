@@ -19,6 +19,7 @@ This is a Settlers 4 (Siedler 4) Remake (it will be :-) ) written in JavaScript 
 
 
 # How to start:
+You need a WebServer that serves the App. E.g. you can use the included one:
 1. Install [NodeJs](https://nodejs.org/)
 2. Copy the *Settlers-4*-game folder with the files (`game.lib`, `gfx.lib`, `Gfx/0.gfx`, ...) to the `/dist/` folder - e.g. to `./dist/Siedler4/`
 3. Run `./dist/run.bat` \
