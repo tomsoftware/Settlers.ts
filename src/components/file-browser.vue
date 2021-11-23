@@ -1,7 +1,7 @@
 <template>
   <select @change="selectFile" v-model="selectedFile">
-    <option v-for="file of files" :key="file.name" :value="file">
-      {{file.name}}
+    <option v-for="file of files" :key="file.path" :value="file">
+      {{file.path}}
     </option>
   </select>
 </template>

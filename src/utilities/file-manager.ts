@@ -3,6 +3,7 @@ import { BinaryReader } from '../resources/file/binary-reader';
 
 export interface IFileSource {
     name: string;
+    path: string;
     readBinary(): Promise<BinaryReader>;
 }
 
@@ -24,10 +25,10 @@ export class FileManager {
         Object.seal(this);
     }
 
-    public async registerProxy(proxy: IFileProxyProvider) {
+    public async registerProxy(proxy: IFileProxyProvider): Promise<void> {
         // send all previous added files to proxy
         for (const f of this.files) {
-            this.callProxyie(proxy, f);
+            await this.callProxyie(proxy, f);
         }
 
         // register proxy
@@ -123,7 +124,7 @@ export class FileManager {
     public filter(filterStr?: string): IFileSource[] {
         const filterArray = (filterStr ?? '')
             .split('|')
-            .map((f) => Path.fixPath(f).toUpperCase());
+            .map((f) => Path.fixPath(f));
 
         return this.files
             .filter((f) => filterArray

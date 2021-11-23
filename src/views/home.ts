@@ -15,6 +15,11 @@ export default class Home extends Vue {
     protected isValidSettlers = false;
 
     public mounted() {
+        this.$watch('fileManager', () => {
+            this.checkIsValidSettlers();
+        });
+
+        this.checkIsValidSettlers();
         // add test here :-)
     }
 
@@ -34,6 +39,6 @@ export default class Home extends Vue {
 
         await this.fileManager.addSource(new LocalFileProvider(files));
 
-        this.$emit('checkSetup');
+        this.checkIsValidSettlers();
     }
 }

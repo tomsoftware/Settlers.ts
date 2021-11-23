@@ -28,11 +28,11 @@ export class LibFileHeader {
         constructor(data: BinaryReader, offset: number) {
             this.reader = new BinaryReader(data);
 
-            if (!this.readHeader(this.reader, offset)) {
-
-            }
-
             Object.seal(this);
+
+            if (!this.readHeader(this.reader, offset)) {
+                this.length = 0;
+            }
         }
 
         public getPathList(): PathList {

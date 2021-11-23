@@ -49,7 +49,7 @@ export default class GfxView extends Vue {
             return;
         }
 
-        const fileId = Path.combine('gfx', Path.getFileNameWithoutExtension(file.name));
+        const fileId = Path.getFileNameWithoutExtension(file.name);
 
         this.doLoad(fileId);
     }
@@ -74,7 +74,7 @@ export default class GfxView extends Vue {
         fileNameList.dil = fileId + '.dil';
         fileNameList.jil = fileId + '.jil';
 
-        const files = await this.fileManager.readFiles(fileNameList, false);
+        const files = await this.fileManager.readFiles(fileNameList, true);
 
         const gfxIndexList = new GilFileReader(files.gil);
         const paletteIndexList = new PilFileReader(files.paletteIndex);

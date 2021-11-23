@@ -10,6 +10,10 @@ class LibFileFile implements IFileSource {
     private baseLibPath: string;
 
     public get name(): string {
+        return this.libFileItem.fileName;
+    }
+
+    public get path(): string {
         return Path.combine(this.baseLibPath, this.libFileItem.getFullName());
     }
 

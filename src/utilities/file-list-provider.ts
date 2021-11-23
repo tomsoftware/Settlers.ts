@@ -5,18 +5,18 @@ import { Path } from './path';
 
 class FileListFile implements IFileSource {
     public name: string;
-    private baseUrl: string;
+    public path: string;
 
-    constructor(fileName: string, baseUrl: string) {
-        this.name = fileName;
-        this.baseUrl = baseUrl;
+    constructor(path: string) {
+        this.name = Path.getFileName(path);
+        this.path = path;
 
         Object.seal(this);
     }
 
     public readBinary(): Promise<BinaryReader> {
         const fileProvider = new RemoteFile();
-        return fileProvider.loadBinary(this.name);
+        return fileProvider.loadBinary(this.path);
     }
 }
 
@@ -30,7 +30,7 @@ export class FileListProvider implements IFileProvider {
     public async readFiles(): Promise<IFileSource[]> {
         const fileNames = await this.loadFileList();
 
-        return fileNames.map((f) => new FileListFile(f, this.baseUrl));
+        return fileNames.map((f) => new FileListFile(f));
     }
 
     private async loadFileList() {

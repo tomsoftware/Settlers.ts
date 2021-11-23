@@ -21,7 +21,7 @@ export class GhTexture extends ShaderTexture {
     }
 
     public async load(gl: WebGLRenderingContext): Promise<void> {
-        const imgFile = await this.fileManager.readFile('gfx/2.gh6', false);
+        const imgFile = await this.fileManager.readFile('2.gh6', true);
         if (!imgFile) {
             GhTexture.log.error('Unable to load texture file "2.gh6"');
             return;

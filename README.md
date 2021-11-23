@@ -2,6 +2,9 @@
 This is a Settlers 4 (Siedler 4) Remake (it will be :-) ) written in JavaScript (Typescript) so 
   it can be run in your browser.
   
+<p style="text-align:center" align="center">
+<a href="https://settlers.hmilch.net/">[explore the game]</a>
+</p>
 
 
 # How to compile:

@@ -4,7 +4,7 @@
     <file-browser
       :fileManager="fileManager"
       @select="onFileSelect"
-      filter=".gh|.gl"
+      filter=".gh6|.gl6|.gh5|.gl5"
       class="browser"
     />
 

@@ -8,6 +8,10 @@ class LocalFileFile implements IFileSource {
         return this.file.name;
     }
 
+    public get path(): string {
+        return (this.file as any).webkitRelativePath ?? this.file.name;
+    }
+
     constructor(file: File) {
         this.file = file;
         Object.seal(this);
