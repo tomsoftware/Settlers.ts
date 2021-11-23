@@ -13,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/map-view.vue')
     },
     {
+        path: '/map-file-view',
+        name: 'MapFileView',
+        component: () => import('@/views/map-file-view.vue')
+    },
+    {
         path: '/lib-view',
         name: 'LibView',
         component: () => import('@/views/lib-view.vue')

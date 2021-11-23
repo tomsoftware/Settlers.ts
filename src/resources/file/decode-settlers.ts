@@ -2,7 +2,7 @@ import { AraCrypt } from './ara-crypt';
 import { BinaryReader } from './binary-reader';
 
 export class DecodeSettlers {
-    public static getReader(source:BinaryReader, size:number, offset = -1):BinaryReader {
+    public static getReader(source: BinaryReader, size: number, offset = -1): BinaryReader {
         const araCrypt = new AraCrypt();
 
         if (offset >= 0) {

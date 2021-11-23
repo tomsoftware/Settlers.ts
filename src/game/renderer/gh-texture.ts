@@ -1,4 +1,4 @@
-import { FileManager } from '@/resources/file-manager';
+import { FileManager } from '@/utilities/file-manager';
 import { GfxImage16Bit } from '@/resources/gfx/gfx-image-16bit';
 import { GhFileReader } from '@/resources/gfx/gh-file-reader';
 import { ImageType } from '@/resources/gfx/image-type';

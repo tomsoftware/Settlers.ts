@@ -1,4 +1,4 @@
-import { FileManager, IFileSource } from '@/resources/file-manager';
+import { FileManager, IFileSource } from '@/utilities/file-manager';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({
@@ -6,7 +6,7 @@ import { Options, Vue } from 'vue-class-component';
     components: {
     },
     emits: {
-        select: (fileName: string) => typeof fileName === 'string'
+        select: (selectedFile: IFileSource) => typeof selectedFile === 'object'
     },
     props: {
         // use | in filter to allow multiple filter patterns
@@ -21,13 +21,13 @@ export default class FileBrowser extends Vue {
     public selectedFile: IFileSource | null = null;
     public files: IFileSource[] = [];
 
-    public async mounted():Promise<void> {
-        await this.doFilter();
+    public mounted() {
+        this.doFilter();
         this.$watch('filter', () => this.doFilter());
     }
 
-    private async doFilter() {
-        this.files = await this.fileManager.filter(this.filter);
+    private doFilter() {
+        this.files = this.fileManager.filter(this.filter);
     }
 
     public selectFile(): void {

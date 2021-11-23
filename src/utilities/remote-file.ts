@@ -1,6 +1,6 @@
 import { LogHandler } from '@/utilities/log-handler';
 import { Path } from '@/utilities/path';
-import { BinaryReader } from './binary-reader';
+import { BinaryReader } from '../resources/file/binary-reader';
 
 class RequestError extends Error {
     public state: number;
@@ -18,8 +18,8 @@ class RequestError extends Error {
 /**
 * Handle Files loading from remote/web
 */
-export class FileProvider {
-    private log: LogHandler = new LogHandler('FileProvider');
+export class RemoteFile {
+    private log: LogHandler = new LogHandler('RemoteFile');
     private rootPath?: string;
 
     constructor(rootPath?: string) {

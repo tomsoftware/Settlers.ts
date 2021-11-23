@@ -1,4 +1,4 @@
-import { FileManager, IFileProvider, IFileSource } from '@/resources/file-manager';
+import { IFileProxyProvider, IFileSource } from '@/utilities/file-manager';
 import { BinaryReader } from '@/resources/file/binary-reader';
 import { LibFileItem } from '@/resources/lib/lib-file-item';
 import { LibFileReader } from '@/resources/lib/lib-file-reader';
@@ -26,32 +26,28 @@ class LibFileFile implements IFileSource {
 }
 
 /** provides access to files in a .lib */
-export class LibFileProvider implements IFileProvider {
+export class LibFileProvider implements IFileProxyProvider {
     private static logHandler = new LogHandler('LibFileProvider');
-    private fileManager: FileManager;
+    public fileNameFilter = '.lib';
 
-    constructor(fileManager: FileManager) {
-        this.fileManager = fileManager;
-    }
+    public async processFile(newFiles: IFileSource): Promise<IFileSource[] | null> {
+        if (!newFiles) {
+            return null;
+        }
 
-    public async readFiles(): Promise<IFileSource[]> {
-        const libFiles = await this.fileManager.filter('.lib');
+        LibFileProvider.logHandler.debug('Read lib ' + newFiles.name);
+
+        const baseLibPath = Path.getPathName(newFiles.name);
+
+        const libFile = await newFiles.readBinary();
+        const reader = new LibFileReader(libFile);
+        const count = reader.getFileCount();
 
         const files: IFileSource[] = [];
 
-        for (const f of libFiles) {
-            LibFileProvider.logHandler.debug('Read lib ' + f.name);
-
-            const baseLibPath = Path.getPathName(f.name);
-
-            const libFile = await f.readBinary();
-            const reader = new LibFileReader(libFile);
-            const count = reader.getFileCount();
-
-            for (let i = 0; i < count; i++) {
-                const file = reader.getFileInfo(i);
-                files.push(new LibFileFile(file, baseLibPath));
-            }
+        for (let i = 0; i < count; i++) {
+            const file = reader.getFileInfo(i);
+            files.push(new LibFileFile(file, baseLibPath));
         }
 
         return files;

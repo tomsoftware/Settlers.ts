@@ -7,7 +7,7 @@ import { MapSize } from '@/utilities/map-size';
 import { ShaderDataTexture } from '../shader-data-texture';
 import { IViewPoint } from '../i-view-point';
 import { TextureManager } from '../texture-manager';
-import { FileManager } from '@/resources/file-manager';
+import { FileManager } from '@/utilities/file-manager';
 
 import vertCode from './landscape-vert.glsl';
 import fragCode from './landscape-frag.glsl';

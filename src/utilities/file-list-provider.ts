@@ -1,6 +1,6 @@
-import { IFileProvider, IFileSource } from '@/resources/file-manager';
+import { IFileProvider, IFileSource } from '@/utilities/file-manager';
 import { BinaryReader } from '@/resources/file/binary-reader';
-import { FileProvider } from '@/resources/file/file-provider';
+import { RemoteFile } from '@/utilities/remote-file';
 import { Path } from './path';
 
 class FileListFile implements IFileSource {
@@ -15,7 +15,7 @@ class FileListFile implements IFileSource {
     }
 
     public readBinary(): Promise<BinaryReader> {
-        const fileProvider = new FileProvider();
+        const fileProvider = new RemoteFile();
         return fileProvider.loadBinary(this.name);
     }
 }
@@ -34,7 +34,7 @@ export class FileListProvider implements IFileProvider {
     }
 
     private async loadFileList() {
-        const fp = new FileProvider(process.env.BASE_URL);
+        const fp = new RemoteFile(process.env.BASE_URL);
         const fileListText = await fp.loadString('file-list.txt');
 
         return fileListText

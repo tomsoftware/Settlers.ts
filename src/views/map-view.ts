@@ -4,11 +4,10 @@ import { OriginalMapFile } from '@/resources/map/original/original-map-file';
 import { MapChunk } from '@/resources/map/original/map-chunk';
 import { IMapLoader } from '@/resources/map/imap-loader';
 import { Game } from '@/game/game';
-import { FileManager, IFileSource } from '@/resources/file-manager';
+import { FileManager, IFileSource } from '@/utilities/file-manager';
 import { LogHandler } from '@/utilities/log-handler';
 
 import FileBrowser from '@/components/file-browser.vue';
-import HexViewer from '@/components/hex-viewer.vue';
 import RendererView from '@/components/renderer-viewer.vue';
 
 @Options({
@@ -18,7 +17,6 @@ import RendererView from '@/components/renderer-viewer.vue';
     },
     components: {
         FileBrowser,
-        HexViewer,
         RendererView
     }
 })
@@ -28,9 +26,6 @@ export default class MapView extends Vue {
 
     public fileName: string | null = null;
     public mapInfo = '';
-    public mapChunks: MapChunk[] = [];
-    public selectedChunk: MapChunk | null = null;
-    public mapContent: IMapLoader | null = null;
     public game: Game | null = null;
 
     public onFileSelect(file: IFileSource): void {
@@ -57,19 +52,16 @@ export default class MapView extends Vue {
             return;
         }
 
-        this.mapContent = MapLoader.getLoader(fileData);
-        if (!this.mapContent) {
+        const mapContent = MapLoader.getLoader(fileData);
+        if (!mapContent) {
             MapView.log.error('file not found ' + file.name);
             return;
         }
 
-        /// doing this for debug to dive into the object structure of the loader
-        this.mapChunks = this.fillChunkList(this.mapContent as any as OriginalMapFile);
-
-        this.mapInfo = this.mapContent.toString();
+        this.mapInfo = mapContent.toString();
 
         /// create a game object
-        this.game = new Game(this.fileManager, this.mapContent);
+        this.game = new Game(this.fileManager, mapContent);
     }
 
     private fillChunkList(map: OriginalMapFile) {

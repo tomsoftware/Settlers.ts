@@ -1,5 +1,5 @@
 import { Options, Vue } from 'vue-class-component';
-import { FileManager } from './resources/file-manager';
+import { FileManager } from './utilities/file-manager';
 import { FileListProvider } from './utilities/file-list-provider';
 import { LibFileProvider } from './utilities/lib-file-provider';
 
@@ -12,6 +12,6 @@ export default class App extends Vue {
     public async mounted(): Promise<void> {
         this.fileManager = new FileManager();
         await this.fileManager.addSource(new FileListProvider(process.env.BASE_URL));
-        await this.fileManager.addSource(new LibFileProvider(this.fileManager));
+        await this.fileManager.registerProxy(new LibFileProvider());
     }
 }

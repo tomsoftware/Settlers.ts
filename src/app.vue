@@ -2,11 +2,14 @@
   <div id="nav">
     <router-link to="/">Start</router-link> |
     <router-link to="/map-view">Map View</router-link> |
+    <router-link to="/map-file-view">Map File View</router-link> |
     <router-link to="/lib-view">Lib View</router-link> |
     <router-link to="/gh-view">Gh View</router-link> |
     <router-link to="/gfx-view">Gfx View</router-link>
   </div>
-  <router-view :fileManager="fileManager"/>
+
+  <router-view :fileManager="fileManager" />
+
 </template>
 
 <script src="./app.ts"></script>

@@ -8,7 +8,7 @@ import { JilFileReader } from '@/resources/gfx/jil-file-reader';
 import { PaletteCollection } from '@/resources/gfx/palette-collection';
 import { PilFileReader } from '@/resources/gfx/pil-file-reader';
 import { LogHandler } from '@/utilities/log-handler';
-import { FileManager, IFileSource } from '@/resources/file-manager';
+import { FileManager, IFileSource } from '@/utilities/file-manager';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';

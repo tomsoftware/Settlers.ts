@@ -2,7 +2,7 @@ import { Options, Vue } from 'vue-class-component';
 import { GhFileReader } from '@/resources/gfx/gh-file-reader';
 import { IGfxImage } from '@/resources/gfx/igfx-image';
 import { ImageType } from '@/resources/gfx/image-type';
-import { FileManager, IFileSource } from '@/resources/file-manager';
+import { FileManager, IFileSource } from '@/utilities/file-manager';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';

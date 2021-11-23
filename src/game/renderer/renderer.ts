@@ -1,4 +1,4 @@
-import { FileManager } from '@/resources/file-manager';
+import { FileManager } from '@/utilities/file-manager';
 import { LogHandler } from '@/utilities/log-handler';
 import { IRenderer } from './i-renderer';
 import { Matrix } from './landscape/matrix';

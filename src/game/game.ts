@@ -1,4 +1,4 @@
-import { FileManager } from '@/resources/file-manager';
+import { FileManager } from '@/utilities/file-manager';
 import { IMapLoader } from '@/resources/map/imap-loader';
 import { MapSize } from '@/utilities/map-size';
 

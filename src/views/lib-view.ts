@@ -5,7 +5,7 @@ import { BinaryReader } from '@/resources/file/binary-reader';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
-import { FileManager, IFileSource } from '@/resources/file-manager';
+import { FileManager, IFileSource } from '@/utilities/file-manager';
 
 @Options({
     name: 'LibView',
