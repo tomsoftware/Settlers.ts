@@ -31,6 +31,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/gfx-view',
         name: 'GfxView',
         component: () => import('@/views/gfx-view.vue')
+    },
+    {
+        path: '/logging-view',
+        name: 'LoggingView',
+        component: () => import('@/views/logging-view.vue')
     }
 ];
 

@@ -24,3 +24,6 @@ pnpm-debug.log*
 Siedler4
 js
 css
+/*.zip
+/package-lock.json
+/public/file-list.txt

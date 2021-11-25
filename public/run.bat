@@ -1,3 +1,5 @@
 call create-file-list.bat
 
-node server.js
+start node server.js
+
+start http://localhost:8888/

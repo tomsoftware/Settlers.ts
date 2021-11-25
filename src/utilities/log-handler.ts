@@ -1,6 +1,9 @@
+import { LogManager, LogType } from './log-manager';
+
 /** handel error logging */
 export class LogHandler {
     private readonly _moduleName: string;
+    private static manager = new LogManager();
 
     constructor(moduleName: string) {
         this._moduleName = moduleName;
@@ -8,19 +11,24 @@ export class LogHandler {
 
     /** log an error */
     public error(msg: string, exception?: Error) : void {
-        console.error(this._moduleName + '\t' + msg);
-
-        if (exception) {
-            console.error(this._moduleName + '\t' + exception.message);
-        }
+        LogHandler.manager.push({
+            type: LogType.Error,
+            source: this._moduleName,
+            msg,
+            exception
+        });
     }
 
     /** write a debug message. If [msg] is not a String it is displayed: as {prop:value} */
     public debug(msg: string | any): void {
-        if (typeof msg === 'string') {
-            console.log(this._moduleName + '\t' + msg);
-        } else {
-            console.dir(msg);
-        }
+        LogHandler.manager.push({
+            type: LogType.Debug,
+            source: this._moduleName,
+            msg
+        });
+    }
+
+    public static getLogManager(): LogManager {
+        return this.manager;
     }
 }

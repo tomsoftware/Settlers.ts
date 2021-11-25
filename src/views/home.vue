@@ -16,9 +16,16 @@
     (Files are only accessed by your browser and are not uploaded)<br />
     <br />
 
-    <input type="file" directory="" webkitdirectory="" @change="selectFiles" />
+    Open via. directory access:<br />
+    <input type="file" directory webkitdirectory multiple @change="selectFiles" />
+    <br />
+    or<br />
+
+    Open via. multi file select:<br />
+    <input type="file" multiple name="files[]" @change="selectFiles" />
 
   </div>
+
 </template>
 
 <script src="./home.ts"></script>

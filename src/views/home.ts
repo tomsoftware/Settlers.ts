@@ -14,16 +14,16 @@ export default class Home extends Vue {
     public readonly fileManager!: FileManager;
     protected isValidSettlers = false;
 
-    public mounted() {
+    public mounted(): void {
         this.$watch('fileManager', () => {
             this.checkIsValidSettlers();
         });
 
+        // check if settlers files are provided
         this.checkIsValidSettlers();
-        // add test here :-)
     }
 
-    protected checkIsValidSettlers() {
+    protected checkIsValidSettlers(): void {
         this.isValidSettlers = this.fileManager.findFile('game.lib', false) != null;
     }
 
