@@ -38,12 +38,16 @@ export class ViewPoint implements IViewPoint {
 
     constructor(canvas: HTMLCanvasElement) {
         canvas.addEventListener('mousedown', e => {
+            e.preventDefault();
+
             this.downX = e.offsetX;
             this.downY = e.offsetY;
             this.mouseIsMoving = true;
         });
 
         canvas.addEventListener('mousemove', e => {
+            e.preventDefault();
+
             if (!this.mouseIsMoving) {
                 return;
             }
@@ -68,6 +72,10 @@ export class ViewPoint implements IViewPoint {
             this.deltaY = 0;
 
             this.invokeOnMove();
+        });
+
+        canvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
         });
 
         canvas.addEventListener('wheel', e => {

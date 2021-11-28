@@ -21,12 +21,17 @@ export default class FileBrowser extends Vue {
     public selectedFile: IFileSource | null = null;
     public files: IFileSource[] = [];
 
-    public mounted() {
+    public mounted(): void {
         this.doFilter();
         this.$watch('filter', () => this.doFilter());
+        this.$watch('fileManager', () => this.doFilter());
     }
 
     private doFilter() {
+        if (!this.fileManager) {
+            return;
+        }
+
         this.files = this.fileManager.filter(this.filter);
     }
 

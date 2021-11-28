@@ -9,7 +9,7 @@ import { LogHandler } from './utilities/log-handler';
 })
 export default class App extends Vue {
     private static log = new LogHandler('App');
-    protected fileManager = new FileManager();
+    protected fileManager: FileManager | null = null;
 
     public async mounted(): Promise<void> {
         App.log.debug('Starting...');

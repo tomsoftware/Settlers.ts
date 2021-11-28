@@ -29,7 +29,7 @@ export class SymbolDirectory {
         return r;
     }
 
-    public static initCharCodeTable() {
+    public static initCharCodeTable(): Int32Array {
         const result: number[] = [];
 
         for (let i = 0; i <= 15; i++) {
@@ -50,16 +50,16 @@ export class SymbolDirectory {
         return new Int32Array(result);
     }
 
-    public findIndex(code: number) {
+    public findIndex(code: number): number {
         return this.codeIndexLookup[code];
     }
 
     /** increment quantity for symbol */
-    public inc(symbol: number) {
+    public inc(symbol: number): void {
         this.quantities[symbol]++;
     }
 
-    public generateCodes() {
+    public generateCodes(): void {
         this.codeTable = new Int32Array(
             // create index array [0, 1, 2, 3, ...]
             Array.from(Array(Packer.Symbols).keys())
@@ -80,7 +80,7 @@ export class Packer {
     ///  Max number of Huffman encoded symbols
     public static Symbols = 274;
 
-    public static createSymbolDirectory() {
+    public static createSymbolDirectory(): SymbolDirectory {
         return new SymbolDirectory(Packer.Symbols);
     }
 

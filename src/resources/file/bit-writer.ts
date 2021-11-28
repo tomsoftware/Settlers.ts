@@ -10,7 +10,7 @@ export class BitWriter {
      *   - seems not to be faster
      *   - is not as readable as "write"
      */
-    public writeNew(value: number, length: number) {
+    public writeNew(value: number, length: number): void {
         let chByte = this.currentByte;
         let chByteLen = this.currentByteLength;
 
@@ -47,7 +47,7 @@ export class BitWriter {
         this.currentByteLength = chByteLen;
     }
 
-    public write(value: number, length: number) {
+    public write(value: number, length: number): void {
         let chByte = this.currentByte;
         let chByteLen = this.currentByteLength;
 

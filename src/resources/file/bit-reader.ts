@@ -34,7 +34,7 @@ export class BitReader {
     }
 
     public resetBitBuffer() :void {
-        this.pos = (this.pos - this.bufferLen / 8); // - move back the in buffer for all not used byte
+        this.pos = this.pos - (this.bufferLen >> 3); // - move back the in-buffer for all not used byte
         this.bufferLen = 0; // - clear bit-buffer
         this.buffer = 0;
     }
@@ -66,6 +66,10 @@ export class BitReader {
     }
 
     public eof(): boolean {
-        return ((this.bufferLen <= 0) && (this.pos >= this.data.length));
+        return this.pos >= this.data.length;
+    }
+
+    public toString(): string {
+        return 'pos: ' + this.pos + ' len: ' + this.data.length + ' eof?: ' + this.eof();
     }
 }

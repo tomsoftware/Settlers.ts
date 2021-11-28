@@ -14,4 +14,8 @@ export class TexturePoint {
     public getKey(): number {
         return this.t0 << 16 | this.t1 << 8 | this.t2;
     }
+
+    public toString(): string {
+        return LandscapeType[this.t0] + ', ' + LandscapeType[this.t1] + ', ' + LandscapeType[this.t2];
+    }
 }

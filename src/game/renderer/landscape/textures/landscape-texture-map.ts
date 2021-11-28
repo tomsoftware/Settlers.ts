@@ -17,7 +17,7 @@ export class LandscapeTextureMap {
         for (const p of pattern) {
             const key = p.getKey();
             if (this.lookup[key]) {
-                this.log.error('Texture type (' + p.t0 + ' ' + p.t1 + ' ' + p.t2 + ') already defined');
+                this.log.error('Texture type (' + p.toString() + ') already defined');
                 return;
             }
 
@@ -27,80 +27,80 @@ export class LandscapeTextureMap {
 
     private addTextureGradient1(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
         // Using Hexagon2Texture for SmallLandscapeTexture!
-        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
-        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+        this.addTexture(new SmallLandscapeTexture(type2, 0, row));
+        this.addTexture(new SmallLandscapeTexture(type3, 1, row));
 
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row, 3, row + 1));
 
         // empty: @ 0, row + 1
         // empty: @ 1, row + 1
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 1));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 1));
+        // variation: Hexagon2Texture(type1, type2, 2, row + 1)
+        // variation: Hexagon2Texture(type2, type1, 3, row + 1)
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
-        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 2));
-        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 2));
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 2, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 2, 3, row + 3));
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
-        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 3));
-        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 3));
+        // variation: Hexagon2Texture(type2, type3, 0, row + 3)
+        // variation: Hexagon2Texture(type3, type2, 1, row + 3)
+        // variation: Hexagon2Texture(type3, type4, 2, row + 3)
+        // variation: Hexagon2Texture(type4, type3, 3, row + 3)
     }
 
     private addTextureGradient2(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
         // Using Hexagon2Texture for SmallLandscapeTexture!
-        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
-        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+        this.addTexture(new SmallLandscapeTexture(type2, 0, row)); /// todo: add variation
+        this.addTexture(new SmallLandscapeTexture(type3, 1, row)); /// todo: add variation
 
-        this.addTexture(new Hexagon2Texture(type4, type3, 2, row));
-        this.addTexture(new Hexagon2Texture(type3, type4, 3, row));
+        this.addTexture(new Hexagon2Texture(type4, type3, 2, row, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type3, type4, 3, row, 3, row + 1));
 
         // empty: @ 0, row + 1
         // empty: @ 1, row + 1
-        this.addTexture(new Hexagon2Texture(type4, type3, 2, row + 1));
-        this.addTexture(new Hexagon2Texture(type3, type4, 3, row + 1));
+        // variation: Hexagon2Texture(type4, type3, 2, row + 1)
+        // variation: Hexagon2Texture(type3, type4, 3, row + 1)
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2));
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2, 3, row + 3));
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 3));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 3));
+        // variation: Hexagon2Texture(type2, type3, 0, row + 3)
+        // variation: Hexagon2Texture(type3, type2, 1, row + 3)
+        // variation: Hexagon2Texture(type1, type2, 2, row + 3)
+        // variation: Hexagon2Texture(type2, type1, 3, row + 3)
     }
 
     private addTextureGradient3(type1: LandscapeType, type2: LandscapeType, type3: LandscapeType, type4: LandscapeType, row: number) {
         // Using Hexagon2Texture for SmallLandscapeTexture!
-        this.addTexture(new Hexagon2Texture(type2, type2, 0, row));
-        this.addTexture(new Hexagon2Texture(type3, type3, 1, row));
+        this.addTexture(new SmallLandscapeTexture(type2, 0, row)); /// todo: add variation
+        this.addTexture(new SmallLandscapeTexture(type3, 1, row)); /// todo: add variation
 
-        this.addTexture(new Hexagon2Texture(type3, type4, 2, row));
-        this.addTexture(new Hexagon2Texture(type4, type3, 3, row));
+        this.addTexture(new Hexagon2Texture(type3, type4, 2, row, 2, row + 1));
+        this.addTexture(new Hexagon2Texture(type4, type3, 3, row, 3, row + 1));
 
         // empty: @ 0, row + 1
         // empty: @ 1, row + 1
-        this.addTexture(new Hexagon2Texture(type3, type4, 2, row + 1));
-        this.addTexture(new Hexagon2Texture(type4, type3, 3, row + 1));
+        // variation: Hexagon2Texture(type3, type4, 2, row + 1)
+        // variation: Hexagon2Texture(type4, type3, 3, row + 1)
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2));
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2));
+        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 2, 0, row + 3));
+        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 2, 1, row + 3));
+        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 2, 2, row + 3));
+        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 2, 3, row + 3));
 
         // next row
-        this.addTexture(new Hexagon2Texture(type2, type3, 0, row + 3));
-        this.addTexture(new Hexagon2Texture(type3, type2, 1, row + 3));
-        this.addTexture(new Hexagon2Texture(type1, type2, 2, row + 3));
-        this.addTexture(new Hexagon2Texture(type2, type1, 3, row + 3));
+        // variation: Hexagon2Texture(type2, type3, 0, row + 3)
+        // variation: Hexagon2Texture(type3, type2, 1, row + 3)
+        // variation: Hexagon2Texture(type1, type2, 2, row + 3)
+        // variation: Hexagon2Texture(type2, type1, 3, row + 3)
     }
 
     constructor() {
@@ -109,26 +109,26 @@ export class LandscapeTextureMap {
         this.addTexture(new BigLandscapeTexture(LandscapeType.GrassDry, 8));
 
         // next row
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 12));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 12));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 12, 0, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 12, 1, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 12, 2, 13));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 12, 3, 13));
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 13));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 13));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 13));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 13));
+        // variation: Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassToGrassDry, 0, 13)
+        // variation: Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.Grass, 1, 13)
+        // variation: Hexagon2Texture(LandscapeType.Beach, LandscapeType.Grass, 2, 13)
+        // variation: Hexagon2Texture(LandscapeType.Grass, LandscapeType.Beach, 3, 13)
 
         // next row
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 14));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 14));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 14, 0, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 14, 1, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 14, 0, 15));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 14, 1, 15));
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 15));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 15));
-        this.addTexture(new Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 15));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 15));
+        // variation: Hexagon2Texture(LandscapeType.GrassToGrassDry, LandscapeType.GrassDry, 0, 15)
+        // variation: Hexagon2Texture(LandscapeType.GrassDry, LandscapeType.GrassToGrassDry, 1, 15)
+        // variation: Hexagon2Texture(LandscapeType.GrassDark, LandscapeType.Grass, 0, 15)
+        // variation: Hexagon2Texture(LandscapeType.Grass, LandscapeType.GrassDark, 1, 15)
 
         // next row
         this.addTexture(new BigLandscapeTexture(LandscapeType.Water7, 16));
@@ -143,19 +143,19 @@ export class LandscapeTextureMap {
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water4, 0, 21));
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water5, 1, 21));
         this.addTexture(new SmallLandscapeTexture(LandscapeType.Water6, 2, 21));
-        this.addTexture(new SmallLandscapeTexture(LandscapeType.Water7, 3, 21));
+        // variation: SmallLandscapeTexture(LandscapeType.Water7, 3, 21) // not sure why this exists
 
         // [beach] --> [water]
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 22));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 23));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 22));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 23));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 22, 0, 23));
+        // variation: Hexagon2Texture(LandscapeType.Beach, LandscapeType.Water0, 0, 23)
+        this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 22, 1, 23));
+        // variation: Hexagon2Texture(LandscapeType.Water0, LandscapeType.Beach, 1, 23)
 
-        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 2, 22));
-        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 3, 22));
+        this.addTexture(new Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 2, 22, 3, 22));
+        // variation: Hexagon3Texture(LandscapeType.Beach, LandscapeType.Grass, LandscapeType.Water0, 3, 22)
 
-        this.addTexture(new Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 2, 23));
-        this.addTexture(new Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 3, 23));
+        this.addTexture(new Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 2, 23, 3, 23));
+        // variation: Hexagon3Texture(LandscapeType.Grass, LandscapeType.Beach, LandscapeType.Water0, 3, 23)
 
         // next row
         this.addTexture(new Hexagon2Texture(LandscapeType.Water0, LandscapeType.Water1, 0, 24));
@@ -217,15 +217,15 @@ export class LandscapeTextureMap {
         // todo: next row (river <-> gras) 72..75
         // todo: next row (?? <-> gras) 76..79
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 76));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 76));
-        this.addTexture(new Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 76));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 76));
+        this.addTexture(new Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 76, 0, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 76, 1, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 76, 2, 77));
+        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 76, 3, 77));
 
-        this.addTexture(new Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 77));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 77));
-        this.addTexture(new Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 77));
-        this.addTexture(new Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 77));
+        // variation: Hexagon2Texture(LandscapeType.DustyWay, LandscapeType.Grass, 0, 77));
+        // variation: Hexagon2Texture(LandscapeType.Grass, LandscapeType.DustyWay, 1, 77));
+        // variation: Hexagon2Texture(LandscapeType.RockyWay, LandscapeType.Grass, 2, 77));
+        // variation: Hexagon2Texture(LandscapeType.Grass, LandscapeType.RockyWay, 3, 77));
         // empty @ 78
         // empty @ 79
 

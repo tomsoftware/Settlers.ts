@@ -24,6 +24,11 @@ export default class Home extends Vue {
     }
 
     protected checkIsValidSettlers(): void {
+        if (!this.fileManager) {
+            this.isValidSettlers = false;
+            return;
+        }
+
         this.isValidSettlers = this.fileManager.findFile('game.lib', false) != null;
     }
 

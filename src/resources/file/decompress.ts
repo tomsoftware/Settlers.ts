@@ -26,7 +26,7 @@ export class Decompress extends Packer {
 
         const codeTable = Packer.createSymbolDirectory();
 
-        while ((inDate.getBufferLength() >= 4) || (!inDate.eof())) {
+        while (!inDate.eof()) {
             // -------
             // - read code type
             const codeType = inDate.read(4);
@@ -116,6 +116,7 @@ export class Decompress extends Packer {
             } else {
                 // - copy from dictionary
                 if (!this.fromDictionary(inDate, writer, codeWord)) {
+                    this.log.error('bad dictionary entry!');
                     break;
                 }
             }
@@ -123,7 +124,7 @@ export class Decompress extends Packer {
 
         // - did an Error happen?
         if (!done) {
-            this.log.error('Unexpected End of Data in ' + inDataSrc.filename);
+            this.log.error('Unexpected End of Data in ' + inDataSrc.filename + ' eof: ' + inDate.toString());
         }
 
         // - create new Reader from Data and return it

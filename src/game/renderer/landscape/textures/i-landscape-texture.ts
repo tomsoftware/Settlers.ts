@@ -7,4 +7,5 @@ export interface ILandscapeTexture {
     getTextureA(tp: TexturePoint, x: number, y: number): [number, number];
     getTextureB(tp: TexturePoint, x: number, y: number): [number, number];
     getPattern(): TexturePoint[];
+    addVariant?(x: number, y: number): boolean;
 }
