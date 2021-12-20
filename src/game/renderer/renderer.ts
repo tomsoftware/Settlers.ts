@@ -1,14 +1,25 @@
-import { FileManager } from '@/utilities/file-manager';
 import { LogHandler } from '@/utilities/log-handler';
 import { IRenderer } from './i-renderer';
 import { Matrix } from './landscape/matrix';
 import { TextureManager } from './texture-manager';
 import { ViewPoint } from './view-point';
 
+declare let WebGLDebugUtils: any;
+
 // https://stackoverflow.com/questions/48741570/how-can-i-import-glsl-as-string-in-typescript
 // https://tympanus.net/codrops/2019/01/17/interactive-particles-with-three-js/
 // https://webglfundamentals.org/webgl/lessons/webgl-instanced-drawing.html
 
+// Device Web-GL support
+// https://webglreport.com/?v=1
+
+// WebGl Debugging
+// https://www.khronos.org/webgl/wiki/Debugging
+
+/**
+ * manages the WebGL context and the IRenderer who drawing to this context
+ * - 
+ */
 export class Renderer {
     private readonly log = new LogHandler('Renderer');
     private canvas: HTMLCanvasElement;
@@ -19,14 +30,29 @@ export class Renderer {
     private viewPoint: ViewPoint;
 
     constructor(canvas: HTMLCanvasElement) {
+        const webGlogger = new LogHandler('WebGL');
+
+        function processWebGlDebugErrors(err: any, funcName: string, args: any) {
+            const argString = WebGLDebugUtils.glFunctionArgsToString(funcName, args) ?? '';
+
+            webGlogger.error(WebGLDebugUtils.glEnumToString(err) +
+            ' was caused by calling: ' + funcName + ' ' +
+            argString.substring(0, 300));
+        }
+
         this.canvas = canvas;
         this.viewPoint = new ViewPoint(canvas);
         this.viewPoint.onMove = () => this.onMove();
 
-        const newGl = canvas.getContext('webgl');
+        let newGl = canvas.getContext('webgl');
         if (!newGl) {
-            this.log.error('ERROR: Unable to initialize WebGL. Your browser may not support it.');
+            this.log.error('Unable to initialize WebGL. Your browser may not support it.');
             return;
+        }
+
+        if (WebGLDebugUtils) {
+            this.log.debug('Run with WebGL debug');
+            newGl = WebGLDebugUtils.makeDebugContext(newGl, processWebGlDebugErrors) as WebGLRenderingContext | null;
         }
 
         this.gl = newGl;

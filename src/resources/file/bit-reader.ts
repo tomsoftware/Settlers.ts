@@ -66,7 +66,7 @@ export class BitReader {
     }
 
     public eof(): boolean {
-        return this.pos >= this.data.length;
+        return ((this.pos >= this.data.length) && (this.bufferLen <= 0));
     }
 
     public toString(): string {

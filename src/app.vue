@@ -6,6 +6,7 @@
     <router-link to="/lib-view">Lib View</router-link> |
     <router-link to="/gh-view">Gh View</router-link> |
     <router-link to="/gfx-view">Gfx View</router-link> |
+    <router-link to="/jil-view">Jil View</router-link> |
     <router-link to="/logging-view">Logging</router-link>
   </div>
 
