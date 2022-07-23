@@ -25,10 +25,10 @@ import { IGfxImage } from './igfx-image';
 import { ImageType } from './image-type';
 
 /** interprets a .gh5 and .gh6 file -
-         *    files contain background images
-         * */
+ *    files contain background images
+ * */
 export class GhFileReader {
-    private log: LogHandler = new LogHandler('GhFileReader');
+    private static log: LogHandler = new LogHandler('GhFileReader');
     private images: IGfxImage[] = [];
 
     /** may this is the file version or a magic indicator for this
@@ -47,7 +47,7 @@ export class GhFileReader {
     /** return a Image by index */
     public getImage(index:number) : IGfxImage | null {
         if ((index < 0) || (index >= this.images.length)) {
-            this.log.error('Image Index out of range: ' + index);
+            GhFileReader.log.error('Image Index out of range: ' + index);
             return null;
         }
         return this.images[index];
@@ -57,11 +57,11 @@ export class GhFileReader {
         const HeaderSize = 5 * 4;
 
         if (reader.length < HeaderSize) {
-            this.log.error('wrong file size');
+            GhFileReader.log.error('wrong file size');
             return;
         }
 
-        this.log.debug('read ' + reader.filename);
+        GhFileReader.log.debug('read ' + reader.filename);
 
         /// file header
         this.magic = reader.readIntBE();
@@ -111,7 +111,7 @@ export class GhFileReader {
 
             this.images.push(img);
 
-            this.log.debug('Found:' + img.toString());
+            GhFileReader.log.debug('Found:' + img.toString());
 
             filePos += size + 8;
         }

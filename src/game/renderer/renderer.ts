@@ -18,10 +18,9 @@ declare let WebGLDebugUtils: any;
 
 /**
  * manages the WebGL context and the IRenderer who drawing to this context
- * - 
  */
 export class Renderer {
-    private readonly log = new LogHandler('Renderer');
+    private static log = new LogHandler('Renderer');
     private canvas: HTMLCanvasElement;
     private gl: WebGLRenderingContext | null = null;
     public textureManager: TextureManager = new TextureManager();
@@ -46,13 +45,16 @@ export class Renderer {
 
         let newGl = canvas.getContext('webgl');
         if (!newGl) {
-            this.log.error('Unable to initialize WebGL. Your browser may not support it.');
+            Renderer.log.error('Unable to initialize WebGL. Your browser may not support it.');
             return;
         }
 
-        if (WebGLDebugUtils) {
-            this.log.debug('Run with WebGL debug');
-            newGl = WebGLDebugUtils.makeDebugContext(newGl, processWebGlDebugErrors) as WebGLRenderingContext | null;
+        try {
+            if (WebGLDebugUtils) {
+                Renderer.log.debug('Run with WebGL debug');
+                newGl = WebGLDebugUtils.makeDebugContext(newGl, processWebGlDebugErrors) as WebGLRenderingContext | null;
+            }
+        } catch (e) {
         }
 
         this.gl = newGl;

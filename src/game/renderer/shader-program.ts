@@ -7,7 +7,7 @@ export enum ShaderType {
 }
 
 export class ShaderProgram implements ShaderObject {
-    private readonly log = new LogHandler('ShaderProgram');
+    private static log = new LogHandler('ShaderProgram');
     private gl: WebGLRenderingContext | null = null;
     private shaders: WebGLShader[] = [];
     private shaderProgram: WebGLProgram | null = null;
@@ -48,7 +48,7 @@ export class ShaderProgram implements ShaderObject {
         this.shaderProgram = this.gl.createProgram();
 
         if (!this.shaderProgram) {
-            this.log.error('Unable to create new shader Program');
+            ShaderProgram.log.error('Unable to create new shader Program');
             return false;
         }
 
@@ -205,7 +205,7 @@ export class ShaderProgram implements ShaderObject {
         const newShader = this.gl.createShader(this.shaderTypeToNumber(shaderType));
 
         if (!newShader) {
-            this.log.error('Unable to createShader: ' + shaderType);
+            ShaderProgram.log.error('Unable to createShader: ' + shaderType);
             return false;
         }
 
@@ -219,7 +219,7 @@ export class ShaderProgram implements ShaderObject {
         const compileStatus = !!this.gl.getShaderParameter(newShader, this.gl.COMPILE_STATUS);
 
         if (!compileStatus) {
-            this.log.error('Unable to compile shader:' + this.gl.getShaderInfoLog(newShader));
+            ShaderProgram.log.error('Unable to compile shader:' + this.gl.getShaderInfoLog(newShader));
             return false;
         }
 

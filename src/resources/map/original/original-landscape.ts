@@ -6,7 +6,7 @@ import { OriginalMapFile } from './original-map-file';
 
 /** provides access to the original landscape data */
 export class OriginalLandscape implements IMapLandscape {
-        private log: LogHandler = new LogHandler('OriginalLandscape');
+        private static log: LogHandler = new LogHandler('OriginalLandscape');
         private data: Uint8Array;
         private mapSize: MapSize;
 
@@ -15,7 +15,7 @@ export class OriginalLandscape implements IMapLandscape {
 
             const reader = mapFile.getChunkReader(mapChunkType);
             if (!reader) {
-                this.log.error('No landscape data in this file!');
+                OriginalLandscape.log.error('No landscape data in this file!');
                 this.data = new Uint8Array(0);
                 return;
             }
@@ -29,7 +29,7 @@ export class OriginalLandscape implements IMapLandscape {
             const result = new Uint8Array(this.mapSize.width * this.mapSize.height);
 
             if (land.length !== (result.length * 4)) {
-                this.log.error('Size of landscape Data is wrong: ' + land.length + '!==' + (result.length * 4));
+                OriginalLandscape.log.error('Size of landscape Data is wrong: ' + land.length + '!==' + (result.length * 4));
                 // return new Uint8Array(0);
             }
 

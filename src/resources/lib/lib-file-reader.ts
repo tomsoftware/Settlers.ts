@@ -6,7 +6,7 @@ import { PathList } from './path-list';
 
 /** provides access to a settlers 4 lib file */
 export class LibFileReader {
-    private log: LogHandler = new LogHandler('LibFileReader');
+    private static log: LogHandler = new LogHandler('LibFileReader');
     private fileInfos: LibFileItem[] = [];
     private pathList?: PathList;
     private reader: BinaryReader
@@ -56,7 +56,7 @@ export class LibFileReader {
         const index = this.getFileIndexFromFileName(pathName, fileName);
         if (index < 0) {
             if (!quiet) {
-                this.log.error('File not found: ' + pathName + ' / ' + fileName);
+                LibFileReader.log.error('File not found: ' + pathName + ' / ' + fileName);
             }
             return null;
         }
@@ -94,7 +94,7 @@ export class LibFileReader {
             return;
         }
 
-        this.log.debug('Header-Info: ' + header);
+        LibFileReader.log.debug('Header-Info: ' + header);
 
         this.pathList = header.getPathList();
         this.fileInfos = header.getFileInfo();

@@ -7,11 +7,11 @@ import { JilFileReader } from './jil-file-reader';
 import { PaletteCollection } from './palette-collection';
 import { ResourceFile } from './resource-file';
 
-/** reads a .gfx file
- *        .gfx files contain images
+/**
+ * reads a .gfx file that contains images
  * */
 export class GfxFileReader extends ResourceFile {
-    private log: LogHandler = new LogHandler('GfxFileReader');
+    private static log: LogHandler = new LogHandler('GfxFileReader');
     private reader: BinaryReader;
     private gilFileReader: GilFileReader;
     private jilFileReader: JilFileReader | null;
@@ -29,7 +29,7 @@ export class GfxFileReader extends ResourceFile {
     /** return a Image by index */
     public getImage(index: number): GfxImage | null {
         if ((index < 0) || (index >= this.gilFileReader.length)) {
-            this.log.error('Image Index out of range: ' + index);
+            GfxFileReader.log.error('Image Index out of range: ' + index);
             return null;
         }
 
@@ -42,7 +42,7 @@ export class GfxFileReader extends ResourceFile {
             jobIndex = this.jilFileReader.reverseLookupOffset(dirOffset);
 
             if (jobIndex === -1) {
-                this.log.error('unable to resolve job Index: ' + index);
+                GfxFileReader.log.error('unable to resolve job Index: ' + index);
                 return null;
             }
         }

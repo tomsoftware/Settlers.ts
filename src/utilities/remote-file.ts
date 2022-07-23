@@ -19,7 +19,7 @@ class RequestError extends Error {
 * Handle Files loading from remote/web
 */
 export class RemoteFile {
-    private log: LogHandler = new LogHandler('RemoteFile');
+    private static log: LogHandler = new LogHandler('RemoteFile');
     private rootPath?: string;
 
     constructor(rootPath?: string) {
@@ -32,7 +32,7 @@ export class RemoteFile {
     public loadBinary(path: string, filename?: string): Promise<BinaryReader> {
         const url = Path.combine(this.rootPath, path, filename);
 
-        this.log.debug('loading: ' + url);
+        RemoteFile.log.debug('loading: ' + url);
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -43,13 +43,13 @@ export class RemoteFile {
 
                     resolve(reader);
                 } else {
-                    this.log.error('error load file:' + url);
+                    RemoteFile.log.error('error load file:' + url);
                     reject(new RequestError(xhr.status, xhr.statusText));
                 }
             };
 
             xhr.onerror = () => {
-                this.log.error('error load file:' + url);
+                RemoteFile.log.error('error load file:' + url);
                 reject(new RequestError(xhr.status, xhr.statusText));
             };
 
@@ -62,7 +62,7 @@ export class RemoteFile {
 
     /** load string data from URL */
     public loadString(url: string): Promise<string> {
-        this.log.debug('Load file as string: ' + url);
+        RemoteFile.log.debug('Load file as string: ' + url);
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -72,7 +72,7 @@ export class RemoteFile {
             };
 
             xhr.onerror = () => {
-                this.log.error('error load file:' + url);
+                RemoteFile.log.error('error load file:' + url);
                 reject(new RequestError(xhr.status, xhr.statusText));
             };
 

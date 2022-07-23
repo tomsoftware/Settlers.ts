@@ -6,18 +6,23 @@ import { Hexagon2Texture } from './hexagon-2-texture';
 import { SmallLandscapeTexture } from './small-landscape-texture';
 import { Hexagon3Texture } from './hexagon-3-texture';
 import { TexturePoint } from './texture-point';
+import { TextureMap16Bit } from '../../texture-map-16bit';
+import { GfxImage16Bit } from '@/resources/gfx/gfx-image-16bit';
 
 export class LandscapeTextureMap {
-    private readonly log = new LogHandler('LandscapeTextureMap');
+    private static log = new LogHandler('LandscapeTextureMap');
     private lookup: {[key: number]: ILandscapeTexture} = {};
+    private textures: ILandscapeTexture[] = [];
 
     private addTexture(text: ILandscapeTexture) {
+        this.textures.push(text);
+
         const pattern = text.getPattern();
 
         for (const p of pattern) {
             const key = p.getKey();
             if (this.lookup[key]) {
-                this.log.error('Texture type (' + p.toString() + ') already defined');
+                LandscapeTextureMap.log.error('Texture type (' + p.toString() + ') already defined');
                 return;
             }
 
@@ -253,5 +258,12 @@ export class LandscapeTextureMap {
         }
 
         return text.getTextureB(tp, x, y);
+    }
+
+    /** copy all textures to the TextureMap */
+    public copyTexture(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit) {
+        for (const t of this.textures) {
+            t.copyToTextureMap(srcImg, destTextureMap);
+        }
     }
 }

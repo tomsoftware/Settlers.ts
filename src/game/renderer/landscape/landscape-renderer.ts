@@ -1,39 +1,64 @@
 import { LogHandler } from '@/utilities/log-handler';
 import { RendererBase } from '../renderer-base';
 import { IRenderer } from '../i-renderer';
-import { GhTexture } from '../gh-texture';
 import { LandscapeTextureMap } from './textures/landscape-texture-map';
 import { MapSize } from '@/utilities/map-size';
 import { ShaderDataTexture } from '../shader-data-texture';
 import { IViewPoint } from '../i-view-point';
 import { TextureManager } from '../texture-manager';
 import { FileManager } from '@/utilities/file-manager';
-
+import { TextureMap16Bit } from '../texture-map-16bit';
+import { GhFileReader } from '@/resources/gfx/gh-file-reader';
+import { GfxImage16Bit } from '@/resources/gfx/gfx-image-16bit';
+import { ImageType } from '@/resources/gfx/image-type';
 import vertCode from './landscape-vert.glsl';
 import fragCode from './landscape-frag.glsl';
 
 export class LandscapeRenderer extends RendererBase implements IRenderer {
-    private readonly log = new LogHandler('LandscapeRenderer');
+    private static log = new LogHandler('LandscapeRenderer');
     private numVertices = 0;
     private textureManager: TextureManager;
-    private texture: GhTexture;
+    private texture: TextureMap16Bit;
     private mapSize: MapSize;
     private landscapeTextureMap = new LandscapeTextureMap();
 
-    private landTypeBuffer: ShaderDataTexture;
-    private landHeightBuffer: ShaderDataTexture;
+    private landTypeBuffer: ShaderDataTexture | null = null;
+    private landHeightBuffer: ShaderDataTexture | null = null;
+    private fileManager: FileManager;
+
+    private groundTypeMap: Uint8Array;
+    private groundHeightMap: Uint8Array;
 
     constructor(fileManager: FileManager, textureManager: TextureManager, mapSize: MapSize, groundTypeMap: Uint8Array, groundHeightMap: Uint8Array) {
         super();
 
-        this.mapSize = mapSize;
-
+        this.fileManager = fileManager;
         this.textureManager = textureManager;
-        this.texture = new GhTexture(fileManager, this.textureManager.create('u_landText'));
-        this.landTypeBuffer = this.createLandTypeBuffer(mapSize, this.textureManager.create('u_landTypeBuffer'), groundTypeMap);
-        this.landHeightBuffer = this.createLandHeightBuffer(mapSize, this.textureManager.create('u_landHeightBuffer'), groundHeightMap);
+        this.mapSize = mapSize;
+        this.groundHeightMap = groundHeightMap;
+        this.groundTypeMap = groundTypeMap;
+
+        this.texture = new TextureMap16Bit(256 * 5, this.textureManager.create('u_landText'));
 
         Object.seal(this);
+    }
+
+    /** load the landscape texture from file and push it to a texture map buffer */
+    private async createLandscapeTextureMap() {
+        const imgFile = await this.fileManager.readFile('2.gh6', true);
+        if (!imgFile) {
+            LandscapeRenderer.log.error('Unable to load texture file "2.gh6"');
+            return;
+        }
+
+        const reader = new GhFileReader(imgFile);
+        const img = reader.findImageByType<GfxImage16Bit>(ImageType.Image16Bit);
+
+        if (!img) {
+            return;
+        }
+
+        this.landscapeTextureMap.copyTexture(img, this.texture);
     }
 
     private createLandHeightBuffer(mapSize: MapSize, textureIndex: number, groundHeightMap: Uint8Array): ShaderDataTexture {
@@ -86,16 +111,21 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
     }
 
     public async init(gl: WebGLRenderingContext): Promise<boolean> {
-        // this.shaderProgram.setDefine('DEBUG_TRIANGLE_BORDER', 1);
+        this.shaderProgram.setDefine('DEBUG_TRIANGLE_BORDER', 1);
         this.shaderProgram.setDefine('MAP_WIDTH', this.mapSize.width);
         this.shaderProgram.setDefine('MAP_HEIGHT', this.mapSize.width);
+        this.shaderProgram.setDefine('LANDSCAPE_TEXTURE_WIDTH_HEIGHT', this.texture.widthHeight);
 
         super.initShader(gl, vertCode, fragCode);
 
-        await this.texture.load(gl);
+        await this.createLandscapeTextureMap();
+        this.texture.load(gl);
+
+        this.landTypeBuffer = this.createLandTypeBuffer(this.mapSize, this.textureManager.create('u_landTypeBuffer'), this.groundTypeMap);
+        this.landHeightBuffer = this.createLandHeightBuffer(this.mapSize, this.textureManager.create('u_landHeightBuffer'), this.groundHeightMap);
 
         if (!this.shaderProgram.getAngleInstancedArrayExtension()) {
-            this.log.error('need WebGL ANGLE_instanced_arrays');
+            LandscapeRenderer.log.error('need WebGL ANGLE_instanced_arrays');
         }
 
         this.numVertices = 6;

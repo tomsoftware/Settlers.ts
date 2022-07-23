@@ -7,7 +7,7 @@ export class BitReader {
     private pos: number;
     private buffer: number;
     private bufferLen: number;
-    private readonly log: LogHandler = new LogHandler('BitReader');
+    private static log: LogHandler = new LogHandler('BitReader');
 
     constructor(fileReader: BinaryReader, offset?: number, sourceLength?: number) {
         // - get the data from the source
@@ -45,7 +45,7 @@ export class BitReader {
         if (this.bufferLen < readLength) {
             // - read next byte
             if (this.pos >= this.data.length) {
-                this.log.error('Unable to read more date - End of data!');
+                BitReader.log.error('Unable to read more date - End of data!');
                 return 0;
             }
 

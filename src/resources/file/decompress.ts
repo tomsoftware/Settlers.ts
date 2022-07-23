@@ -6,9 +6,9 @@ import { StreamWriter } from './stream-writer';
 
 /**
  *    Lz + Huffman decompressing
-*/
+ */
 export class Decompress extends Packer {
-    private log: LogHandler = new LogHandler('Decompress');
+    private static log: LogHandler = new LogHandler('Decompress');
 
     constructor() {
         super();
@@ -32,7 +32,7 @@ export class Decompress extends Packer {
             const codeType = inDate.read(4);
 
             if (codeType < 0) {
-                this.log.error('CodeType == 0 -> out of sync!');
+                Decompress.log.error('CodeType == 0 -> out of sync!');
                 break;
             }
 
@@ -47,7 +47,7 @@ export class Decompress extends Packer {
                 codeWordIndex += inDate.read(codeWordLength);
 
                 if (codeWordIndex >= 274) {
-                    this.log.error('CodeType(' + codeWordIndex + ') >= 274 -> out of sync!');
+                    Decompress.log.error('CodeType(' + codeWordIndex + ') >= 274 -> out of sync!');
                     break;
                 }
             }
@@ -62,7 +62,7 @@ export class Decompress extends Packer {
             // - execute codeword
             if (codeWord < 256) {
                 if (writer.eof()) {
-                    this.log.error('OutBuffer is to small!');
+                    Decompress.log.error('OutBuffer is to small!');
                     break;
                 }
 
@@ -98,7 +98,7 @@ export class Decompress extends Packer {
                 if (inDate.sourceLeftLength() > 2) {
                     // - sometimes there is a end-of-stream (eos) codeword (Codeword == 273) if the out data is "too" long.
                     if (writer.eof()) {
-                        this.log.error('End-of-stream but Data buffer is not empty (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' i OUT bytes left)? Out of sync!');
+                        Decompress.log.error('End-of-stream but Data buffer is not empty (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' i OUT bytes left)? Out of sync!');
                         break;
                     }
 
@@ -106,7 +106,7 @@ export class Decompress extends Packer {
                     inDate.resetBitBuffer();
                 } else {
                     if (!writer.eof()) {
-                        this.log.error('Done decompress (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' OUT bytes left)!');
+                        Decompress.log.error('Done decompress (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' OUT bytes left)!');
                     }
 
                     // - end of data indicator
@@ -116,7 +116,7 @@ export class Decompress extends Packer {
             } else {
                 // - copy from dictionary
                 if (!this.fromDictionary(inDate, writer, codeWord)) {
-                    this.log.error('bad dictionary entry!');
+                    Decompress.log.error('bad dictionary entry!');
                     break;
                 }
             }
@@ -124,7 +124,7 @@ export class Decompress extends Packer {
 
         // - did an Error happen?
         if (!done) {
-            this.log.error('Unexpected End of Data in ' + inDataSrc.filename + ' eof: ' + inDate.toString());
+            Decompress.log.error('Unexpected End of Data in ' + inDataSrc.filename + ' eof: ' + inDate.toString());
         }
 
         // - create new Reader from Data and return it
@@ -144,7 +144,7 @@ export class Decompress extends Packer {
             const ReadInByte = inDate.read(length);
 
             if (ReadInByte < 0) {
-                this.log.error('ReadInByte == 0 -> out of sync!');
+                Decompress.log.error('ReadInByte == 0 -> out of sync!');
                 return false;
             }
 
@@ -153,7 +153,7 @@ export class Decompress extends Packer {
 
         bitValue = inDate.read(3);
         if (bitValue < 0) {
-            this.log.error('bitValue < 0 -> out of sync!');
+            Decompress.log.error('bitValue < 0 -> out of sync!');
             return false;
         }
 
@@ -165,7 +165,7 @@ export class Decompress extends Packer {
 
         bitValue = inDate.read(length);
         if (bitValue < 0) {
-            this.log.error('bit_value < 0 -> out of sync!');
+            Decompress.log.error('bit_value < 0 -> out of sync!');
             return false;
         }
 
@@ -173,7 +173,7 @@ export class Decompress extends Packer {
 
         // - check if destination is big enough:
         if (writer.getWriteOffset() + entryLength > writer.getLength()) {
-            this.log.error('buffer for outData is to small!');
+            Decompress.log.error('buffer for outData is to small!');
             return false;
         }
 

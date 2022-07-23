@@ -8,7 +8,7 @@ import { IndexFile } from './index-file';
  *        jil (job)    --> .dil (direction)--> gil (frames) --> gfx
  * */
 export class DilFileReader extends IndexFile {
-    private log: LogHandler = new LogHandler('DilFileReader');
+    private static log: LogHandler = new LogHandler('DilFileReader');
 
     /** find the index matching a given gil offset */
     public reverseLookupOffset(gilIndex: number): number {
@@ -24,20 +24,20 @@ export class DilFileReader extends IndexFile {
             }
 
             if (offsetTable[i] > offset) {
-                this.log.debug(gilIndex + ' --> ' + lastGood);
+                DilFileReader.log.debug(gilIndex + ' --> ' + lastGood);
                 return lastGood;
             }
             lastGood = i;
         }
 
-        this.log.error('Unable to find offset gilIndex:' + gilIndex);
+        DilFileReader.log.error('Unable to find offset gilIndex:' + gilIndex);
         return lastGood;
     }
 
     constructor(resourceReader: BinaryReader) {
         super(resourceReader);
 
-        this.log.debug('object count ' + resourceReader.length);
+        DilFileReader.log.debug('object count ' + resourceReader.length);
 
         Object.seal(this);
     }

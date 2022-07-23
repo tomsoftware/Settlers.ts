@@ -5,7 +5,7 @@ import { PathList } from './path-list';
 
 /** header of a lib file */
 export class LibFileHeader {
-        private log: LogHandler = new LogHandler('LibFileHeader');
+        private static log: LogHandler = new LogHandler('LibFileHeader');
 
         private reader: BinaryReader;
 
@@ -66,7 +66,7 @@ export class LibFileHeader {
             const HeaderSize = 6 * 4;
 
             if ((offset < 0) || (data.length < offset + HeaderSize)) {
-                this.log.error('Unable to process LibFileHeader of ' + data.filename + ' - wrong offset');
+                LibFileHeader.log.error('Unable to process LibFileHeader of ' + data.filename + ' - wrong offset');
                 return false;
             }
 

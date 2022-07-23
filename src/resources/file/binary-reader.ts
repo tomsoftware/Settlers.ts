@@ -2,7 +2,7 @@ import { LogHandler } from '@/utilities/log-handler';
 
 /** Class to provide a read pointer and read functions to a binary Buffer */
 export class BinaryReader {
-    private readonly log = new LogHandler('BinaryReader');
+    private static log = new LogHandler('BinaryReader');
     public filename: string;
     protected readonly data: Uint8Array;
     protected readonly hiddenOffset: number;
@@ -38,7 +38,7 @@ export class BinaryReader {
         } else {
             this.data = dataArray;
             dataLength = this.data.length;
-            this.log.error('BinaryReader from unknown: ' + dataArray + '; size:' + dataLength);
+            BinaryReader.log.error('BinaryReader from unknown: ' + dataArray + '; size:' + dataLength);
         }
 
         if (length == null) {
@@ -73,7 +73,7 @@ export class BinaryReader {
         }
 
         if ((this.pos < 0) || (this.pos > this.data.length)) {
-            this.log.error('read out of data: ' + this.filename + ' - size: ' + this.data.length + ' @ ' + this.pos);
+            BinaryReader.log.error('read out of data: ' + this.filename + ' - size: ' + this.data.length + ' @ ' + this.pos);
             return 0;
         }
 
@@ -113,7 +113,7 @@ export class BinaryReader {
         }
 
         if ((this.pos < 0) || (this.pos + 4 > this.data.length)) {
-            this.log.error('read out of data: ' + this.filename + ' - size: ' + this.data.length + ' @ ' + this.pos);
+            BinaryReader.log.error('read out of data: ' + this.filename + ' - size: ' + this.data.length + ' @ ' + this.pos);
             return 0;
         }
 

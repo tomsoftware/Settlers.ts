@@ -6,7 +6,7 @@ import { ResourceFile } from './resource-file';
 
 /** read a pa6 file */
 export class PaletteCollection extends ResourceFile {
-    private log: LogHandler = new LogHandler('PaletteCollection');
+    private static log: LogHandler = new LogHandler('PaletteCollection');
     private palette: Palette;
     private pilFile: PilFileReader;
     private paletteFileOffset: number;

@@ -155,7 +155,7 @@ void main() {
   float mapHeight1 = texture2D(u_landHeightBuffer, mapPointCord / mapSize).a * 20.0;
   float mapHeight2 = texture2D(u_landHeightBuffer, (mapPointCord + vec2(0.0, 1.0)) / mapSize).a * 20.0;
 
-  vec2 text_scale = vec2(1.0, 1.0) / vec2(8, 352);
+  vec2 text_scale = vec2(1.0, 1.0) / vec2(LANDSCAPE_TEXTURE_WIDTH_HEIGHT / 32, LANDSCAPE_TEXTURE_WIDTH_HEIGHT / 32);
 
   vec2 real_text_pos;
   if (baseVertecesTypeAorB == 0) {
@@ -166,13 +166,12 @@ void main() {
     // for triangle B use
     real_text_pos = type.zw * vec2(127, 255);
   }
-
   gl_Position = projection *
       vec4(
         baseVerticesPos.x + instancePos.x - instancePos.y * 0.5,
         (baseVerticesPos.y + instancePos.y - mapHeight1) * 0.5,
         0,
-        1 /* not sure why this needs to be 1 ??? */
+        1
       );
 
   // Pass the vertex color/texture to the fragment shader.
