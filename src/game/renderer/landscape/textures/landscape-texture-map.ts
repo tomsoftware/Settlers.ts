@@ -261,7 +261,7 @@ export class LandscapeTextureMap {
     }
 
     /** copy all textures to the TextureMap */
-    public copyTexture(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit) {
+    public copyTexture(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit): void {
         for (const t of this.textures) {
             t.copyToTextureMap(srcImg, destTextureMap);
         }

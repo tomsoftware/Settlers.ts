@@ -5,6 +5,9 @@ import { GfxImage16Bit } from '@/resources/gfx/gfx-image-16bit';
 import { TextureMap16Bit } from '../../texture-map-16bit';
 import { LandscapeTextureBase } from './landscape-texture-base';
 
+/**
+ * Defines a landscape texture with the size 64x64 that has only one LandscapeType
+ */
 export class SmallLandscapeTexture extends LandscapeTextureBase implements ILandscapeTexture {
     private x: number;
     private y: number;
@@ -29,7 +32,7 @@ export class SmallLandscapeTexture extends LandscapeTextureBase implements ILand
         return [new TexturePoint(this.type, this.type, this.type)];
     }
 
-    public copyToTextureMap(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit) {
+    public copyToTextureMap(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit): void {
         const newPos = this.copyImage(srcImg, destTextureMap, 64, this.x, this.y);
 
         this.x = newPos.newX;

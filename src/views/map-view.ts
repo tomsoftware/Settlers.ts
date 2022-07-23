@@ -2,13 +2,12 @@ import { Options, Vue } from 'vue-class-component';
 import { MapLoader } from '@/resources/map/map-loader';
 import { OriginalMapFile } from '@/resources/map/original/original-map-file';
 import { MapChunk } from '@/resources/map/original/map-chunk';
-import { IMapLoader } from '@/resources/map/imap-loader';
 import { Game } from '@/game/game';
 import { FileManager, IFileSource } from '@/utilities/file-manager';
 import { LogHandler } from '@/utilities/log-handler';
 
 import FileBrowser from '@/components/file-browser.vue';
-import RendererView from '@/components/renderer-viewer.vue';
+import RendererViewer from '@/components/renderer-viewer.vue';
 
 @Options({
     name: 'MapView',
@@ -17,7 +16,7 @@ import RendererView from '@/components/renderer-viewer.vue';
     },
     components: {
         FileBrowser,
-        RendererView
+        RendererViewer
     }
 })
 export default class MapView extends Vue {
@@ -27,6 +26,7 @@ export default class MapView extends Vue {
     public fileName: string | null = null;
     public mapInfo = '';
     public game: Game | null = null;
+    protected showDebug = false;
 
     public onFileSelect(file: IFileSource): void {
         this.fileName = file.name;

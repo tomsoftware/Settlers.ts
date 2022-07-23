@@ -28,8 +28,16 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
 
     private groundTypeMap: Uint8Array;
     private groundHeightMap: Uint8Array;
+    private debugGrid: boolean;
 
-    constructor(fileManager: FileManager, textureManager: TextureManager, mapSize: MapSize, groundTypeMap: Uint8Array, groundHeightMap: Uint8Array) {
+    constructor(
+        fileManager: FileManager,
+        textureManager: TextureManager,
+        mapSize: MapSize,
+        groundTypeMap: Uint8Array,
+        groundHeightMap: Uint8Array,
+        debugGrid: boolean
+    ) {
         super();
 
         this.fileManager = fileManager;
@@ -37,8 +45,9 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
         this.mapSize = mapSize;
         this.groundHeightMap = groundHeightMap;
         this.groundTypeMap = groundTypeMap;
+        this.debugGrid = debugGrid;
 
-        this.texture = new TextureMap16Bit(256 * 5, this.textureManager.create('u_landText'));
+        this.texture = new TextureMap16Bit(256 * 6, this.textureManager.create('u_landText'));
 
         Object.seal(this);
     }
@@ -111,10 +120,13 @@ export class LandscapeRenderer extends RendererBase implements IRenderer {
     }
 
     public async init(gl: WebGLRenderingContext): Promise<boolean> {
-        this.shaderProgram.setDefine('DEBUG_TRIANGLE_BORDER', 1);
+        if (this.debugGrid) {
+            this.shaderProgram.setDefine('DEBUG_TRIANGLE_BORDER', 1);
+        }
+
         this.shaderProgram.setDefine('MAP_WIDTH', this.mapSize.width);
         this.shaderProgram.setDefine('MAP_HEIGHT', this.mapSize.width);
-        this.shaderProgram.setDefine('LANDSCAPE_TEXTURE_WIDTH_HEIGHT', this.texture.widthHeight);
+        this.shaderProgram.setDefine('LANDSCAPE_TEXTURE_WIDTH_HEIGHT', this.texture.imgWidthHeight);
 
         super.initShader(gl, vertCode, fragCode);
 

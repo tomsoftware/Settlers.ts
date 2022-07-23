@@ -21,12 +21,12 @@ export class TextureMapImage {
         this.height = height;
     }
 
-    public copyFrom(srcImg: GfxImage16Bit, srcX: number, srcY: number, width: number, height: number): void {
+    public copyFrom(srcImg: GfxImage16Bit, srcX: number, srcY: number, width: number, height: number, destX = 0): void {
         const img = srcImg.getRaw16BitImage();
 
         for (let y = 0; y < height; y++) {
             const srcOffset = (srcY + y) * srcImg.width + srcX;
-            const destOffset = (this.y + y) * this.imgWidthHeight + this.x;
+            const destOffset = (this.y + y) * this.imgWidthHeight + this.x + destX;
             for (let x = 0; x < width; x++) {
                 this.imgData[destOffset + x] = img[srcOffset + x];
             }
@@ -69,7 +69,7 @@ export class TextureMap16Bit extends ShaderTexture {
     private static log = new LogHandler('TextureMap');
     private imgData: Uint16Array;
     /** the size of the texture map. width and height are equeal! */
-    public widthHeight: number;
+    public imgWidthHeight: number;
     /*
     * every slot is 256 pixle height so y=index*256
     * the value of slotPosX is the position in x
@@ -79,7 +79,7 @@ export class TextureMap16Bit extends ShaderTexture {
     constructor(widthHeight: number, textureIndex: number) {
         super(textureIndex);
 
-        this.widthHeight = widthHeight;
+        this.imgWidthHeight = widthHeight;
         this.imgData = new Uint16Array(widthHeight * widthHeight);
 
         const numberOfPixles = widthHeight * widthHeight;
@@ -88,7 +88,7 @@ export class TextureMap16Bit extends ShaderTexture {
         }
 
         // reserve the 0/0 position as null slot
-        const nullSlot = new Slot(0, this.widthHeight, 256);
+        const nullSlot = new Slot(0, this.imgWidthHeight, 256);
         this.slots.push(nullSlot);
         nullSlot.increase(256);
 
@@ -102,13 +102,13 @@ export class TextureMap16Bit extends ShaderTexture {
         if (slot == null) {
             // create new slot
             const freeY = this.slots[this.slots.length - 1]?.buttom ?? 0;
-            slot = new Slot(freeY, this.widthHeight, width);
+            slot = new Slot(freeY, this.imgWidthHeight, height);
             this.slots.push(slot);
         }
 
         const newImg = new TextureMapImage(
             this.imgData,
-            this.widthHeight,
+            this.imgWidthHeight,
             slot.x,
             slot.y,
             width,
@@ -123,8 +123,8 @@ export class TextureMap16Bit extends ShaderTexture {
     public load(gl: WebGLRenderingContext): void {
         const level = 0;
         const internalFormat = gl.RGB;
-        const width = this.widthHeight;
-        const height = this.widthHeight;
+        const width = this.imgWidthHeight;
+        const height = this.imgWidthHeight;
         const border = 0;
         const format = gl.RGB;
         const type = gl.UNSIGNED_SHORT_5_6_5;

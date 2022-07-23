@@ -69,7 +69,7 @@ export class Hexagon3Texture extends LandscapeTextureBase implements ILandscapeT
         ];
     }
 
-    public copyToTextureMap(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit) {
+    public copyToTextureMap(srcImg: GfxImage16Bit, destTextureMap: TextureMap16Bit): void {
         let newPos = this.copyImage(srcImg, destTextureMap, 64, this.x1, this.y1);
         this.x1 = newPos.newX;
         this.y1 = newPos.newY;

@@ -4,16 +4,18 @@ import { Renderer } from '@/game/renderer/renderer';
 import { Options, Vue } from 'vue-class-component';
 
 @Options({
-    name: 'RendererView',
+    name: 'RendererViewer',
     components: {
     },
     props: {
-        game: Object
+        game: Object,
+        debugGrid: Boolean
     }
 })
 export default class RendererViewer extends Vue {
     public renderer!: Renderer;
     public game!:Game;
+    protected debugGrid!: boolean;
 
     public async mounted(): Promise<void> {
         const cav = this.$refs.cav as HTMLCanvasElement;
@@ -37,7 +39,8 @@ export default class RendererViewer extends Vue {
                 this.renderer.textureManager,
                 this.game.mapSize,
                 this.game.groundType,
-                this.game.groundHeight
+                this.game.groundHeight,
+                this.debugGrid
             )
         );
 

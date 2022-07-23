@@ -24,6 +24,8 @@
     Open via. multi file select:<br />
     <input type="file" multiple name="files[]" @change="selectFiles" />
 
+    <h3>You found a bug / you like to contribute?</h3>
+    Find the source at <a href="https://github.com/tomsoftware/Settlers.ts">github</a>
   </div>
 
 </template>
