@@ -62,6 +62,11 @@ export class Renderer {
         Object.seal(this);
     }
 
+    public destroy() {
+        this.gl = null;
+        this.viewPoint.destroy();
+    }
+
     private onMove() {
         this.requestDraw();
     }
@@ -83,10 +88,11 @@ export class Renderer {
             return;
         }
 
-        // view
-        const viewX = this.viewPoint.x;
-        const viewY = this.viewPoint.y;
+        // position of the map to dispaly
+        // const viewX = this.viewPoint.x;
+        // const viewY = this.viewPoint.y;
         const zoomV = this.viewPoint.zoom;
+        // console.log('draw: ' + viewX + ' x ' + viewY + ' zoom: ' + zoomV);
 
         // define camera
         const canvas = this.canvas;
@@ -96,8 +102,6 @@ export class Renderer {
             .createOrthographic(-aspect, aspect, 1, -1, -1, 1)
             .translate(-1, 1, 0)
             .scale(zoomV, zoomV, 1.0);
-
-        console.log('draw: x: ' + viewX + ' x ' + viewY + ' zoom: ' + zoomV);
 
         // draw all renderers
         for (const r of this.renderers) {

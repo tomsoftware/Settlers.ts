@@ -13,8 +13,10 @@ export class ViewPoint implements IViewPoint {
     private downY = 0;
     public zoomValue = 1;
     private mouseIsMoving = false;
+    private canvas: HTMLCanvasElement;
 
-    public onMove?: () => void;
+    /** callback on mouse move */
+    public onMove: (() => void) | null = null;
 
     public get zoom(): number {
         return 0.1 / this.zoomValue;
@@ -28,6 +30,46 @@ export class ViewPoint implements IViewPoint {
         return this.posY + this.deltaY;
     }
 
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+
+        // disable touch scroll
+        canvas.style.touchAction = 'none';
+
+        canvas.addEventListener('pointerdown', this.hanldlePointerdown);
+        canvas.addEventListener('pointermove', this.handlePointerMove);
+        window.addEventListener('pointerup', this.handlePointerUp);
+        canvas.addEventListener('contextmenu', this.handleContextmenu);
+        canvas.addEventListener('wheel', this.henaleWheel);
+
+        Object.seal(this);
+    }
+
+    public destroy(): void {
+        // remove callback event
+        this.onMove = null;
+
+        // remove all event handlers
+        this.doTry(() => window.removeEventListener('pointerup', this.handlePointerUp));
+
+        if (this.canvas == null) {
+            return;
+        }
+
+        this.doTry(() => this.canvas.removeEventListener('pointerdown', this.hanldlePointerdown));
+        this.doTry(() => this.canvas.removeEventListener('pointermove', this.handlePointerMove));
+        this.doTry(() => this.canvas.removeEventListener('contextmenu', this.handleContextmenu));
+        this.doTry(() => this.canvas.removeEventListener('wheel', this.henaleWheel));
+    }
+
+    private doTry(callback: () => void) {
+        try {
+            callback();
+        } catch (e: any) {
+            console.debug(e);
+        }
+    }
+
     private invokeOnMove(): void {
         if (!this.onMove) {
             return;
@@ -36,53 +78,53 @@ export class ViewPoint implements IViewPoint {
         this.onMove();
     }
 
-    constructor(canvas: HTMLCanvasElement) {
-        canvas.addEventListener('mousedown', e => {
-            e.preventDefault();
+    private hanldlePointerdown = (e: PointerEvent) => {
+        e.preventDefault();
 
-            this.downX = e.offsetX;
-            this.downY = e.offsetY;
-            this.mouseIsMoving = true;
-        });
+        this.downX = e.offsetX;
+        this.downY = e.offsetY;
+        this.mouseIsMoving = true;
+    }
 
-        canvas.addEventListener('mousemove', e => {
-            e.preventDefault();
+    private handlePointerMove = (e: PointerEvent) => {
+        e.preventDefault();
 
-            if (!this.mouseIsMoving) {
-                return;
-            }
+        if (!this.mouseIsMoving) {
+            return;
+        }
 
-            this.deltaX = (e.offsetX - this.downX) * this.zoomValue * 0.03;
-            this.deltaY = (e.offsetY - this.downY) * this.zoomValue * 0.03;
+        const dX = (e.offsetX - this.downX) * this.zoomValue * 0.03;
+        const dY = (e.offsetY - this.downY) * this.zoomValue * 0.03;
+        this.deltaX = dX + dY / 2;
+        this.deltaY = dY;
 
-            this.invokeOnMove();
-        });
+        this.invokeOnMove();
+    }
 
-        window.addEventListener('mouseup', e => {
-            if (!this.mouseIsMoving) {
-                return;
-            }
+    private handlePointerUp = () => {
+        if (!this.mouseIsMoving) {
+            return;
+        }
 
-            this.mouseIsMoving = false;
-            // update the pos values
-            this.posX = this.x;
-            this.posY = this.y;
+        this.mouseIsMoving = false;
+        // update the pos values
+        this.posX = this.x;
+        this.posY = this.y;
 
-            this.deltaX = 0;
-            this.deltaY = 0;
+        this.deltaX = 0;
+        this.deltaY = 0;
 
-            this.invokeOnMove();
-        });
+        this.invokeOnMove();
+    }
 
-        canvas.addEventListener('contextmenu', e => {
-            e.preventDefault();
-        });
+    private handleContextmenu = (e: MouseEvent) => {
+        e.preventDefault();
+    }
 
-        canvas.addEventListener('wheel', e => {
-            this.zoomValue = Math.max(1, this.zoomValue + Math.sign(e.deltaY));
-            e.preventDefault();
+    private henaleWheel = (e: WheelEvent) => {
+        this.zoomValue = Math.max(1, this.zoomValue + Math.sign(e.deltaY));
+        e.preventDefault();
 
-            this.invokeOnMove();
-        });
+        this.invokeOnMove();
     }
 }

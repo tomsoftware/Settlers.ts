@@ -13,7 +13,7 @@ import { Options, Vue } from 'vue-class-component';
     }
 })
 export default class RendererViewer extends Vue {
-    public renderer!: Renderer;
+    public renderer: Renderer | null = null;
     public game!:Game;
     protected debugGrid!: boolean;
 
@@ -29,7 +29,7 @@ export default class RendererViewer extends Vue {
     }
 
     private initRenderer() {
-        if (!this.game) {
+        if ((this.game == null) || (this.renderer == null)) {
             return;
         }
 
@@ -45,5 +45,13 @@ export default class RendererViewer extends Vue {
         );
 
         this.renderer.init();
+    }
+
+    public unmounted(): void {
+        if (this.renderer == null) {
+            return;
+        }
+
+        this.renderer.destroy();
     }
 }
