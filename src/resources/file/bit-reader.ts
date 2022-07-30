@@ -40,12 +40,12 @@ export class BitReader {
     }
 
     /** read and return [bitCount] bits from the stream */
-    public read(readLength: number): number {
+    public read(bitCount: number): number {
         // - fill bit buffer
-        if (this.bufferLen < readLength) {
+        if (this.bufferLen < bitCount) {
             // - read next byte
             if (this.pos >= this.data.length) {
-                BitReader.log.error('Unable to read more date - End of data!');
+                BitReader.log.error('Unable to read more data - End of data!');
                 return 0;
             }
 
@@ -56,11 +56,11 @@ export class BitReader {
             this.bufferLen += 8;
         }
 
-        // - read [readLength] bits
-        const bitValue = this.buffer >>> (32 - readLength);
+        // - read [bitCount] bits
+        const bitValue = this.buffer >>> (32 - bitCount);
 
-        this.buffer = this.buffer << readLength;
-        this.bufferLen -= readLength;
+        this.buffer = this.buffer << bitCount;
+        this.bufferLen -= bitCount;
 
         return bitValue;
     }

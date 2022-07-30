@@ -16,7 +16,7 @@ export class Decompress extends Packer {
     }
 
     public unpack(inDataSrc: BinaryReader, inOffset: number, inLength: number, outLength: number): BinaryReader {
-        const inDate = new BitReader(inDataSrc, inOffset, inLength);
+        const inData = new BitReader(inDataSrc, inOffset, inLength);
 
         const writer = new StreamWriter(outLength);
 
@@ -26,10 +26,10 @@ export class Decompress extends Packer {
 
         const codeTable = Packer.createSymbolDirectory();
 
-        while (!inDate.eof()) {
+        while (!inData.eof()) {
             // -------
             // - read code type
-            const codeType = inDate.read(4);
+            const codeType = inData.read(4);
 
             if (codeType < 0) {
                 Decompress.log.error('CodeType == 0 -> out of sync!');
@@ -38,21 +38,20 @@ export class Decompress extends Packer {
 
             // -------
             // - read Code Word
-            let codeWord = 0;
             const codeWordLength = huffmanTable.index[codeType];
             let codeWordIndex = huffmanTable.value[codeType];
 
             if (codeWordLength > 0) {
                 // - the codeword is bigger then 4 bits -> read more!
-                codeWordIndex += inDate.read(codeWordLength);
+                codeWordIndex += inData.read(codeWordLength);
 
-                if (codeWordIndex >= 274) {
-                    Decompress.log.error('CodeType(' + codeWordIndex + ') >= 274 -> out of sync!');
+                if (codeWordIndex >= 0x0112) {
+                    Decompress.log.error('CodeType(' + codeWordIndex + ') >= 0x0112 -> out of sync!');
                     break;
                 }
             }
 
-            codeWord = codeTable.codeTable[codeWordIndex];
+            const codeWord = codeTable.codeTable[codeWordIndex];
 
             // -------
             // - Histogram of code using
@@ -60,7 +59,7 @@ export class Decompress extends Packer {
 
             // -------
             // - execute codeword
-            if (codeWord < 256) {
+            if (codeWord < 0x0100) {
                 if (writer.eof()) {
                     Decompress.log.error('OutBuffer is to small!');
                     break;
@@ -68,7 +67,7 @@ export class Decompress extends Packer {
 
                 // - this is a normal letter
                 writer.setByte(codeWord);
-            } else if (codeWord === 272) {
+            } else if (codeWord === 0x110) {
                 // - create new entropy encoding table
                 codeTable.generateCodes();
 
@@ -84,7 +83,7 @@ export class Decompress extends Packer {
                     let bitValue = 0;
                     do {
                         length++;
-                        bitValue = inDate.read(1);
+                        bitValue = inData.read(1);
                     } while (bitValue === 0);
 
                     newIndex.push(length);
@@ -94,19 +93,19 @@ export class Decompress extends Packer {
                 }
 
                 huffmanTable = new IndexValueTable(newIndex, newValues);
-            } else if (codeWord === 273) {
-                if (inDate.sourceLeftLength() > 2) {
+            } else if (codeWord === 0x0111) {
+                if (inData.sourceLeftLength() > 2) {
                     // - sometimes there is a end-of-stream (eos) codeword (Codeword == 273) if the out data is "too" long.
                     if (writer.eof()) {
-                        Decompress.log.error('End-of-stream but Data buffer is not empty (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' i OUT bytes left)? Out of sync!');
+                        Decompress.log.error('End-of-stream but Data buffer is not empty (' + inData.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' OUT bytes left)? Out of sync!');
                         break;
                     }
 
-                    // -    in this case we ignore this eos and read the next part
-                    inDate.resetBitBuffer();
+                    // - in this case we ignore this eos and read the next part
+                    inData.resetBitBuffer();
                 } else {
                     if (!writer.eof()) {
-                        Decompress.log.error('Done decompress (' + inDate.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' OUT bytes left)!');
+                        Decompress.log.error('Done decompress (' + inData.sourceLeftLength() + ' IN bytes left; ' + writer.getLeftSize() + ' OUT bytes left)!');
                     }
 
                     // - end of data indicator
@@ -115,8 +114,8 @@ export class Decompress extends Packer {
                 }
             } else {
                 // - copy from dictionary
-                if (!this.fromDictionary(inDate, writer, codeWord)) {
-                    Decompress.log.error('bad dictionary entry!');
+                if (!this.fromDictionary(inData, writer, codeWord)) {
+                    Decompress.log.error('Bad dictionary entry!');
                     break;
                 }
             }
@@ -124,63 +123,43 @@ export class Decompress extends Packer {
 
         // - did an Error happen?
         if (!done) {
-            Decompress.log.error('Unexpected End of Data in ' + inDataSrc.filename + ' eof: ' + inDate.toString());
+            Decompress.log.error('Unexpected End of Data in ' + inDataSrc.filename + ' eof: ' + inData.toString());
         }
 
         // - create new Reader from Data and return it
         return writer.getReader();
     }
 
-    private fromDictionary(inDate: BitReader, writer: StreamWriter, codeWord: number): boolean {
-        let entryLength:number;
-        let bitValue:number;
-        let copyOffset = 0;
+    private fromDictionary(inData: BitReader, writer: StreamWriter, codeWord: number): boolean {
+        // write out 4 additional bytes to the output
+        let entryLength = 4;
 
-        if (codeWord < 264) {
-            entryLength = codeWord - 256;
+        if (codeWord < 0x108) {
+            entryLength += codeWord - 0x0100;
         } else {
-            const length = Packer.LengthTable.index[codeWord - 264];
-
-            const ReadInByte = inDate.read(length);
-
-            if (ReadInByte < 0) {
-                Decompress.log.error('ReadInByte == 0 -> out of sync!');
-                return false;
-            }
-
-            entryLength = Packer.LengthTable.value[codeWord - 264] + ReadInByte;
+            const index = codeWord - 0x0108;
+            const bitCount = Packer.LengthTable.index[index];
+            const readInByte = inData.read(bitCount);
+            entryLength += Packer.LengthTable.value[index] + readInByte;
         }
 
-        bitValue = inDate.read(3);
-        if (bitValue < 0) {
-            Decompress.log.error('bitValue < 0 -> out of sync!');
-            return false;
-        }
+        const distanceIndex = inData.read(3);
+        const distanceLength = Packer.DistanceTable.index[distanceIndex] + 1;
+        const baseValue = Packer.DistanceTable.value[distanceIndex];
 
-        const length = Packer.DistanceTable.index[bitValue] + 1;
-        const baseValue = Packer.DistanceTable.value[bitValue];
-
-        bitValue = inDate.read(8);
-        copyOffset = bitValue << length;
-
-        bitValue = inDate.read(length);
-        if (bitValue < 0) {
-            Decompress.log.error('bit_value < 0 -> out of sync!');
-            return false;
-        }
-
-        entryLength += 4;
+        const base = inData.read(8);
+        const offsetValue = inData.read(distanceLength);
 
         // - check if destination is big enough:
         if (writer.getWriteOffset() + entryLength > writer.getLength()) {
-            Decompress.log.error('buffer for outData is to small!');
+            Decompress.log.error('Out buffer is to small!');
             return false;
         }
 
-        // - source position in buffer
-        let srcPos = writer.getWriteOffset() - ((bitValue | copyOffset) + (baseValue << 9));
+        // source position in out buffer
+        let srcPos = writer.getWriteOffset() - ((offsetValue | (base << distanceLength)) + (baseValue << 9));
 
-        // - we need to use single-byte-copy the data case, the src and dest can be overlapped
+        // we need to use single-byte-copy the data case, the src and dest can be overlapped
         for (let i = entryLength; i > 0; i--) {
             writer.setByte(writer.getByte(srcPos));
             srcPos++;

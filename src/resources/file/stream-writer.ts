@@ -18,16 +18,22 @@ export class StreamWriter {
         return new BinaryReader(this.data, 0, this.pos);
     }
 
-    /** Write one Byte to the stream */
+    /** Read one Byte from the output stream */
     public getByte(offset: number): number {
-        if ((offset < 0) || (offset > this.data.length)) {
-            StreamWriter.log.error('write out of data: size: ' + this.data.length + ' @ ' + offset);
-            return -1;
+        if (offset < 0) {
+            StreamWriter.log.error('Read before data: @ ' + offset);
+            return 0;
+        }
+
+        if (offset > this.data.length) {
+            StreamWriter.log.error('Read behind data: size: ' + this.data.length + ' @ ' + offset);
+            return 0;
         }
 
         return this.data[offset];
     }
 
+    /** return the position the stream is writing to */
     public getWriteOffset() :number {
         return this.pos;
     }
@@ -44,7 +50,7 @@ export class StreamWriter {
         return (this.data.length - this.pos);
     }
 
-    /** Write one Byte to the stream */
+    /** Write one byte to the stream */
     public setByte(value: number): boolean {
         if ((this.pos < 0) || (this.pos > this.data.length)) {
             StreamWriter.log.error('write out of data: size: ' + this.data.length + ' @ ' + this.pos);

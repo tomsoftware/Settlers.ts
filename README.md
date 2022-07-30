@@ -57,18 +57,18 @@ You can use *Visual Studio Code* to edit and debug your code:
 
 # Next BIG steps:
 1. using webGl to render the state of a game by loading a save game and pushing all data to webGl:
-  see: https://jsfiddle.net/fsg2kw3o/
-
+    - ✔️ drawing map background
+    - ⌛ drawing objects
+    - drawing settlers
+    - drawing buildings
 
 2. adding game logic to process state changing in the game
-  see: `game.lib/objectInfo.xml` and `game.lib/buildingInfo.xml`
-  see: https://github.com/jsettlers/settlers-remake
+    - see: `game.lib/objectInfo.xml` and `game.lib/buildingInfo.xml`
+    - see: https://github.com/jsettlers/settlers-remake
 
 
 3. adding backend logic
-  using websocket to communicate with local webserver. The webserver now can provide: 
-   * Folder access to e.g. list all save games
-   * Network access to allow network gaming
+     - use MQTT over websocket to connect with other players see: http://www.hivemq.com/demos/websocket-client/
 
 
 # State:

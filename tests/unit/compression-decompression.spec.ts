@@ -28,13 +28,46 @@ describe('compression/decompression.ts', () => {
             43, 59, 37, 63, 39, 57, 63, 52, 24, 31, 82, 71, 76, 208, 211, 201, 80, 21, 142, 155, 145, 43, 47, 44, 8, 104, 55, 6,
             3, 115, 83, 148, 114, 83, 82, 83, 116, 37, 103, 36, 193, 5, 9, 41, 185, 41, 170, 98, 180, 146, 211, 51, 37, 101, 228,
             167, 39, 99, 167, 228, 101, 169, 228, 138, 208, 75, 82, 149, 148, 162, 155, 143, 156, 142, 161, 160, 92, 41, 253];
+
         const buffer = new BinaryReader(new Uint8Array(data));
 
         const unComp = new Decompress();
         const resultBuffer = unComp.unpack(buffer, 0, buffer.length, 396);
 
         const result = resultBuffer.readString();
-        expect(result).contains('The quick brown fox jumps over the lazy dog.');
-        expect(result).contains('A quick movement of the enemy will jeopardize six gunboats.');
+
+        expect(result).to.equal(
+            'The quick brown fox jumps over the lazy dog.\r\n' +
+            'Jackdaws love my big sphinx of quartz.\r\n' +
+            'Pack my box with five dozen liquor jugs.\r\n' +
+            'Sphinx of black quartz judge my vow.\r\n' +
+            'The five boxing wizards jump quickly.\r\n' +
+            'Five quacking Zephyrs jolt my wax bed.\r\n' +
+            'The quick brown fox jumps over the lazy dog.\r\n' +
+            'Heavy boxes perform quick waltzes and jigs.\r\n' +
+            'A quick movement of the enemy will jeopardize six gunboats.\0');
+    });
+
+    it('Decompress does not fail when reading with offset < dictionary-start. See issue #6', () => {
+        const source = [114, 40, 228, 82, 76, 164, 153, 75, 64, 64, 10, 76, 164, 153, 71, 32, 192, 80, 167, 244];
+        const sourceBuffer = new BinaryReader(new Uint8Array(source));
+
+        const decompress = new Decompress();
+        const resultBuffer = decompress.unpack(sourceBuffer, 0, sourceBuffer.length, 27);
+        const readStringHex = resultBuffer.readStringHex(null, null, ' ');
+
+        expect(readStringHex).to.equal('45 00 45 00 66 00 66 00 87 00 87 00 87 00 66 00 66 00 45 00 45 00 45 00 66 00 00 ');
+    });
+
+    it('Decompress can process multi chunks', () => {
+        // There can be chunks of compressed data. The unpacked data is merged again.
+        const source = [0x75, 0x92, 0x99, 0x99, 0x9c, 0x2b, 0x09, 0x39, 0x3f, 0x33, 0x22, 0x9e, 0x53, 0xfa];
+        const sourceBuffer = new BinaryReader(new Uint8Array([...source, ...source]));
+
+        const decompress = new Decompress();
+        const resultBuffer = decompress.unpack(sourceBuffer, 0, sourceBuffer.length, 26);
+        const readStringHex = resultBuffer.readString();
+
+        expect(readStringHex).to.equal('Hello World!\0Hello World!\0');
     });
 });

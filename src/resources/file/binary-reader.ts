@@ -188,7 +188,7 @@ export class BinaryReader {
     }
 
     /** Read a String */
-    public readStringHex(length: number | null = null, offset: number | null = null): string {
+    public readStringHex(length: number | null = null, offset: number | null = null, spacer = ''): string {
         if (offset !== null) {
             this.pos = offset + this.hiddenOffset;
         }
@@ -203,7 +203,7 @@ export class BinaryReader {
             const v: number = this.data[this.pos];
             this.pos++;
 
-            result += ('0' + v.toString(16)).slice(-2);
+            result += ('0' + v.toString(16)).slice(-2) + spacer;
         }
         return result;
     }
