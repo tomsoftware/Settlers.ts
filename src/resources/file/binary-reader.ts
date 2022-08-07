@@ -84,7 +84,7 @@ export class BinaryReader {
     }
 
     /** Read one DWord (4 Byte) from stream (little ending) */
-    public readInt(length = 4, offset: number | null = null): number {
+    public readInt(offset: number | null = null, length = 4): number {
         if (offset === null) {
             offset = this.pos;
         }

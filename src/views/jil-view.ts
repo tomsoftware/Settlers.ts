@@ -8,10 +8,10 @@ import { PaletteCollection } from '@/resources/gfx/palette-collection';
 import { PilFileReader } from '@/resources/gfx/pil-file-reader';
 import { LogHandler } from '@/utilities/log-handler';
 import { FileManager, IFileSource } from '@/utilities/file-manager';
+import { IndexFileItem } from '@/resources/gfx/index-file-item';
 
 import FileBrowser from '@/components/file-browser.vue';
 import HexViewer from '@/components/hex-viewer.vue';
-import { IndexFileItem } from '@/resources/gfx/index-file-item';
 
 @Options({
     name: 'JilView',
@@ -26,6 +26,10 @@ import { IndexFileItem } from '@/resources/gfx/index-file-item';
 export default class JilView extends Vue {
     private static log = new LogHandler('JilView');
     public readonly fileManager!: FileManager;
+
+    protected doAnimation = true;
+    private animationTimer = 0;
+
     public fileName: string | null = null;
     public jilList: IndexFileItem[] = [];
     public dilList: IndexFileItem[] = [];
@@ -110,6 +114,8 @@ export default class JilView extends Vue {
         }
 
         this.dilList = this.dilFileReader.getItems(this.selectedJil.offset, this.selectedJil.lenght);
+        this.selectedDil = this.dilList[0];
+        this.onSelectDil();
     }
 
     public onSelectDil(): void {
@@ -118,6 +124,8 @@ export default class JilView extends Vue {
         }
 
         this.gilList = this.gilFileReader.getItems(this.selectedDil.offset, this.selectedDil.lenght);
+        this.selectedGil = this.gilList[0];
+        this.onSelectGil();
     }
 
     public onSelectGil(): void {
@@ -145,5 +153,23 @@ export default class JilView extends Vue {
         }
 
         context.putImageData(img, 0, 0);
+    }
+
+    private onAnimate() {
+        if ((this.gilList == null) || (!this.gilList.length) || (!this.doAnimation)) {
+            return;
+        }
+
+        const nextFrameIndex = (this.gilList.findIndex((f) => f === this.selectedGil) + 1) % this.gilList.length;
+        this.selectedGil = this.gilList[nextFrameIndex];
+        this.onSelectGil();
+    }
+
+    public mounted(): void {
+        this.animationTimer = window.setInterval(() => this.onAnimate(), 100);
+    }
+
+    public unmounted(): void {
+        window.clearInterval(this.animationTimer);
     }
 }

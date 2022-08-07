@@ -53,6 +53,9 @@ You can use *Visual Studio Code* to edit and debug your code:
 
         npm run test:unit
 
+or to run a single file in watch mode:
+
+        npm run test:watch tests/unit/objects-info.spec.ts
 
 
 # Next BIG steps:

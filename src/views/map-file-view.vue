@@ -4,7 +4,7 @@
     <file-browser
       :fileManager="fileManager"
       @select="onFileSelect"
-      filter=".map"
+      filter=".exe|.map|.edm"
       class="browser"
     />
 

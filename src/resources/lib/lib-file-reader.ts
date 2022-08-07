@@ -9,7 +9,7 @@ export class LibFileReader {
     private static log: LogHandler = new LogHandler('LibFileReader');
     private fileInfos: LibFileItem[] = [];
     private pathList?: PathList;
-    private reader: BinaryReader
+    private reader: BinaryReader;
 
     constructor(data: BinaryReader) {
         this.reader = data;

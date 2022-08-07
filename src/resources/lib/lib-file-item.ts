@@ -75,16 +75,6 @@ export class LibFileItem {
         const reader = decompress.unpack(this.reader, this.offset, this.length, this.decompressedLength);
         reader.filename = fullName;
 
-        // test
-        const startTimeStamp = Date.now();
-        const pack = Compression.compress(reader);
-        const endTimeStamp = Date.now();
-
-        const flat2 = decompress.unpack(pack, 0, pack.length, reader.length);
-
-        // console.log(flat2.readString());
-        console.log(this.length + ' <-> ' + pack.length + ' unpacked: ' + reader.length + ' <-> ' + flat2.length + ' in ' + (endTimeStamp - startTimeStamp));
-
         // console.log(this.reader.readStringHex(this.length, this.offset));
         // console.log(pack.readStringHex());
 

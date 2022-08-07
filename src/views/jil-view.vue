@@ -20,6 +20,7 @@
       </option>
     </select>
 
+    Orientation:
     <select
       class="mulit-row fullsize"
       v-model="selectedDil"
@@ -30,6 +31,7 @@
       </option>
     </select>
 
+    Frame:
     <select
       class="mulit-row fullsize"
       v-model="selectedGil"
@@ -41,7 +43,13 @@
     </select>
     <br />
 
-    Image:<br />
+    Image:
+    <label>
+      <input type="checkbox" v-model="doAnimation" />
+      animate
+    </label>
+
+    <br />
     <canvas height="800" width="800" ref="ghCav" class="1PixelatedRendering">
       Sorry! Your browser does not support HTML5 Canvas and can not run this Application.
     </canvas>

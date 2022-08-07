@@ -36,7 +36,7 @@ export default class HexViewer extends Vue {
         this.updateContent();
     }
 
-    public showAll() {
+    public showAll(): void {
         this.doNotTrim = true;
         this.updateContent();
     }
@@ -58,7 +58,24 @@ export default class HexViewer extends Vue {
         this.updateContent();
     }
 
-    public onMouseMove(evt: MouseEvent) {
+    /** trigger a download of the content */
+    public onSaveFile(): void {
+        if (this.value == null) {
+            return;
+        }
+
+        const a = window.document.createElement('a');
+        const url = window.URL.createObjectURL(new Blob([this.value.getBuffer()]));
+        a.download = this.value.filename;
+        a.href = url;
+        a.click();
+
+        setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+    public onMouseMove(evt: MouseEvent): void {
         if (!this.value) {
             return;
         }

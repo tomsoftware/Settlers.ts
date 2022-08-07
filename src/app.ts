@@ -16,7 +16,7 @@ export default class App extends Vue {
 
         const fileManager = new FileManager();
 
-        await fileManager.addSource(new FileListProvider(process.env.BASE_URL));
+        await fileManager.addSource(new FileListProvider());
         await fileManager.registerProxy(new LibFileProvider());
 
         this.fileManager = fileManager;

@@ -15,7 +15,8 @@
     "types": [
       "webpack-env",
       "mocha",
-      "chai"
+      "chai",
+      "node"
     ],
     "paths": {
       "@/*": [
@@ -33,7 +34,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/**/*.vert",    
+    "src/**/*.vert",
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],

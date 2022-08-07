@@ -7,7 +7,8 @@
       filter=".gfx"
       class="browser"
     />
-
+    <br />
+    number of images: {{gfxContent?.length}} - total image size: {{imageSize}}
     <br />
     Items:
     <select

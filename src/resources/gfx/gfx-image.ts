@@ -42,23 +42,16 @@ export class GfxImage implements IGfxImage {
             const value = buffer[pos];
             pos++;
 
-            let color: number;
-            let count = 1;
-
             if (value <= 1) {
-                count = buffer[pos];
+                const count = buffer[pos];
                 pos++;
 
-                if (value === 0) {
-                    color = 0xFF0000FF;
-                } else {
-                    color = 0xFF00FF00;
+                const color = value === 0 ? 0xFF0000FF : 0xFF00FF00;
+                for (let i = 0; (i < count) && (j < length); i++) {
+                    imgData[j++] = color;
                 }
             } else {
-                color = palette.getColor(paletteOffset + value);
-            }
-
-            for (let i = 0; (i < count) && (j < length); i++) {
+                const color = palette.getColor(paletteOffset + value);
                 imgData[j++] = color;
             }
         }

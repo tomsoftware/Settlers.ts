@@ -27,7 +27,11 @@ export class MapChunk {
             }
 
             const c = new Decompress();
-            return c.unpack(this.reader, this.offset, this.length, this.unpackedLength);
+            const file = c.unpack(this.reader, this.offset, this.length, this.unpackedLength);
+
+            file.filename = this.reader.filename + ' [' + this.chunkTypeAsString + ']';
+
+            return file;
         }
 
         /** return the position of the next section header in the file */

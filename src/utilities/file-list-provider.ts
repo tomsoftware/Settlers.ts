@@ -21,12 +21,6 @@ class FileListFile implements IFileSource {
 }
 
 export class FileListProvider implements IFileProvider {
-    public baseUrl: string;
-
-    constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
-    }
-
     public async readFiles(): Promise<IFileSource[]> {
         const fileNames = await this.loadFileList();
 

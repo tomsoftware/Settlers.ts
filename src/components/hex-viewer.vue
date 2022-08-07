@@ -1,23 +1,25 @@
 <template>
+  <div class="optionSelect">
+    <input type="radio" id="none" value="" v-model="type">
+    <label for="none">none</label>
 
-  <input type="radio" id="none" value="" v-model="type">
-  <label for="none">none</label>
+    <input type="radio" id="text" value="text" v-model="type">
+    <label for="text">text</label>
 
-  <input type="radio" id="text" value="text" v-model="type">
-  <label for="text">text</label>
+    <input type="radio" id="hex" value="hex" v-model="type">
+    <label for="hex">hex</label>
 
-  <input type="radio" id="hex" value="hex" v-model="type">
-  <label for="hex">hex</label>
+    <template v-if="width">
+      <input type="radio" id="img" value="img" v-model="type">
+      <label for="img">image</label>
+    </template>
 
-  <template v-if="width">
-    <input type="radio" id="img" value="img" v-model="type">
-    <label for="img">image</label>
-  </template>
+    <button @click="onSaveFile()">save</button>
+  </div>
 
   <br />
 
- <template v-if="type!=='img'">
-
+  <template v-if="type!=='img'">
     <pre class="content">{{content}}</pre>
 
     <a href="#" v-if="isTrimmed" @click="showAll">show all</a>
@@ -54,14 +56,20 @@
 <script src="./hex-viewer.ts"></script>
 
 <style scoped>
+
 .content{
   font-family:"Courier New", Courier, monospace;
   text-align: left;
   white-space: pre-wrap;
 }
+
 .cav {
   margin: 3px;
   border: 1px solid red;
+}
+
+.optionSelect input, .optionSelect button {
+  margin-left: 10px;
 }
 
 </style>
